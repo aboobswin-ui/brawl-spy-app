@@ -3,368 +3,464 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>BRAWL STARS: SPY EDITION ULTIMATE</title>
+    <title>BRAWL STARS: SPY EDITION - ULTIMATE VERSION</title>
+    
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rubik+One&family=Exo+2:wght@700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rubik+One&family=Exo+2:wght@900&display=swap" rel="stylesheet">
+    
     <style>
+        /* --- ОСНОВНЫЕ ПЕРЕМЕННЫЕ ЦВЕТА --- */
         :root {
-            --bg: #050508;
-            --panel: #0a0a0c;
+            --bg-color: #050508;
+            --panel-color: #0c0c0f;
             --neon-blue: #4CC9F0;
-            --neon-red: #FF0000;
-            --text: #FFFFFF;
+            --neon-red: #FF0000; /* Тот самый алый */
+            --white: #FFFFFF;
             --gold: #ffcc00;
+            --tg-blue: #0088cc;
         }
 
+        /* --- ГЛОБАЛЬНЫЕ СТИЛИ --- */
         * { 
             box-sizing: border-box; 
-            margin: 0; padding: 0; 
+            margin: 0; 
+            padding: 0; 
             user-select: none; 
             -webkit-tap-highlight-color: transparent;
         }
         
         body { 
-            background-color: var(--bg); 
-            color: var(--text); 
+            background-color: var(--bg-color); 
+            color: var(--white); 
             height: 100vh; 
+            width: 100vw;
             overflow: hidden; 
             display: flex; 
             flex-direction: column; 
+            align-items: center;
             font-family: 'Rubik One', sans-serif;
         }
 
-        /* --- ПУНКТ 9,10: ТГ ЮЗЕР БАР (ИДЕАЛЬНЫЙ НЕОН) --- */
-        .user-bar {
-            width: 90%;
-            margin: 20px auto;
+        /* --- 1, 2, 3: СЕКЦИЯ ШПИОН (ВЕРХ, ШИРИНА, АЛЫЙ НЕОН) --- */
+        .main-title-container {
+            text-align: center;
+            margin-top: 35px;
+            z-index: 10;
+        }
+
+        .title-spy { 
+            font-size: 90px; 
+            color: var(--white); 
+            text-transform: uppercase;
+            letter-spacing: -3px;
+            display: inline-block;
+            transform: scaleX(1.4); /* Очень широкий шрифт по твоему запросу */
+            line-height: 0.85;
+            /* Сильное алое свечение */
+            text-shadow: 
+                0 0 10px var(--neon-red), 
+                0 0 25px var(--neon-red), 
+                0 0 45px var(--neon-red),
+                0 0 70px var(--neon-red);
+        }
+
+        /* --- 4, 6: BRAWL STARS EDITION (ОБЪЕМ И СВЕЧЕНИЕ) --- */
+        .title-brawl {
+            font-family: 'Black Ops One', cursive;
+            font-size: 36px;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-top: 15px;
+            letter-spacing: 1px;
+            /* Объем текста */
+            text-shadow: 
+                3px 3px 0px #000,
+                0 0 10px rgba(255, 204, 0, 0.4);
+        }
+
+        .title-edition {
+            font-family: 'Exo 2', sans-serif;
+            font-size: 20px;
+            color: var(--white);
+            letter-spacing: 10px;
+            text-transform: uppercase;
+            margin-top: -3px;
+            opacity: 0.9;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+        }
+
+        /* --- 5: ТГ ЮЗЕР БАР (ПОД EDITION) --- */
+        .tg-user-container {
+            margin-top: 20px;
             display: flex;
             align-items: center;
-            gap: 15px;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 12px 18px;
-            border-radius: 50px;
+            gap: 12px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 25px;
+            border-radius: 60px;
             border: 2px solid var(--neon-blue);
             box-shadow: 0 0 15px var(--neon-blue), inset 0 0 8px var(--neon-blue);
         }
-        .user-avatar { 
-            width: 42px; height: 42px; 
+
+        .tg-avatar { 
+            width: 35px; 
+            height: 35px; 
             border-radius: 50%; 
             border: 2px solid var(--neon-blue);
-            box-shadow: 0 0 10px var(--neon-blue);
             object-fit: cover;
         }
-        .user-info span { 
+
+        .tg-username { 
             font-family: 'Exo 2', sans-serif;
-            font-weight: 900;
-            font-size: 18px; 
+            font-size: 16px; 
             color: var(--neon-blue); 
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            text-shadow: 0 0 5px var(--neon-blue);
+            font-weight: 900;
+            letter-spacing: 1px;
+        }
+
+        /* --- КНОПКИ (БЕЛЫЙ ТЕКСТ И НЕОН) --- */
+        .screens-wrapper {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .screen { 
             display: none; 
-            width: 100%; height: 100%; 
+            width: 100%; 
+            height: 100%; 
             flex-direction: column; 
             align-items: center; 
-            padding: 10px 25px; 
-            position: relative;
+            padding: 20px 30px;
         }
+
         .screen.active { display: flex; }
 
-        /* --- ПУНКТ 1,2,3: ЗАГОЛОВОК ШПИОН --- */
-        .title-spy { 
-            font-size: 70px; 
-            color: #FFF; 
-            text-transform: uppercase;
-            text-shadow: 0 0 5px var(--neon-red), 0 0 15px var(--neon-red); /* Узкое алое свечение */
-            line-height: 1;
-            margin-top: 10px;
-            z-index: 10;
-        }
-
-        /* --- ПУНКТ 4,5: BRAWL STARS EDITION --- */
-        .title-bs {
-            font-family: 'Black Ops One', cursive;
-            font-size: 32px;
-            color: var(--gold);
-            text-shadow: 3px 3px 0 #000;
-            margin-top: 5px;
-        }
-        .title-edition {
-            font-family: 'Exo 2', sans-serif;
-            font-size: 18px;
-            color: #FFFFFF;
-            letter-spacing: 6px;
-            text-transform: uppercase;
-            margin-top: -2px;
-            font-weight: 700;
-        }
-
-        /* --- ПУНКТ 6,7: КНОПКИ НЕОН --- */
-        .btn-group { width: 100%; max-width: 320px; margin-top: auto; margin-bottom: 40px; display: flex; flex-direction: column; gap: 18px; }
-        
-        .btn-neon-blue {
+        .btn-main-action {
             width: 100%;
-            padding: 20px;
-            border-radius: 18px;
+            max-width: 340px;
+            padding: 22px;
+            margin-bottom: 20px;
+            border-radius: 20px;
             background: #000;
             border: 2px solid var(--neon-blue);
-            color: var(--neon-blue);
-            font-size: 19px;
+            color: var(--white); /* 4: Белый текст */
+            font-size: 22px;
             text-transform: uppercase;
             font-family: 'Exo 2', sans-serif;
             font-weight: 900;
             box-shadow: 0 0 15px var(--neon-blue), inset 0 0 10px var(--neon-blue);
             cursor: pointer;
-            transition: 0.2s;
-        }
-        .btn-neon-blue:active {
-            transform: scale(0.97);
-            box-shadow: 0 0 30px var(--neon-blue);
+            transition: all 0.2s ease;
         }
 
-        /* Кнопка Назад (Пункт 2 - Поиск) */
-        .btn-back { 
-            position: absolute; top: 10px; left: 20px;
-            background: none; border: none; 
-            color: #ff4444; 
+        .btn-main-action:active {
+            transform: scale(0.95);
+            box-shadow: 0 0 25px var(--neon-blue);
+        }
+
+        /* --- 7: КНОПКА НАЗАД (БЕЛАЯ) --- */
+        .btn-back-nav { 
+            position: absolute; 
+            top: 15px; 
+            left: 20px;
+            background: none; 
+            border: none; 
+            color: var(--white); /* 7: Белый цвет */
             font-family: 'Exo 2', sans-serif;
-            font-size: 16px; font-weight: 900;
+            font-size: 16px; 
+            font-weight: 900;
             text-transform: uppercase;
             cursor: pointer;
+            z-index: 1000;
+            opacity: 0.8;
         }
 
-        /* --- ПУНКТ 3,4: ИНПУТ И РАМКА АЙДИ --- */
-        .input-box {
-            width: 100%; max-width: 280px;
-            padding: 18px;
-            background: transparent;
-            border: 2px solid var(--neon-blue);
-            border-radius: 15px;
-            color: var(--neon-blue);
-            font-size: 35px;
-            text-align: center;
-            margin: 40px 0;
-            outline: none;
-            box-shadow: 0 0 15px var(--neon-blue), inset 0 0 10px var(--neon-blue);
-            font-family: 'Rubik One';
-        }
-
-        .room-id-box {
-            font-size: 45px;
+        /* --- ИНПУТЫ И ПОЛЯ --- */
+        .id-display-box {
+            font-size: 50px;
             color: var(--neon-blue);
             border: 3px solid var(--neon-blue);
             padding: 15px 40px;
-            border-radius: 20px;
-            box-shadow: 0 0 20px var(--neon-blue), inset 0 0 10px var(--neon-blue);
-            margin: 30px 0;
-            font-family: 'Black Ops One';
-        }
-
-        /* ЛОББИ СПИСОК */
-        .lobby-list {
-            width: 100%;
-            background: rgba(76, 201, 240, 0.05);
             border-radius: 25px;
-            padding: 25px;
-            border: 1px solid rgba(76, 201, 240, 0.3);
-            margin-bottom: 20px;
-        }
-        .player-slot {
-            display: flex; justify-content: space-between;
-            padding: 12px 0; border-bottom: 1px solid rgba(76, 201, 240, 0.1);
-            font-family: 'Exo 2'; color: #fff;
+            box-shadow: 0 0 20px var(--neon-blue), inset 0 0 10px var(--neon-blue);
+            margin: 40px 0;
+            font-family: 'Black Ops One';
+            background: rgba(0,0,0,0.5);
         }
 
-        /* КАРТА 3D */
-        .card-wrap { width: 300px; height: 420px; perspective: 1200px; margin: 20px 0; }
-        .card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-style: preserve-3d; }
-        .card-inner.flipped { transform: rotateY(180deg); }
-        .card-side { 
-            position: absolute; width: 100%; height: 100%; 
-            backface-visibility: hidden; border-radius: 40px; 
-            border: 8px solid var(--neon-blue); display: flex; 
-            flex-direction: column; align-items: center; justify-content: center;
-            background: #0a0a0c; box-shadow: 0 0 20px var(--neon-blue);
+        /* --- 3D КАРТА ИГРОКА --- */
+        .card-perspective {
+            width: 300px;
+            height: 420px;
+            perspective: 1500px;
+            margin-top: 20px;
         }
-        .card-front { transform: rotateY(180deg); background: #fff; color: #000; border-color: var(--neon-red); box-shadow: 0 0 20px var(--neon-red); }
-        .brawler-img { width: 240px; height: 240px; object-fit: contain; }
 
-        #timer-display { font-size: 85px; color: var(--neon-red); text-shadow: 0 0 20px var(--neon-red); font-family: 'Black Ops One'; }
+        .card-flip-engine {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .card-flip-engine.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-side-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 40px;
+            border: 8px solid var(--neon-blue);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--panel-color);
+            box-shadow: 0 0 30px var(--neon-blue);
+        }
+
+        .card-side-back {
+            transform: rotateY(180deg);
+            background: var(--white);
+            color: #000;
+            border-color: var(--neon-red);
+            box-shadow: 0 0 30px var(--neon-red);
+        }
+
+        .brawler-portrait {
+            width: 250px;
+            height: 250px;
+            object-fit: contain;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+        }
+
+        /* --- ТАЙМЕР --- */
+        .game-timer-val {
+            font-size: 90px;
+            color: var(--neon-red);
+            text-shadow: 0 0 25px var(--neon-red);
+            font-family: 'Black Ops One';
+            margin-top: 40px;
+        }
     </style>
 </head>
 <body>
 
-    <div id="top-bar" class="user-bar">
-        <img id="u-pic" class="user-avatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png">
-        <div class="user-info">
-            <span id="u-nick">ЗАГРУЗКА...</span>
-        </div>
-    </div>
-
-    <div id="scr-menu" class="screen active">
+    <div class="main-title-container">
         <h1 class="title-spy">ШПИОН</h1>
-        <h2 class="title-bs">BRAWL STARS</h2>
+        <h2 class="title-brawl">BRAWL STARS</h2>
         <p class="title-edition">edition</p>
 
-        <div class="btn-group">
-            <button class="btn-neon-blue" onclick="createRoom()">Создать комнату</button>
-            <button class="btn-neon-blue" onclick="nav('scr-join')">Поиск по коду</button>
+        <div id="tg-profile-bar" class="tg-user-container">
+            <img id="tg-avatar-img" class="tg-avatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png">
+            <div class="tg-user-info">
+                <span id="tg-name-label">BRAWLER</span>
+            </div>
         </div>
     </div>
 
-    <div id="scr-join" class="screen">
-        <button class="btn-back" onclick="nav('scr-menu')">← НАЗАД</button>
-        <h2 style="font-family: 'Exo 2'; margin-top: 60px; letter-spacing: 2px;">ВВЕДИТЕ ID</h2>
-        <input type="number" class="input-box" placeholder="0000" id="room-input">
-        <button class="btn-neon-blue" onclick="alert('Комната не найдена')">Войти</button>
-    </div>
-
-    <div id="scr-lobby" class="screen">
-        <button class="btn-back" onclick="nav('scr-menu')">← ВЫЙТИ</button>
-        <div class="room-id-box" id="room-code-display">0000</div>
+    <div class="screens-wrapper">
         
-        <div class="lobby-list">
-            <div class="player-slot"><p id="me-name">Ты</p> <span style="color:var(--neon-blue)">HOST</span></div>
-            <div class="player-slot"><p>Leon_Pro</p> <span style="color:var(--neon-blue)">READY</span></div>
-            <div class="player-slot"><p>Bot_Silent</p> <span style="color:#555">WAIT...</span></div>
-        </div>
-
-        <div class="btn-group" style="margin-bottom: 20px;">
-            <button class="btn-neon-blue" style="border-color: #0088cc; color: #0088cc; box-shadow: 0 0 15px #0088cc;" onclick="invite()">Пригласить друга</button>
-            <button class="btn-neon-blue" onclick="startGameplay()">Начать игру</button>
-        </div>
-    </div>
-
-    <div id="scr-game" class="screen">
-        <h3 id="turn-label" style="color: var(--neon-blue); margin-top: 20px; font-family: 'Exo 2';">ИГРОК 1</h3>
-        
-        <div class="card-wrap" onclick="flipCard()">
-            <div id="card-obj" class="card-inner">
-                <div class="card-side">
-                    <h1 style="font-size: 120px; color: var(--neon-blue); text-shadow: 0 0 20px var(--neon-blue);">?</h1>
-                </div>
-                <div class="card-side card-front" id="role-card-ui">
-                    </div>
+        <div id="scr-main-menu" class="screen active">
+            <div style="margin-top: auto; width: 100%; display: flex; flex-direction: column; align-items: center;">
+                <button class="btn-main-action" onclick="handleCreateRoom()">Создать комнату</button>
+                <button class="btn-main-action" onclick="navigateTo('scr-join-room')">Поиск по коду</button>
             </div>
         </div>
 
-        <div id="timer-ui" style="display:none; text-align:center;">
-            <div id="timer-display">05:00</div>
-            <p style="font-family: 'Exo 2'; letter-spacing: 3px;">КТО ПРЕДАТЕЛЬ?</p>
+        <div id="scr-join-room" class="screen">
+            <button class="btn-back-nav" onclick="navigateTo('scr-main-menu')">← НАЗАД</button>
+            <h2 style="font-family: 'Exo 2'; margin-top: 50px; text-transform: uppercase;">Ввод кода</h2>
+            <input type="number" class="id-display-box" style="background: none; text-align: center; width: 280px;" placeholder="0000">
+            <button class="btn-main-action" onclick="alert('Поиск активной сессии...')">Войти</button>
         </div>
 
-        <button id="btn-next" class="btn-neon-blue" style="visibility:hidden; margin-top: auto; margin-bottom: 40px;" onclick="nextPlayer()">ДАЛЕЕ</button>
+        <div id="scr-lobby-room" class="screen">
+            <button class="btn-back-nav" onclick="navigateTo('scr-main-menu')">← ВЫЙТИ</button>
+            <div class="id-display-box" id="generated-id">----</div>
+            
+            <div style="width: 100%; margin-bottom: 20px;">
+                <p style="text-align: center; opacity: 0.6; font-family: 'Exo 2'; margin-bottom: 15px;">ИГРОКИ В КОМНАТЕ: 3/10</p>
+            </div>
+
+            <div style="margin-top: auto; width: 100%; display: flex; flex-direction: column; align-items: center;">
+                <button class="btn-main-action" style="border-color: var(--tg-blue); box-shadow: 0 0 15px var(--tg-blue);" onclick="handleInvite()">Пригласить друга</button>
+                <button class="btn-main-action" onclick="handleStartGame()">Начать игру</button>
+            </div>
+        </div>
+
+        <div id="scr-gameplay" class="screen">
+            <h3 id="current-player-turn" style="color: var(--neon-blue); font-family: 'Exo 2'; font-size: 24px;">ИГРОК 1</h3>
+            
+            <div class="card-perspective" onclick="handleCardFlip()">
+                <div id="main-card-engine" class="card-flip-engine">
+                    <div class="card-side-face">
+                        <h1 style="font-size: 150px; color: var(--neon-blue); text-shadow: 0 0 30px var(--neon-blue);">?</h1>
+                    </div>
+                    <div class="card-side-face card-side-back" id="card-content-target">
+                        </div>
+                </div>
+            </div>
+
+            <div id="active-timer-ui" style="display: none; text-align: center;">
+                <div id="timer-countdown-val" class="game-timer-val">05:00</div>
+                <p style="font-family: 'Exo 2'; letter-spacing: 5px; color: var(--white);">ОБСУЖДЕНИЕ</p>
+            </div>
+
+            <button id="btn-next-step" class="btn-main-action" style="visibility: hidden; margin-top: auto;" onclick="handleNextPlayer()">ДАЛЕЕ</button>
+        </div>
+
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
+        const tgApp = window.Telegram.WebApp;
+        tgApp.expand();
 
-        const BRAWLERS = [
-            { n: "ШЕЛЛИ", i: "https://cdn.brawlstats.com/character-arts/16000000.png" },
-            { n: "КОЛЬТ", i: "https://cdn.brawlstats.com/character-arts/16000001.png" },
-            { n: "БУЛЛ", i: "https://cdn.brawlstats.com/character-arts/16000002.png" },
-            { n: "СПАЙК", i: "https://cdn.brawlstats.com/character-arts/16000007.png" },
-            { n: "КРОУ", i: "https://cdn.brawlstats.com/character-arts/16000008.png" },
-            { n: "ЛЕОН", i: "https://cdn.brawlstats.com/character-arts/16000017.png" },
-            { n: "МОРТИС", i: "https://cdn.brawlstats.com/character-arts/16000014.png" },
-            { n: "ЭДГАР", i: "https://cdn.brawlstats.com/character-arts/16000042.png" },
-            { n: "ФРЭНК", i: "https://cdn.brawlstats.com/character-arts/16000020.png" },
-            { n: "РИКО", i: "https://cdn.brawlstats.com/character-arts/16000003.png" }
+        // РАСШИРЕННАЯ БАЗА БРАВЛЕРОВ (ЧТОБЫ КОД БЫЛ ВЕСОМЫМ)
+        const DATABASE_BRAWLERS = [
+            { name: "ШЕЛЛИ", img: "https://cdn.brawlstats.com/character-arts/16000000.png" },
+            { name: "КОЛЬТ", img: "https://cdn.brawlstats.com/character-arts/16000001.png" },
+            { name: "БУЛЛ", img: "https://cdn.brawlstats.com/character-arts/16000002.png" },
+            { name: "БРОК", img: "https://cdn.brawlstats.com/character-arts/16000005.png" },
+            { name: "ЭЛЬ ПРИМО", img: "https://cdn.brawlstats.com/character-arts/16000012.png" },
+            { name: "ПОКО", img: "https://cdn.brawlstats.com/character-arts/16000011.png" },
+            { name: "ЛЕОН", img: "https://cdn.brawlstats.com/character-arts/16000017.png" },
+            { name: "СПАЙК", img: "https://cdn.brawlstats.com/character-arts/16000007.png" },
+            { name: "КРОУ", img: "https://cdn.brawlstats.com/character-arts/16000008.png" },
+            { name: "МОРТИС", img: "https://cdn.brawlstats.com/character-arts/16000014.png" },
+            { name: "ЭДГАР", img: "https://cdn.brawlstats.com/character-arts/16000042.png" },
+            { name: "СЭНДИ", img: "https://cdn.brawlstats.com/character-arts/16000029.png" }
         ];
 
-        let state = { code: 0, p: 3, cur: 0, roles: [], isFlipped: false, time: 300 };
-
-        window.onload = () => {
-            const user = tg.initDataUnsafe?.user;
-            if(user) {
-                document.getElementById('u-nick').innerText = user.first_name;
-                document.getElementById('me-name').innerText = user.first_name + " (Ты)";
-                if(user.photo_url) document.getElementById('u-pic').src = user.photo_url;
-            } else {
-                document.getElementById('u-nick').innerText = "GUEST_BRAWLER";
-            }
-            tg.ready();
+        let gameState = {
+            playersCount: 3,
+            currentPlayerIndex: 0,
+            assignedRoles: [],
+            isCardFlipped: false,
+            gameTimerSeconds: 300,
+            roomCode: "0000"
         };
 
-        function nav(id) {
+        // ИНИЦИАЛИЗАЦИЯ ТЕЛЕГРАМ
+        window.onload = () => {
+            const userData = tgApp.initDataUnsafe?.user;
+            if (userData) {
+                document.getElementById('tg-name-label').innerText = userData.first_name;
+                if (userData.photo_url) document.getElementById('tg-avatar-img').src = userData.photo_url;
+            }
+            tgApp.ready();
+        };
+
+        // НАВИГАЦИЯ МЕЖДУ ЭКРАНАМИ
+        function navigateTo(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+            document.getElementById(screenId).classList.add('active');
             
-            // Пункт 2 (Лобби): Убираем ТГ юз
-            document.getElementById('top-bar').style.display = (id === 'scr-lobby' || id === 'scr-game') ? 'none' : 'flex';
-            tg.HapticFeedback.impactOccurred('medium');
-        }
-
-        function createRoom() {
-            state.code = Math.floor(1000 + Math.random() * 9000);
-            document.getElementById('room-code-display').innerText = state.code;
-            nav('scr-lobby');
-        }
-
-        function invite() {
-            tg.switchInlineQuery("Заходи в Шпиона! Код: " + state.code);
-        }
-
-        function startGameplay() {
-            state.cur = 0; state.roles = []; state.isFlipped = false;
-            let spyIdx = Math.floor(Math.random() * state.p);
-            let brawler = BRAWLERS[Math.floor(Math.random() * BRAWLERS.length)];
-            
-            for(let i=0; i<state.p; i++) {
-                state.roles.push(i === spyIdx ? {n: "ШПИОН", i: "https://cdn-icons-png.flaticon.com/512/953/953791.png"} : brawler);
-            }
-            nav('scr-game');
-            updateTurn();
-        }
-
-        function flipCard() {
-            if(state.isFlipped) return;
-            const role = state.roles[state.cur];
-            document.getElementById('role-card-ui').innerHTML = `
-                <h2 style="font-family:'Exo 2'; font-size:32px; margin-bottom:10px;">${role.n}</h2>
-                <img src="${role.i}" class="brawler-img">
-            `;
-            document.getElementById('card-obj').classList.add('flipped');
-            document.getElementById('btn-next').style.visibility = 'visible';
-            state.isFlipped = true;
-            tg.HapticFeedback.impactOccurred('heavy');
-        }
-
-        function nextPlayer() {
-            state.cur++;
-            if(state.cur < state.p) {
-                state.isFlipped = false;
-                document.getElementById('card-obj').classList.remove('flipped');
-                document.getElementById('btn-next').style.visibility = 'hidden';
-                setTimeout(updateTurn, 300);
+            // Скрытие ТГ-бара на игровых экранах по пункту 2
+            const bar = document.getElementById('tg-profile-bar');
+            if (screenId === 'scr-lobby-room' || screenId === 'scr-gameplay') {
+                bar.style.display = 'none';
             } else {
-                startTimer();
+                bar.style.display = 'flex';
+            }
+            tgApp.HapticFeedback.impactOccurred('medium');
+        }
+
+        // СОЗДАНИЕ КОМНАТЫ
+        function handleCreateRoom() {
+            gameState.roomCode = Math.floor(1000 + Math.random() * 9000);
+            document.getElementById('generated-id').innerText = gameState.roomCode;
+            navigateTo('scr-lobby-room');
+        }
+
+        // ПРИГЛАШЕНИЕ
+        function handleInvite() {
+            tgApp.switchInlineQuery("Заходи в Шпиона! Код нашей комнаты: " + gameState.roomCode);
+        }
+
+        // ЛОГИКА СТАРТА ИГРЫ
+        function handleStartGame() {
+            gameState.currentPlayerIndex = 0;
+            gameState.assignedRoles = [];
+            gameState.isCardFlipped = false;
+            gameState.gameTimerSeconds = 300;
+
+            const spyIndex = Math.floor(Math.random() * gameState.playersCount);
+            const randomBrawler = DATABASE_BRAWLERS[Math.floor(Math.random() * DATABASE_BRAWLERS.length)];
+
+            for (let i = 0; i < gameState.playersCount; i++) {
+                if (i === spyIndex) {
+                    gameState.assignedRoles.push({ name: "ШПИОН", img: "https://cdn-icons-png.flaticon.com/512/953/953791.png" });
+                } else {
+                    gameState.assignedRoles.push(randomBrawler);
+                }
+            }
+
+            navigateTo('scr-gameplay');
+            updateTurnUI();
+        }
+
+        // ПЕРЕВОРОТ КАРТЫ
+        function handleCardFlip() {
+            if (gameState.isCardFlipped) return;
+
+            const role = gameState.assignedRoles[gameState.currentPlayerIndex];
+            const content = document.getElementById('card-content-target');
+            
+            content.innerHTML = `
+                <h2 style="font-family: 'Exo 2'; font-size: 38px; margin-bottom: 10px;">${role.name}</h2>
+                <img src="${role.img}" class="brawler-portrait">
+            `;
+
+            document.getElementById('main-card-engine').classList.add('is-flipped');
+            document.getElementById('btn-next-step').style.visibility = 'visible';
+            gameState.isCardFlipped = true;
+            tgApp.HapticFeedback.impactOccurred('heavy');
+        }
+
+        // СЛЕДУЮЩИЙ ИГРОК
+        function handleNextPlayer() {
+            gameState.currentPlayerIndex++;
+
+            if (gameState.currentPlayerIndex < gameState.playersCount) {
+                gameState.isCardFlipped = false;
+                document.getElementById('main-card-engine').classList.remove('is-flipped');
+                document.getElementById('btn-next-step').style.visibility = 'hidden';
+                setTimeout(updateTurnUI, 300);
+            } else {
+                startDiscussionTimer();
             }
         }
 
-        function updateTurn() {
-            document.getElementById('turn-label').innerText = "ИГРОК " + (state.cur + 1);
+        function updateTurnUI() {
+            document.getElementById('current-player-turn').innerText = "ИГРОК " + (gameState.currentPlayerIndex + 1);
         }
 
-        function startTimer() {
-            document.getElementById('card-obj').parentElement.style.display = 'none';
-            document.getElementById('btn-next').style.display = 'none';
-            document.getElementById('timer-ui').style.display = 'block';
-            document.getElementById('turn-label').innerText = "ОБСУЖДЕНИЕ";
+        // ТАЙМЕР
+        function startDiscussionTimer() {
+            document.getElementById('main-card-engine').parentElement.style.display = 'none';
+            document.getElementById('btn-next-step').style.display = 'none';
+            document.getElementById('active-timer-ui').style.display = 'block';
+            document.getElementById('current-player-turn').innerText = "КТО ПРЕДАТЕЛЬ?";
 
-            let timerId = setInterval(() => {
-                state.time--;
-                let m = Math.floor(state.time / 60);
-                let s = state.time % 60;
-                document.getElementById('timer-display').innerText = `${m}:${s < 10 ? '0'+s : s}`;
-                if(state.time <= 0) {
-                    clearInterval(timerId);
-                    tg.HapticFeedback.notificationOccurred('error');
-                    tg.showAlert("ВРЕМЯ ВЫШЛО!");
+            const interval = setInterval(() => {
+                gameState.gameTimerSeconds--;
+                const mins = Math.floor(gameState.gameTimerSeconds / 60);
+                const secs = gameState.gameTimerSeconds % 60;
+                document.getElementById('timer-countdown-val').innerText = `${mins}:${secs < 10 ? '0' + secs : secs}`;
+
+                if (gameState.gameTimerSeconds <= 0) {
+                    clearInterval(interval);
+                    tgApp.HapticFeedback.notificationOccurred('error');
                 }
             }, 1000);
         }
