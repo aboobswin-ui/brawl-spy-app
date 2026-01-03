@@ -2,54 +2,226 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brawl Spy</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Brawl Spy Premium</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap" rel="stylesheet">
     <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
         body {
             background-color: #0A0A0F;
+            background-image: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #0A0A0F 100%);
             color: white;
             font-family: 'Lilita One', cursive;
+            margin: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
+            min-height: 100vh;
+            padding: 20px;
         }
 
         h1 {
-            font-size: 56px;
-            color: #FFFFFF;
+            font-size: 48px;
             text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(0, 245, 255, 0.4), 3px 3px 0px #000;
+            margin: 40px 0 20px;
             letter-spacing: 2px;
-            /* Объем и свечение */
-            text-shadow: 
-                0 0 15px rgba(0, 245, 255, 0.5), 
-                2px 2px 0px #000, 
-                4px 4px 0px #000;
-            margin-bottom: 20px;
-            text-align: center;
         }
 
-        p {
-            color: #B0B7C3;
-            font-size: 16px;
+        /* Контейнер для экранов */
+        .screen {
+            display: none;
+            width: 100%;
+            max-width: 360px;
+            flex-direction: column;
+            align-items: center;
+            animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .active { display: flex; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Карточка профиля */
+        .user-profile {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            border-radius: 30px;
+            padding: 10px 25px;
+            display: flex;
+            align-items: center;
             margin-bottom: 40px;
-            opacity: 0.8;
-            font-family: sans-serif; /* Для контраста сделаем описание простым шрифтом */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        .btn-play {
+        .user-avatar {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            border: 2px solid #00F5FF;
+            box-shadow: 0 0 10px #00F5FF;
+            margin-right: 15px;
+            object-fit: cover;
+        }
+
+        /* Кнопки */
+        .btn-main {
             background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 40px; /* Более округлая кнопка */
-            
-            color: #FFFFFF; /* Белый текст на кнопке */
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            color: white;
             font-family: 'Lilita One', cursive;
-            font-size: 26px; /* Не слишком жирный, аккуратный */
-            padding: 18px
+            font-size: 24px;
+            padding: 20px;
+            width: 100%;
+            margin: 10px 0;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: 0.2s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .btn-main:active { transform: scale(0.96); background: rgba(255, 255, 255, 0.2); }
+        
+        .btn-primary { 
+            background: rgba(0, 245, 255, 0.15); 
+            border-color: rgba(0, 245, 255, 0.4);
+            color: #00F5FF;
+        }
+
+        /* Настройки */
+        .settings-box {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 25px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .row:last-child { border: none; }
+
+        .control {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .btn-circle {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: #00F5FF;
+            color: #000;
+            font-family: 'Lilita One', cursive;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px rgba(0, 245, 255, 0.5);
+        }
+
+        .val { font-size: 24px; min-width: 20px; text-align: center; }
+
+        .hint {
+            font-family: sans-serif;
+            font-size: 14px;
+            color: #B0B7C3;
+            text-align: center;
+            margin-top: 20px;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="screen-main" class="screen active">
+        <h1>BRAWL SPY</h1>
+        <div class="user-profile">
+            <img id="user-photo" src="https://cdn-icons-png.flaticon.com/512/847/847969.png" class="user-avatar">
+            <span id="user-name">Игрок</span>
+        </div>
+        <button class="btn-main btn-primary" onclick="showScreen('screen-menu')">ИГРАТЬ</button>
+        <p class="hint">v1.0.0 Alpha</p>
+    </div>
+
+    <div id="screen-menu" class="screen">
+        <h1>МЕНЮ</h1>
+        <button class="btn-main" onclick="showScreen('screen-create')">Создать комнату</button>
+        <button class="btn-main" onclick="inviteFriend()">Пригласить друга</button>
+        <button class="btn-main" onclick="showScreen('screen-main')" style="font-size: 16px; margin-top: 30px; opacity: 0.5; border:none; background:none;">⬅ Назад</button>
+    </div>
+
+    <div id="screen-create" class="screen">
+        <h1>КОМНАТА</h1>
+        
+        <div class="settings-box">
+            <div class="row">
+                <span>ИГРОКОВ</span>
+                <div class="control">
+                    <button class="btn-circle" onclick="change('p', -1)">-</button>
+                    <span id="p-val" class="val">4</span>
+                    <button class="btn-circle" onclick="change('p', 1)">+</button>
+                </div>
+            </div>
+            <div class="row">
+                <span>ШПИОНОВ</span>
+                <div class="control">
+                    <button class="btn-circle" onclick="change('s', -1)">-</button>
+                    <span id="s-val" class="val">1</span>
+                    <button class="btn-circle" onclick="change('s', 1)">+</button>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-main btn-primary" onclick="inviteFriend()">Позвать друзей</button>
+        <button class="btn-main" onclick="showScreen('screen-menu')" style="font-size: 16px; margin-top: 20px; opacity: 0.5; border:none; background:none;">⬅ Назад</button>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.headerColor = '#0A0A0F';
+
+        // Данные юзера
+        const user = tg.initDataUnsafe?.user;
+        if (user) {
+            document.getElementById('user-name').innerText = user.first_name;
+            if (user.photo_url) document.getElementById('user-photo').src = user.photo_url;
+        }
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            tg.HapticFeedback.impactOccurred('medium'); // Вибрация при переходе
+        }
+
+        function change(type, delta) {
+            let el = document.getElementById(type + '-val');
+            let v = parseInt(el.innerText) + delta;
+            
+            if(type === 'p') { if(v < 3) v = 3; if(v > 10) v = 10; }
+            if(type === 's') { if(v < 1) v = 1; if(v >= parseInt(document.getElementById('p-val').innerText)) v = 1; }
+            
+            el.innerText = v;
+            tg.HapticFeedback.selectionChanged();
+        }
+
+        function inviteFriend() {
+            tg.switchInlineQuery("Го играть в Brawl Spy! Жду тебя в комнате.");
+        }
+    </script>
+</body>
+</html>
