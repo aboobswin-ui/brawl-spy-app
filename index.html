@@ -11,8 +11,9 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         
         body {
-            background-color: #0A0A0F;
-            background-image: radial-gradient(circle at 50% 50%, #1a0b2e 0%, #0A0A0F 100%);
+            /* ТОТ САМЫЙ СИНИЙ ФОН */
+            background-color: #1a237e;
+            background-image: radial-gradient(circle at 50% 50%, #283593 0%, #1a237e 100%);
             color: white;
             font-family: 'Rubik One', 'Arial Black', sans-serif;
             height: 100vh;
@@ -21,12 +22,12 @@
             overflow: hidden;
         }
 
-        /* Контейнер для центровки всего контента */
+        /* Контейнер для центровки */
         .app-container {
             flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: space-around; /* Распределяет элементы по высоте */
+            justify-content: space-around;
             align-items: center;
             padding: 40px 20px;
         }
@@ -42,181 +43,29 @@
 
         .active { display: flex; }
 
-        /* Заголовок с фиолетовым неоном */
+        /* Заголовок - МИНИМУМ СВЕЧЕНИЯ */
         h1 {
             font-size: 46px;
             text-transform: uppercase;
             text-align: center;
             color: #FFFFFF;
             text-shadow: 
-                0 0 10px #7209B7,
-                0 0 20px #B5179E,
+                0 0 5px rgba(114, 9, 183, 0.4),
                 3px 3px 0px #000;
         }
 
-        /* Карточка игрока */
+        .menu-title { font-size: 64px; } /* ОГРОМНОЕ МЕНЮ */
+
+        /* Карточка игрока под Brawl Spy с неоном */
         .user-info {
-            background: rgba(114, 9, 183, 0.15);
-            border: 2px solid #B5179E;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid #7209B7; /* Неоновая окантовка */
             border-radius: 50px;
             padding: 10px 25px;
             display: flex;
             align-items: center;
-            box-shadow: 0 0 15px rgba(181, 23, 158, 0.3);
+            box-shadow: 0 0 8px rgba(114, 9, 183, 0.3);
+            margin-top: -20px;
         }
 
-        .avatar {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            border: 2px solid #FFFFFF;
-            margin-right: 15px;
-        }
-
-        /* Кнопка ИГРАТЬ (Фиолетовый градиент) */
-        .btn-main {
-            background: linear-gradient(180deg, #B5179E 0%, #7209B7 100%);
-            border: 3px solid #FFFFFF;
-            border-radius: 25px;
-            color: white;
-            font-family: 'Rubik One', sans-serif;
-            font-size: 28px;
-            padding: 20px 0;
-            width: 100%;
-            max-width: 300px;
-            text-transform: uppercase;
-            box-shadow: 0 5px 20px rgba(181, 23, 158, 0.6);
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        /* Кнопки меню */
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid #7209B7;
-            border-radius: 20px;
-            color: white;
-            font-family: 'Rubik One', sans-serif;
-            font-size: 20px;
-            padding: 15px;
-            width: 100%;
-            margin: 10px 0;
-            text-transform: uppercase;
-        }
-
-        .btn-main:active { transform: scale(0.95); }
-
-        /* Настройки */
-        .settings-card {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 20px;
-            width: 100%;
-            padding: 10px;
-        }
-
-        .setting-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-        }
-
-        .circle-btn {
-            width: 40px; height: 40px;
-            background: #B5179E;
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 24px;
-            font-family: 'Rubik One';
-        }
-
-        .back-btn {
-            color: #B0B7C3;
-            text-transform: uppercase;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="app-container">
-        
-        <div id="screen-main" class="screen active">
-            <h1>BRAWL SPY</h1>
-            <div class="user-info">
-                <img id="u-pic" src="https://cdn-icons-png.flaticon.com/512/847/847969.png" class="avatar">
-                <span id="u-name">ИГРОК</span>
-            </div>
-            <button class="btn-main" onclick="go('screen-menu')">ИГРАТЬ</button>
-        </div>
-
-        <div id="screen-menu" class="screen">
-            <h1>МЕНЮ</h1>
-            <div style="width: 100%; max-width: 300px;">
-                <button class="btn-secondary" onclick="go('screen-settings')">Создать комнату</button>
-                <button class="btn-secondary" onclick="invite()">Пригласить друга</button>
-            </div>
-            <div class="back-btn" onclick="go('screen-main')">назад</div>
-        </div>
-
-        <div id="screen-settings" class="screen">
-            <h1>КОМНАТА</h1>
-            <div class="settings-card">
-                <div class="setting-item">
-                    <span>ИГРОКОВ</span>
-                    <div>
-                        <button class="circle-btn" onclick="adj('p',-1)">-</button>
-                        <span id="p-v" style="margin: 0 10px; font-size: 24px;">4</span>
-                        <button class="circle-btn" onclick="adj('p',1)">+</button>
-                    </div>
-                </div>
-                <div class="setting-item">
-                    <span>ШПИОНОВ</span>
-                    <div>
-                        <button class="circle-btn" onclick="adj('s',-1)">-</button>
-                        <span id="s-v" style="margin: 0 10px; font-size: 24px;">1</span>
-                        <button class="circle-btn" onclick="adj('s',1)">+</button>
-                    </div>
-                </div>
-            </div>
-            <button class="btn-main" style="font-size: 20px;" onclick="invite()">ПОЗВАТЬ ДРУЗЕЙ</button>
-            <div class="back-btn" onclick="go('screen-menu')">назад</div>
-        </div>
-
-    </div>
-
-    <script>
-        let tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.ready();
-
-        // Заполнение данных
-        const user = tg.initDataUnsafe?.user;
-        if (user) {
-            document.getElementById('u-name').innerText = user.first_name.toUpperCase();
-            if (user.photo_url) document.getElementById('u-pic').src = user.photo_url;
-        }
-
-        function go(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            tg.HapticFeedback.impactOccurred('medium');
-        }
-
-        function adj(t, d) {
-            let e = document.getElementById(t + '-v');
-            let v = parseInt(e.innerText) + d;
-            if(t === 'p') { if(v<3) v=3; if(v>10) v=10; }
-            if(t === 's') { if(v<1) v=1; if(v>=parseInt(document.getElementById('p-v').innerText)) v=1; }
-            e.innerText = v;
-            tg.HapticFeedback.selectionChanged();
-        }
-
-        function invite() {
-            tg.switchInlineQuery("Го в Brawl Spy!");
-        }
-    </script>
-</body>
-</html>
+        .avatar
