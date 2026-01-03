@@ -68,4 +68,163 @@
 
         /* ЕДИНЫЙ СТИЛЬ КНОПОК ДЛЯ ВСЕХ ЭКРАНОВ */
         .btn-style {
-            background: rgba(255, 255, 255
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px);
+            border: 2px solid #7209B7;
+            border-radius: 20px;
+            color: white;
+            font-family: 'Rubik One', sans-serif;
+            font-size: 22px;
+            padding: 20px;
+            width: 100%;
+            max-width: 300px;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-align: center;
+            outline: none;
+        }
+
+        .btn-style:active { transform: scale(0.95); background: rgba(114, 9, 183, 0.2); }
+
+        .settings-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 320px;
+            padding: 10px;
+            border: 1px solid rgba(114, 9, 183, 0.2);
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .circle-btn {
+            width: 44px; height: 44px;
+            background: #560bad;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 26px;
+            font-family: 'Rubik One';
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .back-btn {
+            color: #B0B7C3;
+            text-transform: uppercase;
+            font-size: 14px;
+            margin-top: 10px;
+            cursor: pointer;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <div id="screen-main" class="screen active">
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <h1>BRAWL SPY</h1>
+                <div class="user-info">
+                    <img id="u-pic" src="https://cdn-icons-png.flaticon.com/512/847/847969.png" class="avatar">
+                    <span id="u-name">ЗАГРУЗКА...</span>
+                </div>
+            </div>
+            <button class="btn-style" onclick="go('screen-menu')">ИГРАТЬ</button>
+        </div>
+
+        <div id="screen-menu" class="screen">
+            <h1 style="font-size: 60px;">МЕНЮ</h1>
+            <div style="width: 100%; display: flex; flex-direction: column; align-items: center; gap: 15px;">
+                <button class="btn-style" onclick="go('screen-settings')">Создать комнату</button>
+                <button class="btn-style" onclick="invite()">Пригласить друга</button>
+            </div>
+            <div class="back-btn" onclick="go('screen-main')">назад</div>
+        </div>
+
+        <div id="screen-settings" class="screen">
+            <h1>КОМНАТА</h1>
+            <div class="settings-card">
+                <div class="setting-item">
+                    <span>ИГРОКОВ</span>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <button class="circle-btn" onclick="adj('p',-1)">-</button>
+                        <span id="p-v" style="font-size: 26px; min-width: 30px; text-align: center;">4</span>
+                        <button class="circle-btn" onclick="adj('p',1)">+</button>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <span>ШПИОНОВ</span>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <button class="circle-btn" onclick="adj('s',-1)">-</button>
+                        <span id="s-v" style="font-size: 26px; min-width: 30px; text-align: center;">1</span>
+                        <button class="circle-btn" onclick="adj('s',1)">+</button>
+                    </div>
+                </div>
+            </div>
+            <button class="btn-style" onclick="invite()">ПОЗВАТЬ ДРУЗЕЙ</button>
+            <div class="back-btn" onclick="go('screen-menu')">назад</div>
+        </div>
+
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
+
+        // Подгружаем юзера сразу
+        const user = tg.initDataUnsafe?.user;
+        if (user) {
+            document.getElementById('u-name').innerText = user.first_name.toUpperCase();
+            if (user.photo_url) document.getElementById('u-pic').src = user.photo_url;
+        } else {
+            document.getElementById('u-name').innerText = "ИГРОК";
+        }
+
+        // Рабочая навигация
+        function go(screenId) {
+            // Скрываем все экраны
+            const screens = document.getElementsByClassName('screen');
+            for (let i = 0; i < screens.length; i++) {
+                screens[i].classList.remove('active');
+            }
+            // Показываем нужный
+            const target = document.getElementById(screenId);
+            if (target) {
+                target.classList.add('active');
+            }
+            tg.HapticFeedback.impactOccurred('medium');
+        }
+
+        // Настройка количества
+        function adj(type, delta) {
+            const el = document.getElementById(type + '-v');
+            let val = parseInt(el.innerText) + delta;
+            
+            if(type === 'p') { 
+                if(val < 3) val = 3; 
+                if(val > 12) val = 12; 
+            }
+            if(type === 's') { 
+                let p = parseInt(document.getElementById('p-v').innerText);
+                if(val < 1) val = 1; 
+                if(val >= p) val = 1; 
+            }
+            el.innerText = val;
+            tg.HapticFeedback.selectionChanged();
+        }
+
+        function invite() {
+            tg.switchInlineQuery("Го в Brawl Spy!");
+        }
+    </script>
+</body>
+</html>
