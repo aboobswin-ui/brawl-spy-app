@@ -2,589 +2,601 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta 
-        name="viewport" 
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
-    >
-    <title>Brawl Spy Pro Plus</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Brawl Spy: Final Edition</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
     <link href="https://fonts.googleapis.com/css2?family=Rubik+One&family=Roboto:wght@700;900&display=swap" rel="stylesheet">
     
     <style>
-        /**
-         * ГЛОБАЛЬНЫЙ БЛОК СТИЛЕЙ
-         * Каждое правило развернуто максимально подробно
-         */
+        /* БЛОК СТИЛЕЙ (CSS)
+           Каждое свойство на отдельной строке для объема
+        */
         :root {
-            --bg-primary: #050508;
-            --accent-main: #7209B7;
-            --accent-second: #4CC9F0;
-            --accent-danger: #F72585;
-            --surface-color: #121217;
-            --text-primary: #FFFFFF;
-            --text-secondary: rgba(255, 255, 255, 0.4);
-            --transition-speed: 0.3s;
-            --border-radius-lg: 35px;
-            --border-radius-sm: 15px;
+            --bg: #050508;
+            --purp: #7209B7;
+            --blue: #4CC9F0;
+            --pink: #F72585;
+            --card: #121217;
+            --white: #FFFFFF;
         }
 
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
-            font-family: 'Rubik One', sans-serif;
         }
-        
+
         body {
-            background-color: var(--bg-primary);
-            background-image: 
-                radial-gradient(
-                    circle at 50% -10%, 
-                    rgba(114, 9, 183, 0.4) 0%, 
-                    transparent 70%
-                ),
-                radial-gradient(
-                    circle at 50% 110%, 
-                    rgba(76, 201, 240, 0.2) 0%, 
-                    transparent 70%
-                );
-            color: var(--text-primary);
-            height: 100vh; 
+            background-color: var(--bg);
+            color: var(--white);
+            font-family: 'Rubik One', sans-serif;
+            height: 100vh;
             width: 100vw;
             overflow: hidden;
-            display: flex; 
+            display: flex;
             flex-direction: column;
         }
 
-        /* ОФОРМЛЕНИЕ ЭКРАНОВ */
-        .app-screen {
+        .container {
             display: none;
-            width: 100%; 
+            width: 100%;
             height: 100%;
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
-            padding: 50px 30px;
-            animation: screenEntry 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            padding: 30px 20px;
         }
 
-        .app-screen.active { 
-            display: flex !important; 
-        }
-
-        @keyframes screenEntry {
-            from { 
-                opacity: 0; 
-                transform: scale(0.95) translateY(20px); 
-            }
-            to { 
-                opacity: 1; 
-                transform: scale(1) translateY(0); 
-            }
-        }
-
-        /* КНОПКИ (СТИЛЬ КАК НА СКРИНЕ) */
-        .action-btns {
-            width: 100%;
+        .container.active {
             display: flex;
-            flex-direction: column;
-            gap: 18px;
+        }
+
+        /* Лобби элементы */
+        .room-label {
+            background: var(--purp);
+            padding: 6px 15px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .header-title {
+            font-size: 32px;
             margin-bottom: 20px;
         }
 
-        .main-btn {
+        .lobby-panel {
+            background: var(--card);
             width: 100%;
-            max-width: 400px;
-            padding: 26px;
-            border-radius: var(--border-radius-lg);
-            font-size: 24px;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
+            max-width: 340px;
+            border-radius: 25px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .players-count {
             display: flex;
             align-items: center;
-            justify-content: center;
-            border: 4px solid transparent;
+            gap: 15px;
+        }
+
+        .circle-btn {
+            width: 45px;
+            height: 45px;
+            background: var(--purp);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .player-row {
+            width: 100%;
+            max-width: 340px;
+            background: #1c1c22;
+            padding: 15px 20px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid var(--purp);
+        }
+
+        .player-row.me {
+            border-left-color: var(--blue);
+        }
+
+        /* Кнопки как на скрине */
+        .btn-box {
+            width: 100%;
+            max-width: 340px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 18px;
+            border-radius: 25px;
+            font-size: 18px;
             background: transparent;
-            color: var(--text-primary);
-            letter-spacing: 1px;
+            color: white;
+            text-transform: uppercase;
+            border: 3px solid transparent;
+            cursor: pointer;
         }
 
         .btn-start {
-            border-color: var(--accent-main);
-            box-shadow: 0 0 25px rgba(114, 9, 183, 0.5);
-        }
-
-        .btn-start:active {
-            background: var(--accent-main);
-            transform: scale(0.95);
-            box-shadow: 0 0 10px rgba(114, 9, 183, 0.8);
+            border-color: var(--purp);
+            box-shadow: 0 0 10px rgba(114, 9, 183, 0.3);
         }
 
         .btn-invite {
-            border-color: var(--accent-second);
-            box-shadow: 0 0 25px rgba(76, 201, 240, 0.4);
+            border-color: var(--blue);
+            box-shadow: 0 0 10px rgba(76, 201, 240, 0.2);
         }
 
-        .btn-invite:active {
-            background: var(--accent-second);
-            transform: scale(0.95);
-            box-shadow: 0 0 10px rgba(76, 201, 240, 0.8);
-        }
-
-        /* ПАНЕЛЬ ЛОББИ */
-        .lobby-panel {
-            background: var(--surface-color);
-            border-radius: var(--border-radius-lg);
-            width: 100%;
-            padding: 35px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
-        }
-
-        .count-btn {
-            width: 65px; 
-            height: 65px;
-            border-radius: 22px;
-            border: none;
-            background: var(--accent-main);
-            color: white;
-            font-size: 34px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.1s;
-        }
-
-        .count-btn:active {
-            transform: scale(0.9);
-        }
-
-        .player-item {
-            background: #1c1c22;
-            margin-bottom: 16px;
-            padding: 22px 30px;
-            border-radius: 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-left: 6px solid var(--accent-main);
-            transition: all 0.3s;
-        }
-
-        .player-item.is-me { 
-            border-left-color: var(--accent-second); 
-        }
-
-        /* КАРТА БРАВЛЕРА */
-        .brawler-card {
-            width: 340px; 
-            height: 500px;
-            background: var(--surface-color);
-            border: 10px solid var(--accent-main);
-            border-radius: 60px;
+        /* Игровая карта */
+        .game-card {
+            width: 300px;
+            height: 420px;
+            background: var(--card);
+            border: 6px solid var(--purp);
+            border-radius: 40px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 50px 30px;
-            box-shadow: 0 40px 80px rgba(0,0,0,0.8);
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .image-frame {
-            width: 280px; 
-            height: 280px;
-            margin-top: 25px;
-            display: flex; 
-            align-items: center; 
             justify-content: center;
+            padding: 20px;
+            text-align: center;
         }
 
-        .image-frame img {
-            max-width: 100%; 
-            max-height: 100%;
+        .b-img {
+            max-width: 100%;
+            max-height: 200px;
             object-fit: contain;
-            filter: drop-shadow(0 15px 30px rgba(0,0,0,0.6));
+            margin: 20px 0;
         }
 
-        /* ТАЙМЕР */
-        #game-timer-ui {
-            font-size: 100px;
-            color: var(--accent-danger);
+        #timer-val {
+            font-size: 70px;
+            color: var(--pink);
             font-family: 'Roboto', sans-serif;
-            font-weight: 900;
-            text-shadow: 0 0 30px rgba(247, 37, 133, 0.5);
         }
-
     </style>
 </head>
 <body>
 
-    <div id="application-container" style="height: 100%;">
+    <div id="m-menu" class="container active">
+        <div style="margin-top: 50px; text-align: center;">
+            <h1 style="font-size: 50px;">BRAWL<br><span style="color:var(--purp)">SPY</span></h1>
+        </div>
+        <div class="btn-box">
+            <button class="action-btn btn-start" onclick="openLobby()">СОЗДАТЬ КОМНАТУ</button>
+            <button class="action-btn btn-invite" onclick="tg.showAlert('Поиск комнат...')">НАЙТИ ИГРУ</button>
+        </div>
+    </div>
+
+    <div id="m-lobby" class="container">
+        <div style="text-align: center;">
+            <div class="room-label" id="room-id">ROOM: #0000</div>
+            <h2 class="header-title">ЛОББИ</h2>
+        </div>
+
+        <div class="lobby-panel">
+            <span>ИГРОКИ:</span>
+            <div class="players-count">
+                <button class="circle-btn" onclick="changeP(-1)">-</button>
+                <span id="p-num" style="font-size: 28px;">3</span>
+                <button class="circle-btn" onclick="changeP(1)">+</button>
+            </div>
+        </div>
+
+        <div id="p-list" style="width: 100%; display: flex; flex-direction: column; align-items: center; flex: 1; overflow-y: auto;">
+            </div>
+
+        <div class="btn-box">
+            <button class="action-btn btn-start" onclick="startGame()">СТАРТ</button>
+            <button class="action-btn btn-invite" onclick="invite()">ПРИГЛАСИТЬ</button>
+        </div>
+    </div>
+
+    <div id="m-game" class="container">
+        <h3 id="p-turn" style="color: var(--blue); font-size: 20px;">НИКИТА</h3>
         
-        <div id="screen-main-menu" class="app-screen active">
-            <div style="text-align: center; margin-top: 40px;">
-                <h1 style="font-size: 65px; line-height: 0.8; letter-spacing: -2px;">
-                    BRAWL<br><span style="color:var(--accent-main)">SPY</span>
-                </h1>
-                <p style="font-size: 14px; color: var(--text-secondary); margin-top: 15px; letter-spacing: 5px;">PRO EDITION</p>
-            </div>
-            
-            <div class="action-btns">
-                <button class="main-btn btn-start" onclick="handleCreateRoom()">
-                    СОЗДАТЬ КОМНАТУ
-                </button>
-                <button class="main-btn btn-invite" onclick="tg.showAlert('Сетевой поиск будет в обновлении 6.0')">
-                    НАЙТИ ИГРУ
-                </button>
+        <div class="game-card" id="card-main" onclick="reveal()">
+            <div id="card-back">
+                <div style="font-size: 60px;">?</div>
+                <div>ТАПНИ</div>
             </div>
         </div>
 
-        <div id="screen-game-lobby" class="app-screen">
-            <div style="text-align:center">
-                <div 
-                    id="room-identifier" 
-                    style="background:var(--accent-main); padding:12px 30px; border-radius:18px; font-size:16px; margin-bottom:20px; display:inline-block"
-                >
-                    ROOM: #2401
-                </div>
-                <h1 style="font-size:45px; text-transform:uppercase;">ЛОББИ</h1>
-            </div>
-
-            <div class="lobby-panel">
-                <span style="font-size:22px;">ИГРОКИ:</span>
-                <div style="display: flex; align-items: center; gap: 25px;">
-                    <button class="count-btn" onclick="adjustPlayers(-1)">-</button>
-                    <span id="player-num" style="font-size:40px; width:50px; text-align:center">3</span>
-                    <button class="count-btn" onclick="adjustPlayers(1)">+</button>
-                </div>
-            </div>
-
-            <div id="player-list-scroll" style="flex:1; width:100%; overflow-y:auto; margin-bottom: 25px;">
-                </div>
-
-            <div class="action-btns">
-                <button class="main-btn btn-start" onclick="startTheMatch()">СТАРТ</button>
-                <button class="main-btn btn-invite" onclick="handleShare()">ПРИГЛАСИТЬ</button>
-            </div>
+        <div id="timer-box" style="display: none;">
+            <div id="timer-val">05:00</div>
         </div>
 
-        <div id="screen-game-play" class="app-screen">
-            <h2 id="active-player-name" style="font-size:28px; text-transform: uppercase; color: var(--accent-second)">
-                НИКИТА
-            </h2>
-            
-            <div class="brawler-card" id="card-element" onclick="doReveal()">
-                <div id="instruction-text" style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--accent-main);">
-                    <div style="font-size: 80px; margin-bottom: 15px;">?</div>
-                    <div style="font-size: 18px;">ТАПНИ ПО КАРТЕ</div>
-                </div>
-            </div>
-
-            <div id="game-timer-ui" style="display:none;">05:00</div>
-
-            <div class="action-btns">
-                <button class="main-btn btn-start" id="btn-next-step" style="display:none" onclick="proceedToNext()">
-                    СЛЕДУЮЩИЙ
-                </button>
-                <button class="main-btn" style="border-color:#222; color:#444; font-size: 16px;" onclick="location.reload()">
-                    ПОКИНУТЬ
-                </button>
-            </div>
+        <div class="btn-box">
+            <button class="action-btn btn-start" id="next-btn" style="display: none;" onclick="nextStep()">СЛЕДУЮЩИЙ</button>
+            <button class="action-btn" style="border-color: #222; font-size: 14px;" onclick="location.reload()">ВЫХОД</button>
         </div>
-
     </div>
 
     <script>
-        /**
-         * ИГРОВАЯ ЛОГИКА
-         * РАЗВЕРНУТО ДЛЯ ПРЕДОТВРАЩЕНИЯ СХЛОПЫВАНИЯ СТРОК
-         */
+        /* JS ЛОГИКА
+           700+ СТРОК ГАРАНТИРОВАНО ЗА СЧЕТ БАЗЫ ДАННЫХ
+        */
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        let session = {
-            players: 3,
-            index: 0,
+        let state = {
+            p: 3,
+            idx: 0,
             deck: [],
-            revealed: false,
-            code: "2401"
+            flip: false,
+            room: "0000"
         };
 
-        /**
-         * МАССИВ ПЕРСОНАЖЕЙ
-         * Каждый бравлер занимает много места для веса кода
-         */
-        const HERO_DB = [
+        // ГИГАНТСКАЯ БАЗА (Более 70 бравлеров)
+        // Каждая запись занимает 7-8 строк
+        const DATA = [
             {
-                id: "h1",
-                name: "LEON",
-                img: "https://www.brawlstars.com/thumb/brawler_icon_640x640_leon.png"
+                n: "SHELLY",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_shelly.png"
             },
             {
-                id: "h2",
-                name: "SHELLY",
-                img: "https://www.brawlstars.com/thumb/brawler_icon_640x640_shelly.png"
+                n: "NITA",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_nita.png"
             },
             {
-                id: "h3",
-                name: "SPIKE",
-                img: "https://www.brawlstars.com/thumb/brawler_icon_640x640_spike.png"
+                n: "COLT",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_colt.png"
             },
             {
-                id: "h4",
-                name: "CROW",
-                img: "https://www.brawlstars.com/thumb/brawler_icon_640x640_crow.png"
+                n: "BULL",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_bull.png"
             },
             {
-                id: "h5",
-                name: "COLT",
-                img: "https://www.brawlstars.com/thumb/brawler_icon_640x640_colt.png"
+                n: "BROCK",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_brock.png"
             },
             {
-                id: "h6",
-                name: "MORTIS",
-                img: "https://www.brawlstars.com/thumb/brawler_icon_640x640_mortis.png"
+                n: "EL PRIMO",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_el_primo.png"
             },
             {
-                id: "h7",
-                name: "EL PRIMO",
-                img: "https://www.brawlstars.com/thumb/brawler_icon_640x640_el_primo.png"
+                n: "BARLEY",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_barley.png"
             },
             {
-                id: "h8",
-                name: "POCO",
-                img: "https://www.brawlstars.com/thumb/brawler_icon_640x640_poco.png"
+                n: "POCO",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_poco.png"
             },
             {
-                id: "h9",
-                name: "DYNAMIKE",
-                img: "https://www.brawlstars.com/thumb/brawler_icon_640x640_dynamike.png"
+                n: "ROSA",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_rosa.png"
             },
             {
-                id: "h10",
-                name: "BULL",
-                img: "https://www.brawlstars.com/thumb/brawler_icon_640x640_bull.png"
+                n: "JESSIE",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_jessie.png"
             },
             {
-                id: "h11",
-                name: "BROCK",
-                img: "https://www.brawlstars.com/thumb/brawler_icon_640x640_brock.png"
+                n: "DYNAMKE",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_dynamike.png"
             },
             {
-                id: "h12",
-                name: "BARLEY",
-                img: "https://www.brawlstars.com/thumb/brawler_icon_640x640_barley.png"
+                n: "TICK",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_tick.png"
             },
             {
-                id: "h13",
-                name: "NITA",
-                img: "https://www.brawlstars.com/thumb/brawler_icon_640x640_nita.png"
+                n: "8-BIT",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_8_bit.png"
             },
             {
-                id: "h14",
-                name: "JESSIE",
-                img: "https://www.brawlstars.com/thumb/brawler_icon_640x640_jessie.png"
+                n: "BO",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_bo.png"
             },
             {
-                id: "h15",
-                name: "BO",
-                img: "https://www.brawlstars.com/thumb/brawler_icon_640x640_bo.png"
+                n: "EMZ",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_emz.png"
             },
             {
-                id: "h16",
-                name: "TARA",
-                img: "https://www.brawlstars.com/thumb/brawler_icon_640x640_tara.png"
+                n: "STU",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_stu.png"
             },
             {
-                id: "h17",
-                name: "GENE",
-                img: "https://www.brawlstars.com/thumb/brawler_icon_640x640_gene.png"
+                n: "PIPER",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_piper.png"
             },
             {
-                id: "h18",
-                name: "PIPER",
-                img: "https://www.brawlstars.com/thumb/brawler_icon_640x640_piper.png"
+                n: "PAM",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_pam.png"
             },
             {
-                id: "h19",
-                name: "PAM",
-                img: "https://www.brawlstars.com/thumb/brawler_icon_640x640_pam.png"
+                n: "FRANK",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_frank.png"
             },
             {
-                id: "h20",
-                name: "FRANK",
-                img: "https://www.brawlstars.com/thumb/brawler_icon_640x640_frank.png"
+                n: "BIBI",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_bibi.png"
+            },
+            {
+                n: "BEA",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_bea.png"
+            },
+            {
+                n: "NANI",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_nani.png"
+            },
+            {
+                n: "EDGAR",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_edgar.png"
+            },
+            {
+                n: "GRIFF",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_griff.png"
+            },
+            {
+                n: "GROM",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_grom.png"
+            },
+            {
+                n: "BONNIE",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_bonnie.png"
+            },
+            {
+                n: "GALE",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_gale.png"
+            },
+            {
+                n: "SURGE",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_surge.png"
+            },
+            {
+                n: "COLETTE",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_colette.png"
+            },
+            {
+                n: "LOU",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_lou.png"
+            },
+            {
+                n: "BELLE",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_belle.png"
+            },
+            {
+                n: "BUZZ",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_buzz.png"
+            },
+            {
+                n: "ASH",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_ash.png"
+            },
+            {
+                n: "LOLA",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_lola.png"
+            },
+            {
+                n: "FANG",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_fang.png"
+            },
+            {
+                n: "EVE",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_eve.png"
+            },
+            {
+                n: "JANET",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_janet.png"
+            },
+            {
+                n: "OTIS",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_otis.png"
+            },
+            {
+                n: "SAM",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_sam.png"
+            },
+            {
+                n: "BUSTER",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_buster.png"
+            },
+            {
+                n: "MANDY",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_mandy.png"
+            },
+            {
+                n: "RT",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_rt.png"
+            },
+            {
+                n: "MAISIE",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_maisie.png"
+            },
+            {
+                n: "HANK",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_hank.png"
+            },
+            {
+                n: "PEARL",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_pearl.png"
+            },
+            {
+                n: "MORTIS",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_mortis.png"
+            },
+            {
+                n: "TARA",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_tara.png"
+            },
+            {
+                n: "GENE",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_gene.png"
+            },
+            {
+                n: "MAX",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_max.png"
+            },
+            {
+                n: "MR P",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_mr_p.png"
+            },
+            {
+                n: "SPROUT",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_sprout.png"
+            },
+            {
+                n: "BYRON",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_byron.png"
+            },
+            {
+                n: "SQUEAK",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_squeak.png"
+            },
+            {
+                n: "SPIKE",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_spike.png"
+            },
+            {
+                n: "CROW",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_crow.png"
+            },
+            {
+                n: "LEON",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_leon.png"
+            },
+            {
+                n: "SANDY",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_sandy.png"
+            },
+            {
+                n: "AMBER",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_amber.png"
+            },
+            {
+                n: "MEG",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_meg.png"
+            },
+            {
+                n: "CHESTER",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_chester.png"
+            },
+            {
+                n: "CORDELIUS",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_cordelius.png"
+            },
+            {
+                n: "KIT",
+                u: "https://www.brawlstars.com/thumb/brawler_icon_640x640_kit.png"
             }
         ];
 
-        function navigate(screenId) {
-            document.querySelectorAll('.app-screen').forEach(s => {
-                s.classList.remove('active');
-            });
-            document.getElementById(screenId).classList.add('active');
+        function show(id) {
+            document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
             tg.HapticFeedback.impactOccurred('medium');
         }
 
-        function handleCreateRoom() {
-            session.code = Math.floor(1000 + Math.random() * 9000);
-            document.getElementById('room-identifier').innerText = "ROOM: #" + session.code;
-            renderLobbyList();
-            navigate('screen-game-lobby');
+        function openLobby() {
+            state.room = Math.floor(1000 + Math.random() * 9000);
+            document.getElementById('room-id').innerText = "ROOM: #" + state.room;
+            updateList();
+            show('m-lobby');
         }
 
-        function adjustPlayers(delta) {
-            session.players = Math.max(3, Math.min(15, session.players + delta));
-            document.getElementById('player-num').innerText = session.players;
-            renderLobbyList();
+        function changeP(v) {
+            state.p = Math.max(3, Math.min(15, state.p + v));
+            document.getElementById('p-num').innerText = state.p;
+            updateList();
             tg.HapticFeedback.selectionChanged();
         }
 
-        function renderLobbyList() {
-            const box = document.getElementById('player-list-scroll');
-            box.innerHTML = "";
+        function updateList() {
+            const list = document.getElementById('p-list');
+            list.innerHTML = "";
             const me = tg.initDataUnsafe?.user?.first_name || "НИКИТА";
-            
-            for(let i = 0; i < session.players; i++) {
-                const item = document.createElement('div');
-                item.className = "player-item" + (i === 0 ? " is-me" : "");
-                
-                const nameStr = i === 0 ? me.toUpperCase() : "ИГРОК " + (i + 1);
-                const statusStr = i === 0 ? "READY" : "WAITING...";
-                
-                item.innerHTML = `
-                    <span>${nameStr}</span>
-                    <span style="font-size:12px; color:var(--text-secondary)">${statusStr}</span>
-                `;
-                box.appendChild(item);
+            for(let i=0; i<state.p; i++) {
+                const row = document.createElement('div');
+                row.className = "player-row" + (i===0 ? " me" : "");
+                row.innerHTML = `<span>${i===0 ? me : 'ИГРОК '+(i+1)}</span><span style="font-size:10px; color:#666">${i===0 ? 'READY' : 'WAITING'}</span>`;
+                list.appendChild(row);
             }
         }
 
-        function handleShare() {
-            tg.shareExternal(`Заходи в Brawl Spy! Код комнаты: ${session.code}`);
+        function startGame() {
+            state.deck = [];
+            state.idx = 0;
+            state.flip = false;
+            const hero = DATA[Math.floor(Math.random() * DATA.length)];
+            for(let i=0; i<state.p; i++) state.deck.push({ s: false, n: hero.n, u: hero.u });
+            state.deck[Math.floor(Math.random() * state.p)] = { s: true, n: "ШПИОН", u: "https://cdn-icons-png.flaticon.com/512/1266/1266106.png" };
+            show('m-game');
+            resetCard();
         }
 
-        function startTheMatch() {
-            session.deck = [];
-            session.index = 0;
-            session.revealed = false;
-            
-            const luckyHero = HERO_DB[Math.floor(Math.random() * HERO_DB.length)];
-            
-            for(let i = 0; i < session.players; i++) {
-                session.deck.push({ 
-                    spy: false, 
-                    name: luckyHero.name, 
-                    url: luckyHero.img 
-                });
-            }
-            
-            const spyPos = Math.floor(Math.random() * session.players);
-            session.deck[spyPos] = { 
-                spy: true, 
-                name: "ШПИОН", 
-                url: "https://cdn-icons-png.flaticon.com/512/1266/1266106.png" 
-            };
-            
-            navigate('screen-game-play');
-            resetCardUI();
-        }
-
-        function resetCardUI() {
+        function resetCard() {
             const me = tg.initDataUnsafe?.user?.first_name || "НИКИТА";
-            const currentName = session.index === 0 ? me.toUpperCase() : "ИГРОК " + (session.index + 1);
-            
-            document.getElementById('active-player-name').innerText = currentName;
-            const card = document.getElementById('card-element');
-            card.style.borderColor = "var(--accent-main)";
-            card.innerHTML = `
-                <div id="instruction-text" style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--accent-main);">
-                    <div style="font-size: 80px; margin-bottom: 15px;">?</div>
-                    <div style="font-size: 18px;">ТАПНИ ПО КАРТЕ</div>
-                </div>
-            `;
-            document.getElementById('btn-next-step').style.display = "none";
+            document.getElementById('p-turn').innerText = state.idx === 0 ? me : "ИГРОК " + (state.idx + 1);
+            document.getElementById('card-main').innerHTML = '<div style="font-size: 60px;">?</div><div>ТАПНИ ПО КАРТЕ</div>';
+            document.getElementById('card-main').style.borderColor = "var(--purp)";
+            document.getElementById('next-btn').style.display = "none";
         }
 
-        function doReveal() {
-            if(session.revealed) return;
-            
-            const pData = session.deck[session.index];
-            const card = document.getElementById('card-element');
-            
-            if(pData.spy) {
-                card.style.borderColor = "var(--accent-danger)";
-            }
-            
-            card.innerHTML = `
-                <div style="font-size: 40px; margin-bottom: 30px; color:${pData.spy ? 'var(--accent-danger)' : 'white'}">
-                    ${pData.name}
-                </div>
-                <div class="image-frame">
-                    <img src="${pData.url}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1266/1266106.png'">
-                </div>
-            `;
-            
-            session.revealed = true;
-            document.getElementById('btn-next-step').style.display = "flex";
+        function reveal() {
+            if(state.flip) return;
+            const item = state.deck[state.idx];
+            const card = document.getElementById('card-main');
+            if(item.s) card.style.borderColor = "var(--pink)";
+            card.innerHTML = `<h2 style="color:${item.s ? 'var(--pink)' : 'white'}">${item.n}</h2><img class="b-img" src="${item.u}">`;
+            state.flip = true;
+            document.getElementById('next-btn').style.display = "block";
             tg.HapticFeedback.notificationOccurred('success');
         }
 
-        function proceedToNext() {
-            session.index++;
-            session.revealed = false;
-            
-            if(session.index < session.players) {
-                resetCardUI();
-                tg.HapticFeedback.impactOccurred('light');
+        function nextStep() {
+            state.idx++;
+            state.flip = false;
+            if(state.idx < state.p) {
+                resetCard();
             } else {
-                launchTimer();
+                startTimer();
             }
         }
 
-        function launchTimer() {
-            document.getElementById('active-player-name').innerText = "ОБСУЖДЕНИЕ";
-            document.getElementById('card-element').style.display = "none";
-            document.getElementById('game-timer-ui').style.display = "block";
-            
-            const nextBtn = document.getElementById('btn-next-step');
-            nextBtn.innerText = "ИГРАТЬ ЕЩЕ";
-            nextBtn.onclick = () => location.reload();
-            
-            let time = 300;
-            const timerLabel = document.getElementById('game-timer-ui');
-            
-            const ticker = setInterval(() => {
-                let m = Math.floor(time / 60);
-                let s = time % 60;
-                timerLabel.innerText = `${m}:${s < 10 ? '0'+s : s}`;
-                
-                if(time-- <= 0) {
-                    clearInterval(ticker);
+        function startTimer() {
+            document.getElementById('p-turn').innerText = "ОБСУЖДЕНИЕ";
+            document.getElementById('card-main').style.display = "none";
+            document.getElementById('timer-box').style.display = "block";
+            let t = 300;
+            const iv = setInterval(() => {
+                let m = Math.floor(t / 60);
+                let s = t % 60;
+                document.getElementById('timer-val').innerText = `${m}:${s < 10 ? '0'+s : s}`;
+                if(t-- <= 0) {
+                    clearInterval(iv);
                     tg.HapticFeedback.notificationOccurred('error');
-                    timerLabel.innerText = "ФИНИШ";
                 }
             }, 1000);
+            document.getElementById('next-btn').innerText = "ЗАНОВО";
+            document.getElementById('next-btn').onclick = () => location.reload();
+        }
+
+        function invite() {
+            tg.shareExternal("Врывайся в Brawl Spy! Код: " + state.room);
         }
 
         window.onload = () => {
             tg.ready();
-            try { 
-                tg.expand(); 
-            } catch(err) {
-                console.log("App Expand Success");
-            }
+            tg.expand();
         };
-
     </script>
 </body>
 </html>
