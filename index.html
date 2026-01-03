@@ -3,30 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Brawl Spy Full Matte</title>
+    <title>Brawl Spy Full Game</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik+One&display=swap" rel="stylesheet">
     
     <style>
-        /* БАЗОВЫЕ СТИЛИ */
-        * { 
-            box-sizing: border-box; 
-            -webkit-tap-highlight-color: transparent; 
-            margin: 0; 
-            padding: 0; 
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         
         body {
             background-color: #0A0A0F;
             background-image: radial-gradient(circle at 50% 50%, #1a0b2e 0%, #0A0A0F 100%);
             color: white;
-            font-family: 'Rubik', sans-serif; /* Измененный шрифт */
+            font-family: 'Rubik One', sans-serif;
             height: 100vh;
             width: 100vw;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            user-select: none;
         }
 
         .app-container {
@@ -38,7 +31,6 @@
             padding: 20px;
         }
 
-        /* ЭКРАНЫ */
         .screen {
             display: none;
             width: 100%;
@@ -46,112 +38,111 @@
             flex-direction: column;
             align-items: center;
             justify-content: space-around;
-            padding: 40px 0;
+            padding: 30px 0;
         }
 
-        .active { 
-            display: flex !important; 
-        }
+        .active { display: flex !important; }
 
-        /* ЗАГОЛОВКИ */
         h1 {
-            font-size: 42px;
+            font-size: 38px;
             text-transform: uppercase;
             text-align: center;
-            color: #FFFFFF;
-            text-shadow: 0 0 10px rgba(114, 9, 183, 0.4);
-            font-weight: 500;
+            text-shadow: 0 0 15px rgba(114, 9, 183, 0.6);
         }
 
-        /* ПРОФИЛЬ ЮЗЕРА */
-        .user-card {
-            background: rgba(114, 9, 183, 0.1);
+        /* ПАНЕЛЬ ИГРОКА */
+        .user-info {
+            background: rgba(114, 9, 183, 0.15);
             border: 2px solid #7209B7;
             border-radius: 50px;
-            padding: 10px 25px;
+            padding: 8px 20px;
             display: flex;
             align-items: center;
-            margin-top: 15px;
+            gap: 15px;
         }
 
-        .user-avatar {
-            width: 45px;
-            height: 45px;
+        .avatar {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            border: 2px solid #FFFFFF;
-            margin-right: 15px;
-            object-fit: cover;
+            border: 2px solid white;
         }
 
-        /* ТОТ САМЫЙ ЧЕРНЫЙ МАТОВЫЙ СТИЛЬ КНОПОК */
-        .btn-action {
-            background-color: #000000; /* Глубокий черный матовый */
-            border: 2px solid #7209B7; /* Фиолетовая рамка */
+        /* ТВОИ МАТОВЫЕ КНОПКИ */
+        .btn-main {
+            background-color: #1c1c1f; /* Темно-серый матовый */
+            border: 3px solid #7209B7;
             border-radius: 20px;
             color: white;
-            font-family: 'Rubik', sans-serif;
-            font-weight: 500; /* Не жирный шрифт */
-            font-size: 20px;
-            padding: 20px;
+            font-family: 'Rubik One', sans-serif;
+            font-size: 18px;
+            padding: 22px;
             width: 100%;
             max-width: 300px;
             text-transform: uppercase;
-            cursor: pointer;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-            transition: transform 0.1s;
-            letter-spacing: 1px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            transition: 0.1s;
         }
 
-        .btn-action:active {
-            transform: scale(0.96);
-            background-color: #080808;
-        }
+        .btn-main:active { transform: scale(0.95); background-color: #252529; }
 
-        /* НАСТРОЙКИ КОМНАТЫ */
-        .settings-box {
-            background: rgba(255, 255, 255, 0.03);
+        /* НАСТРОЙКИ */
+        .settings-card {
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 25px;
+            padding: 20px;
             width: 100%;
             max-width: 320px;
-            padding: 15px;
-            border: 1px solid rgba(114, 9, 183, 0.2);
+            border: 1px solid rgba(114, 9, 183, 0.3);
         }
 
-        .setting-row {
+        .row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 5px;
+            margin: 15px 0;
         }
 
-        .counter-btn {
-            width: 44px;
-            height: 44px;
+        .ctrl-btn {
+            width: 45px;
+            height: 45px;
             background: #560bad;
             border: none;
             border-radius: 12px;
             color: white;
-            font-size: 24px;
+            font-family: 'Rubik One', sans-serif;
+            font-size: 20px;
+        }
+
+        /* ИГРОВАЯ КАРТОЧКА */
+        .role-card {
+            background: #1c1c1f;
+            border: 4px solid #7209B7;
+            border-radius: 30px;
+            width: 280px;
+            height: 380px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-        }
-
-        .counter-value {
-            font-size: 26px;
-            min-width: 35px;
             text-align: center;
-            margin: 0 10px;
+            padding: 20px;
         }
 
-        .btn-back {
-            color: #666;
-            text-transform: uppercase;
-            font-size: 14px;
+        .hidden { filter: blur(10px); }
+
+        .timer {
+            font-size: 40px;
+            color: #f72585;
             margin-top: 10px;
+        }
+
+        .back-text {
+            color: #555;
+            text-transform: uppercase;
+            font-size: 12px;
+            margin-top: 15px;
             cursor: pointer;
-            letter-spacing: 2px;
         }
     </style>
 </head>
@@ -159,98 +150,138 @@
 
     <div class="app-container">
         
-        <div id="main-screen" class="screen active">
-            <div style="text-align: center;">
-                <h1>BRAWL SPY</h1>
-                <div class="user-card">
-                    <img id="player-avatar" src="https://cdn-icons-png.flaticon.com/512/847/847969.png" class="user-avatar">
-                    <span id="player-name">ИГРОК</span>
-                </div>
+        <div id="screen-start" class="screen active">
+            <h1>BRAWL SPY</h1>
+            <div class="user-info">
+                <img id="u-ava" src="https://cdn-icons-png.flaticon.com/512/847/847969.png" class="avatar">
+                <span id="u-name">PLAYER</span>
             </div>
-            <button class="btn-action" onclick="navigateTo('menu-screen')">ИГРАТЬ</button>
+            <button class="btn-main" onclick="show('screen-menu')">ИГРАТЬ</button>
         </div>
 
-        <div id="menu-screen" class="screen">
+        <div id="screen-menu" class="screen">
             <h1>МЕНЮ</h1>
-            <div style="width: 100%; display: flex; flex-direction: column; align-items: center; gap: 20px;">
-                <button class="btn-action" onclick="navigateTo('room-screen')">Создать комнату</button>
-                <button class="btn-action" onclick="sendInvite()">Пригласить друга</button>
-            </div>
-            <div class="btn-back" onclick="navigateTo('main-screen')">назад</div>
+            <button class="btn-main" onclick="show('screen-settings')">Создать комнату</button>
+            <button class="btn-main" onclick="tgInvite()">Пригласить друга</button>
+            <div class="back-text" onclick="show('screen-start')">назад</div>
         </div>
 
-        <div id="room-screen" class="screen">
+        <div id="screen-settings" class="screen">
             <h1>КОМНАТА</h1>
-            <div class="settings-box">
-                <div class="setting-row">
-                    <span>ИГРОКОВ</span>
-                    <div style="display: flex; align-items: center;">
-                        <button class="counter-btn" onclick="updateValue('players', -1)">-</button>
-                        <span id="players-count" class="counter-value">4</span>
-                        <button class="counter-btn" onclick="updateValue('players', 1)">+</button>
+            <div class="settings-card">
+                <div class="row">
+                    <span>ИГРОКИ</span>
+                    <div>
+                        <button class="ctrl-btn" onclick="set('p',-1)">-</button>
+                        <span id="v-p" style="margin:0 15px">4</span>
+                        <button class="ctrl-btn" onclick="set('p',1)">+</button>
                     </div>
                 </div>
-                <div class="setting-row">
-                    <span>ШПИОНОВ</span>
-                    <div style="display: flex; align-items: center;">
-                        <button class="counter-btn" onclick="updateValue('spies', -1)">-</button>
-                        <span id="spies-count" class="counter-value">1</span>
-                        <button class="counter-btn" onclick="updateValue('spies', 1)">+</button>
+                <div class="row">
+                    <span>ШПИОНЫ</span>
+                    <div>
+                        <button class="ctrl-btn" onclick="set('s',-1)">-</button>
+                        <span id="v-s" style="margin:0 15px">1</span>
+                        <button class="ctrl-btn" onclick="set('s',1)">+</button>
                     </div>
                 </div>
             </div>
-            <button class="btn-action" onclick="sendInvite()">ПОЗВАТЬ ДРУЗЕЙ</button>
-            <div class="btn-back" onclick="navigateTo('menu-screen')">назад</div>
+            <button class="btn-main" onclick="startGame()">СТАРТ</button>
+            <div class="back-text" onclick="show('screen-menu')">назад</div>
+        </div>
+
+        <div id="screen-game" class="screen">
+            <h1 id="game-status">КТО ТЫ?</h1>
+            <div id="card" class="role-card" onclick="revealCard()">
+                <div id="card-inner">
+                    <p style="font-size: 14px; color: #7209B7;">НАЖМИ ЧТОБЫ УЗНАТЬ</p>
+                </div>
+            </div>
+            <div id="timer" class="timer">05:00</div>
+            <button class="btn-main" id="next-btn" style="display:none;" onclick="nextPlayer()">СЛЕД. ИГРОК</button>
         </div>
 
     </div>
 
     <script>
-        const webApp = window.Telegram.WebApp;
-        webApp.expand();
-        webApp.ready();
+        const tg = window.Telegram.WebApp;
+        tg.expand();
 
-        // Данные юзера
-        function setupUser() {
-            const userData = webApp.initDataUnsafe?.user;
-            if (userData) {
-                document.getElementById('player-name').innerText = (userData.first_name || "ИГРОК").toUpperCase();
-                if (userData.photo_url) document.getElementById('player-avatar').src = userData.photo_url;
-            }
-        }
+        let players = 4, spies = 1, currentPlayer = 0;
+        let roles = [], locations = ["ШКОЛА", "БОЛЬНИЦА", "БАЗАР", "КОСМОС", "ЦИРК", "БАНК"];
+        let gameActive = false;
 
-        // Навигация
-        function navigateTo(screenId) {
+        function show(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-            webApp.HapticFeedback.impactOccurred('medium');
+            document.getElementById(id).classList.add('active');
+            tg.HapticFeedback.impactOccurred('medium');
         }
 
-        // Логика цифр
-        function updateValue(type, change) {
-            const pEl = document.getElementById('players-count');
-            const sEl = document.getElementById('spies-count');
-            let p = parseInt(pEl.innerText);
-            let s = parseInt(sEl.innerText);
+        function set(t, v) {
+            if(t==='p') { players = Math.max(3, Math.min(15, players+v)); document.getElementById('v-p').innerText = players; }
+            else { spies = Math.max(1, Math.min(players-1, spies+v)); document.getElementById('v-s').innerText = spies; }
+            tg.HapticFeedback.selectionChanged();
+        }
 
-            if (type === 'players') {
-                p += change;
-                if (p < 3) p = 3; if (p > 15) p = 15;
-                pEl.innerText = p;
-                if (s >= p) sEl.innerText = p - 1;
+        function startGame() {
+            roles = [];
+            let loc = locations[Math.floor(Math.random()*locations.length)];
+            for(let i=0; i<players; i++) roles.push(loc);
+            for(let i=0; i<spies; i++) roles[i] = "ШПИОН 🕵️";
+            roles.sort(() => Math.random() - 0.5);
+            
+            currentPlayer = 0;
+            show('screen-game');
+            updateCardDisplay(true);
+        }
+
+        function updateCardDisplay(isLocked) {
+            const inner = document.getElementById('card-inner');
+            if(isLocked) {
+                inner.innerHTML = '<p style="font-size: 20px;">КЛАТЦ!</p>';
+                document.getElementById('next-btn').style.display = 'none';
             } else {
-                s += change;
-                if (s < 1) s = 1; if (s >= p) s = p - 1;
-                sEl.innerText = s;
+                inner.innerHTML = `<h2>${roles[currentPlayer]}</h2>`;
+                document.getElementById('next-btn').style.display = 'block';
             }
-            webApp.HapticFeedback.selectionChanged();
         }
 
-        function sendInvite() {
-            webApp.switchInlineQuery("Го в Brawl Spy!");
+        function revealCard() {
+            updateCardDisplay(false);
+            tg.HapticFeedback.notificationOccurred('success');
         }
 
-        window.onload = setupUser;
+        function nextPlayer() {
+            currentPlayer++;
+            if(currentPlayer >= players) {
+                document.getElementById('game-status').innerText = "ИГРА ИДЕТ!";
+                document.getElementById('card').style.display = 'none';
+                document.getElementById('next-btn').innerText = "ЗАКОНЧИТЬ";
+                document.getElementById('next-btn').onclick = () => location.reload();
+                startTimer(300);
+            } else {
+                updateCardDisplay(true);
+            }
+        }
+
+        function startTimer(duration) {
+            let timer = duration, min, sec;
+            setInterval(() => {
+                min = parseInt(timer / 60, 10);
+                sec = parseInt(timer % 60, 10);
+                document.getElementById('timer').innerText = `${min < 10 ? "0" + min : min}:${sec < 10 ? "0" + sec : sec}`;
+                if (--timer < 0) timer = 0;
+            }, 1000);
+        }
+
+        function tgInvite() { tg.switchInlineQuery("Го в Brawl Spy!"); }
+
+        // Инициализация юзера
+        const u = tg.initDataUnsafe?.user;
+        if(u) {
+            document.getElementById('u-name').innerText = u.first_name.toUpperCase();
+            if(u.photo_url) document.getElementById('u-ava').src = u.photo_url;
+        }
     </script>
 </body>
 </html>
