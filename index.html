@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Brawl Spy Ultimate</title>
+    <title>Brawl Spy Ultimate Fixed</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Rubik+One&display=swap" rel="stylesheet">
     <style>
@@ -21,67 +21,89 @@
         .screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: space-between; padding: 40px 20px; text-align: center; }
         .screen.active { display: flex; }
 
-        /* Дизайн кнопок */
+        .main-title { font-size: 50px; line-height: 0.9; margin-top: 20px; text-transform: uppercase; }
+        .main-title span { color: var(--primary); display: block; font-size: 60px; }
+
         .btn-main {
-            width: 100%; max-width: 320px; padding: 20px; border-radius: 20px;
-            background: var(--primary); color: white; border: none; font-size: 22px;
+            width: 100%; max-width: 320px; padding: 22px; border-radius: 25px;
+            background: var(--primary); color: white; border: none; font-size: 24px;
             box-shadow: 0 6px 0 #4a0577; transition: 0.1s; cursor: pointer;
+            text-transform: uppercase; margin-bottom: 20px;
         }
         .btn-main:active { transform: translateY(4px); box-shadow: 0 2px 0 #4a0577; }
         
-        /* 3D Карта */
+        .controls-row { display: flex; align-items: center; gap: 30px; background: var(--panel); padding: 20px; border-radius: 20px; border: 1px solid #333; }
+        .btn-step { width: 60px; height: 60px; background: var(--primary); border: none; border-radius: 15px; color: white; font-size: 30px; cursor: pointer; }
+
         .card-wrap { width: 280px; height: 400px; perspective: 1000px; margin: 20px 0; }
         .card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-style: preserve-3d; }
         .card-inner.flipped { transform: rotateY(180deg); }
         .card-side { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 35px; border: 8px solid var(--primary); display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--panel); }
         .card-front { transform: rotateY(180deg); background: #fff; color: #000; border-color: var(--accent); }
         
-        .brawler-img { width: 200px; height: 200px; object-fit: contain; }
-        #timer-display { font-size: 70px; color: var(--accent); margin-bottom: 20px; }
+        .brawler-img { width: 220px; height: 220px; object-fit: contain; }
+        #timer-display { font-size: 80px; color: var(--accent); }
     </style>
 </head>
 <body>
 
     <div id="menu" class="screen active">
-        <h1 style="font-size: 50px;">BRAWL<br><span style="color:var(--primary)">SPY</span></h1>
-        <button class="btn-main" onclick="nav('lobby')">ИГРАТЬ</button>
+        <h1 class="main-title">BRAWL<span>SPY</span></h1>
+        <button class="btn-main" onclick="nav('lobby')">Играть</button>
     </div>
 
     <div id="lobby" class="screen">
-        <h2>ИГРОКИ</h2>
-        <div style="display:flex; align-items:center; gap:30px; background:var(--panel); padding:20px; border-radius:20px;">
-            <button class="btn-circle" style="width:50px; height:50px; background:var(--primary); border:none; border-radius:10px; color:white; font-size:24px;" onclick="changeP(-1)">-</button>
-            <span id="p-count" style="font-size:40px;">3</span>
-            <button class="btn-circle" style="width:50px; height:50px; background:var(--primary); border:none; border-radius:10px; color:white; font-size:24px;" onclick="changeP(1)">+</button>
+        <h2 style="font-size: 30px;">КОЛИЧЕСТВО ИГРОКОВ</h2>
+        <div class="controls-row">
+            <button class="btn-step" onclick="changeP(-1)">-</button>
+            <span id="p-count" style="font-size: 45px;">3</span>
+            <button class="btn-step" onclick="changeP(1)">+</button>
         </div>
-        <button class="btn-main" onclick="startGame()">РАЗДАТЬ</button>
+        <button class="btn-main" onclick="startGame()">Раздать роли</button>
     </div>
 
     <div id="game" class="screen">
-        <h3 id="p-label" style="color:var(--secondary)">ИГРОК 1</h3>
+        <h3 id="p-label" style="color:var(--secondary); font-size: 25px;">ИГРОК 1</h3>
         <div class="card-wrap" onclick="flip()">
             <div id="card-obj" class="card-inner">
-                <div class="card-side"><h1>?</h1><p>ТАПНИ МЕНЯ</p></div>
+                <div class="card-side">
+                    <h1 style="font-size: 80px;">?</h1>
+                    <p style="font-size: 14px; opacity: 0.7;">НАЖМИ, ЧТОБЫ УЗНАТЬ РОЛЬ</p>
+                </div>
                 <div class="card-side card-front" id="role-ui"></div>
             </div>
         </div>
         <div id="timer-ui" style="display:none;">
             <div id="timer-display">05:00</div>
+            <p>КТО ШПИОН?</p>
         </div>
-        <button id="btn-action" class="btn-main" style="visibility:hidden;" onclick="next()">ДАЛЕЕ</button>
+        <button id="btn-action" class="btn-main" style="visibility:hidden;" onclick="next()">Далее</button>
+        <button id="btn-restart" class="btn-main" style="display:none;" onclick="location.reload()">В меню</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand();
-
+        
+        // Исправленный список: Имя на русском + Точная картинка
         const BRAWLERS = [
-            { n: "LEON", i: "https://cdn.brawlstats.com/character-arts/16000017.png" },
-            { n: "SPIKE", i: "https://cdn.brawlstats.com/character-arts/16000007.png" },
-            { n: "CROW", i: "https://cdn.brawlstats.com/character-arts/16000008.png" },
-            { n: "MORTIS", i: "https://cdn.brawlstats.com/character-arts/16000014.png" },
-            { n: "SHELLY", i: "https://cdn.brawlstats.com/character-arts/16000000.png" },
-            { n: "EL PRIMO", i: "https://cdn.brawlstats.com/character-arts/16000012.png" }
+            { n: "ШЕЛЛИ", i: "https://cdn.brawlstats.com/character-arts/16000000.png" },
+            { n: "КОЛЬТ", i: "https://cdn.brawlstats.com/character-arts/16000001.png" },
+            { n: "БУЛЛ", i: "https://cdn.brawlstats.com/character-arts/16000002.png" },
+            { n: "РИКО", i: "https://cdn.brawlstats.com/character-arts/16000003.png" },
+            { n: "ДЖЕССИ", i: "https://cdn.brawlstats.com/character-arts/16000004.png" },
+            { n: "БРОК", i: "https://cdn.brawlstats.com/character-arts/16000005.png" },
+            { n: "ДИНАМАЙК", i: "https://cdn.brawlstats.com/character-arts/16000006.png" },
+            { n: "СПАЙК", i: "https://cdn.brawlstats.com/character-arts/16000007.png" },
+            { n: "КРОУ", i: "https://cdn.brawlstats.com/character-arts/16000008.png" },
+            { n: "БАРЛИ", i: "https://cdn.brawlstats.com/character-arts/16000009.png" },
+            { n: "БО", i: "https://cdn.brawlstats.com/character-arts/16000010.png" },
+            { n: "ПОКО", i: "https://cdn.brawlstats.com/character-arts/16000011.png" },
+            { n: "ЭЛЬ ПРИМО", i: "https://cdn.brawlstats.com/character-arts/16000012.png" },
+            { n: "ПАЙПЕР", i: "https://cdn.brawlstats.com/character-arts/16000013.png" },
+            { n: "МОРТИС", i: "https://cdn.brawlstats.com/character-arts/16000014.png" },
+            { n: "ДЭРРИЛ", i: "https://cdn.brawlstats.com/character-arts/16000015.png" },
+            { n: "ПЕННИ", i: "https://cdn.brawlstats.com/character-arts/16000016.png" },
+            { n: "ЛЕОН", i: "https://cdn.brawlstats.com/character-arts/16000017.png" }
         ];
 
         let state = { p: 3, cur: 0, roles: [], isFlipped: false, time: 300 };
@@ -102,8 +124,8 @@
             state.cur = 0; state.roles = []; state.isFlipped = false;
             let spyIdx = Math.floor(Math.random() * state.p);
             let brawler = BRAWLERS[Math.floor(Math.random() * BRAWLERS.length)];
-            
             for(let i=0; i<state.p; i++) {
+                // Картинка для шпиона (иконка маски)
                 state.roles.push(i === spyIdx ? {n: "ШПИОН", i: "https://cdn-icons-png.flaticon.com/512/953/953791.png"} : brawler);
             }
             nav('game');
@@ -113,7 +135,7 @@
         function flip() {
             if(state.isFlipped) return;
             const role = state.roles[state.cur];
-            document.getElementById('role-ui').innerHTML = `<h2 style="margin-bottom:10px">${role.n}</h2><img src="${role.i}" class="brawler-img">`;
+            document.getElementById('role-ui').innerHTML = `<h2 style="font-size:28px;margin-bottom:10px">${role.n}</h2><img src="${role.i}" class="brawler-img">`;
             document.getElementById('card-obj').classList.add('flipped');
             document.getElementById('btn-action').style.visibility = 'visible';
             state.isFlipped = true;
@@ -135,10 +157,11 @@
         function updateUI() { document.getElementById('p-label').innerText = `ИГРОК ${state.cur + 1}`; }
 
         function startTimer() {
-            document.querySelector('.card-canvas').style.display = 'none';
+            document.querySelector('.card-wrap').style.display = 'none';
             document.getElementById('btn-action').style.display = 'none';
-            document.getElementById('p-label').innerText = "КТО ШПИОН?";
+            document.getElementById('p-label').innerText = "ОБСУЖДЕНИЕ";
             document.getElementById('timer-ui').style.display = 'block';
+            document.getElementById('btn-restart').style.display = 'block';
             
             let countdown = setInterval(() => {
                 state.time--;
@@ -147,12 +170,15 @@
                 if(state.time <= 0) {
                     clearInterval(countdown);
                     tg.HapticFeedback.notificationOccurred('error');
-                    tg.showSelection({title: "ВРЕМЯ ВЫШЛО", items: [{id:"1", title: "Голосовать"}]});
+                    tg.showAlert("ВРЕМЯ ВЫШЛО! КТО ЖЕ ШПИОН?");
                 }
             }, 1000);
         }
 
-        window.onload = () => { tg.ready(); };
+        window.onload = () => { 
+            tg.ready(); 
+            tg.expand();
+        };
     </script>
 </body>
 </html>
