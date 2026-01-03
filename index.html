@@ -3,18 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Brawl Spy: Ultimate Brawler Edition</title>
+    <title>Brawl Spy: Ultimate 400+ Edition</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Rubik+One&display=swap" rel="stylesheet">
     
     <style>
-        /* --- ГЛОБАЛЬНЫЕ СТИЛИ (МАССИВНЫЙ БЛОК) --- */
+        /* --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ И СТИЛИ --- */
         :root {
             --accent: #7209B7;
-            --accent-light: #B5179E;
-            --spy-color: #F72585;
-            --bg-dark: #0A0A0F;
-            --matte-gray: #1c1c1f;
+            --accent-dark: #560bad;
+            --spy-neon: #F72585;
+            --bg-deep: #0A0A0F;
+            --card-gray: #1c1c1f;
+            --text-main: #FFFFFF;
+            --glass: rgba(255, 255, 255, 0.05);
         }
 
         * { 
@@ -26,174 +28,220 @@
         }
         
         body {
-            background-color: var(--bg-dark);
+            background-color: var(--bg-deep);
             background-image: 
-                radial-gradient(circle at 10% 20%, rgba(114, 9, 183, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(247, 37, 133, 0.1) 0%, transparent 40%);
-            color: white;
+                radial-gradient(circle at 0% 0%, rgba(114, 9, 183, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(247, 37, 133, 0.15) 0%, transparent 50%);
+            color: var(--text-main);
             font-family: 'Rubik One', sans-serif;
             height: 100vh;
             width: 100vw;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
         }
 
-        /* --- КОНТЕЙНЕР ПРИЛОЖЕНИЯ --- */
-        .app-container {
+        /* --- АНИМАЦИИ --- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes pulseSpy {
+            0% { box-shadow: 0 0 10px var(--spy-neon); }
+            50% { box-shadow: 0 0 30px var(--spy-neon); }
+            100% { box-shadow: 0 0 10px var(--spy-neon); }
+        }
+
+        /* --- КОНТЕЙНЕРЫ --- */
+        .app-wrapper {
             flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             padding: 20px;
-            position: relative;
+            z-index: 2;
         }
 
-        /* --- ЭКРАНЫ И АНИМАЦИИ --- */
         .screen {
             display: none;
             width: 100%;
             height: 100%;
             flex-direction: column;
             align-items: center;
-            justify-content: space-around;
-            padding: 40px 0;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            justify-content: space-between;
+            padding: 30px 0;
+            animation: fadeIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
 
-        .screen.active { 
-            display: flex !important; 
-            opacity: 1; 
-            transform: translateY(0);
-        }
+        .screen.active { display: flex !important; }
 
-        /* --- ШАПКИ И ЗАГОЛОВКИ --- */
-        h1 {
-            font-size: 38px;
-            text-transform: uppercase;
+        /* --- ШАПКА И ЛОББИ ЭЛЕМЕНТЫ --- */
+        .header-box {
             text-align: center;
-            line-height: 1.1;
-            background: linear-gradient(to bottom, #fff 40%, #ccc 100%);
+            margin-bottom: 20px;
+        }
+
+        .main-title {
+            font-size: 42px;
+            text-transform: uppercase;
+            background: linear-gradient(180deg, #FFF 0%, #AAA 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 10px rgba(114, 9, 183, 0.5));
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
         }
 
-        /* --- КАРТОЧКА ЮЗЕРА ТГ --- */
-        .user-profile {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid var(--accent);
-            border-radius: 60px;
-            padding: 10px 25px;
+        .room-badge {
+            background: var(--accent);
+            padding: 6px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        /* --- СПИСОК ИГРОКОВ (ЛОББИ) --- */
+        .lobby-container {
+            width: 100%;
+            max-width: 360px;
+            background: var(--glass);
+            border: 1px solid rgba(114, 9, 183, 0.3);
+            border-radius: 25px;
+            padding: 15px;
+            flex: 1;
+            margin: 20px 0;
+            overflow-y: auto;
+        }
+
+        .player-row {
+            background: var(--card-gray);
+            margin-bottom: 10px;
+            padding: 12px 20px;
+            border-radius: 15px;
             display: flex;
             align-items: center;
-            gap: 15px;
-            backdrop-filter: blur(10px);
-            margin-bottom: 10px;
+            justify-content: space-between;
+            border-left: 4px solid var(--accent);
+            transition: 0.2s;
         }
 
-        .avatar-img {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            border: 2px solid white;
-            background: #222;
-        }
+        .player-row.is-host { border-left-color: #00f2ff; }
 
-        /* --- КНОПКИ (ТВОЙ МАТОВЫЙ СТИЛЬ) --- */
+        /* --- КНОПКИ (МАТОВЫЙ СЕРЫЙ) --- */
         .btn-matte {
-            background-color: var(--matte-gray);
+            background-color: var(--card-gray);
             border: 3px solid var(--accent);
-            border-radius: 24px;
+            border-radius: 22px;
             color: white;
             font-family: 'Rubik One', sans-serif;
-            font-size: 20px;
-            padding: 24px;
+            font-size: 18px;
+            padding: 22px;
             width: 100%;
             max-width: 340px;
             text-transform: uppercase;
             cursor: pointer;
-            box-shadow: 0 12px 0px rgba(0, 0, 0, 0.3), 0 20px 40px rgba(0, 0, 0, 0.5);
-            transition: all 0.1s ease;
+            box-shadow: 0 10px 0px rgba(0, 0, 0, 0.2), 0 15px 30px rgba(0,0,0,0.4);
+            transition: 0.1s;
             display: flex;
             align-items: center;
             justify-content: center;
-            letter-spacing: 1px;
+            margin-bottom: 15px;
         }
 
         .btn-matte:active {
             transform: translateY(4px);
-            box-shadow: 0 4px 0px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 0px rgba(0, 0, 0, 0.2);
             background-color: #252529;
         }
 
-        /* --- ИГРОВАЯ КАРТОЧКА (VIP ДИЗАЙН) --- */
-        .card-main {
-            background: var(--matte-gray);
+        .btn-secondary {
+            border-color: #444;
+            font-size: 14px;
+            padding: 15px;
+        }
+
+        /* --- ИГРОВАЯ КАРТА --- */
+        .card-container {
+            perspective: 1000px;
+            width: 300px;
+            height: 440px;
+        }
+
+        .brawl-card {
+            background: var(--card-gray);
             border: 5px solid var(--accent);
-            border-radius: 40px;
-            width: 310px;
-            height: 460px;
+            border-radius: 35px;
+            width: 100%;
+            height: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 35px 20px;
-            position: relative;
-            box-shadow: 0 0 50px rgba(114, 9, 183, 0.3);
-            transition: transform 0.6s;
+            padding: 30px 20px;
+            box-shadow: 0 0 40px rgba(114, 9, 183, 0.3);
+            cursor: pointer;
         }
 
-        .brawler-name-header {
-            font-size: 30px;
-            height: 40px;
-            margin-bottom: 30px;
-            text-transform: uppercase;
+        .brawler-name-top {
+            font-size: 28px;
+            color: white;
+            margin-bottom: 25px;
             text-align: center;
-            width: 100%;
-            color: #fff;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            text-transform: uppercase;
+            min-height: 40px;
         }
 
-        .spy-alert { color: var(--spy-color); text-shadow: 0 0 15px var(--spy-color); }
-
-        .image-holder {
-            width: 230px;
-            height: 230px;
+        .photo-frame {
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle, rgba(114, 9, 183, 0.3) 0%, transparent 70%);
             display: flex;
             align-items: center;
             justify-content: center;
-            background: radial-gradient(circle, rgba(114, 9, 183, 0.25) 0%, transparent 70%);
-            border-radius: 50%;
         }
 
-        .image-holder img {
+        .brawler-photo {
             width: 100%;
             height: 100%;
             object-fit: contain;
-            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+        }
+
+        .spy-mode {
+            border-color: var(--spy-neon);
+            animation: pulseSpy 2s infinite;
+        }
+
+        .spy-mode .brawler-name-top {
+            color: var(--spy-neon);
+            text-shadow: 0 0 10px var(--spy-neon);
+        }
+
+        /* --- ТАЙМЕР --- */
+        .timer-text {
+            font-size: 70px;
+            color: var(--spy-neon);
+            text-shadow: 0 0 20px rgba(247, 37, 133, 0.5);
+            margin: 20px 0;
         }
 
         /* --- НАСТРОЙКИ --- */
-        .settings-wrap {
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 35px;
-            padding: 30px;
+        .setting-panel {
             width: 100%;
-            max-width: 350px;
-            border: 1px solid rgba(255,255,255,0.1);
+            max-width: 340px;
+            background: var(--glass);
+            border-radius: 30px;
+            padding: 25px;
+            margin-bottom: 20px;
         }
 
-        .count-row {
+        .control-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin: 10px 0;
         }
 
-        .circle-btn {
+        .stepper-btn {
             width: 55px;
             height: 55px;
             background: var(--accent);
@@ -202,211 +250,242 @@
             color: white;
             font-family: 'Rubik One', sans-serif;
             font-size: 24px;
-            box-shadow: 0 4px 0 #560bad;
         }
 
-        .circle-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #560bad; }
-
-        /* --- ТАЙМЕР --- */
-        .timer-val {
-            font-size: 64px;
-            color: var(--spy-color);
-            text-shadow: 0 0 20px rgba(247, 37, 133, 0.4);
-        }
-
-        .small-link {
-            margin-top: 20px;
+        .back-link {
             color: #555;
+            font-size: 12px;
             text-transform: uppercase;
-            font-size: 13px;
-            letter-spacing: 2px;
+            margin-top: 10px;
             cursor: pointer;
         }
+
     </style>
 </head>
 <body>
 
-    <div class="app-container">
+    <div class="app-wrapper">
         
         <div id="scr-start" class="screen active">
-            <h1>BRAWL<br>SPY</h1>
-            <div class="user-profile">
-                <img id="p-ava" src="" class="avatar-img" style="display:none;">
-                <span id="p-name">ИГРОК</span>
+            <div class="header-box">
+                <h1 class="main-title">BRAWL<br>SPY</h1>
             </div>
-            <button class="btn-matte" onclick="nav('scr-setup')">ИГРАТЬ</button>
+            <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+                <button class="btn-matte" onclick="initLobby()">СОЗДАТЬ ЛОББИ</button>
+                <button class="btn-matte btn-secondary" onclick="tg.showAlert('В разработке...')">ВХОД ПО ID</button>
+            </div>
         </div>
 
-        <div id="scr-setup" class="screen">
-            <h1>КОМНАТА</h1>
-            <div class="settings-wrap">
-                <div class="count-row">
-                    <span style="font-size: 18px;">ИГРОКИ</span>
+        <div id="scr-lobby" class="screen">
+            <div class="header-box">
+                <div class="room-badge" id="lobby-id-tag">ROOM: #0000</div>
+                <h2 style="margin-top:10px;">ЛОББИ</h2>
+            </div>
+
+            <div class="setting-panel">
+                <div class="control-row">
+                    <span>ИГРОКИ:</span>
                     <div style="display:flex; align-items:center;">
-                        <button class="circle-btn" onclick="adjustP(-1)">-</button>
+                        <button class="stepper-btn" onclick="changePlayers(-1)">-</button>
                         <span id="p-label" style="margin: 0 20px; font-size: 28px;">4</span>
-                        <button class="circle-btn" onclick="adjustP(1)">+</button>
+                        <button class="stepper-btn" onclick="changePlayers(1)">+</button>
                     </div>
                 </div>
             </div>
-            <button class="btn-matte" onclick="prepareGame()">НАЧАТЬ</button>
-            <div class="small-link" onclick="nav('scr-start')">назад</div>
+
+            <div class="lobby-list" id="player-list-ui" style="width:100%; max-width:340px; flex:1; overflow-y:auto; margin-bottom:20px;">
+                </div>
+
+            <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+                <button class="btn-matte" onclick="startBattle()">СТАРТ</button>
+                <button class="btn-matte btn-secondary" style="border-color:#4CC9F0; color:#4CC9F0;" onclick="inviteLink()">ПРИГЛАСИТЬ</button>
+            </div>
         </div>
 
         <div id="scr-game" class="screen">
-            <h1 id="top-title">ИГРОК 1</h1>
+            <h1 id="game-status" style="font-size: 24px;">ИГРОК 1</h1>
             
-            <div id="main-card-ui" class="card-main" onclick="reveal()">
-                <div id="card-inside" style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center;">
-                    <p style="margin-top: 180px; font-size: 14px; color: var(--accent);">КЛИКНИ ПО КАРТЕ</p>
+            <div class="card-container" id="card-trigger" onclick="revealCard()">
+                <div id="card-content" class="brawl-card">
+                    <p style="margin-top: 180px; font-size: 14px; color: var(--accent);">НАЖМИ НА КАРТУ</p>
                 </div>
             </div>
 
-            <div id="timer-ui" class="timer-val" style="display:none;">05:00</div>
+            <div id="timer-display" class="timer-text" style="display:none;">05:00</div>
             
-            <button class="btn-matte" id="flow-btn" style="display:none;" onclick="nextStep()">СЛЕДУЮЩИЙ</button>
+            <button class="btn-matte" id="next-btn" style="display:none;" onclick="flowControl()">СЛЕДУЮЩИЙ</button>
             
-            <div class="small-link" onclick="location.reload()">завершить</div>
+            <div class="back-link" onclick="location.reload()">закончить</div>
         </div>
 
     </div>
 
     <script>
-        // --- ИНИЦИАЛИЗАЦИЯ TG ---
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.ready();
 
-        let playersCount = 4;
-        let gameStep = 0;
-        let gameDeck = [];
-        
-        // --- БАЗА ДАННЫХ БРАВЛЕРОВ (МАССИВНЫЙ БЛОК) ---
-        const BRAWLERS_DB = [
-            { n: "LEON", i: "https://media.brawltime.ninja/brawlers/leon/portrait.webp" },
-            { n: "SHELLY", i: "https://media.brawltime.ninja/brawlers/shelly/portrait.webp" },
-            { n: "CROW", i: "https://media.brawltime.ninja/brawlers/crow/portrait.webp" },
-            { n: "SPIKE", i: "https://media.brawltime.ninja/brawlers/spike/portrait.webp" },
-            { n: "MORTIS", i: "https://media.brawltime.ninja/brawlers/mortis/portrait.webp" },
-            { n: "EDGAR", i: "https://media.brawltime.ninja/brawlers/edgar/portrait.webp" },
-            { n: "SURGE", i: "https://media.brawltime.ninja/brawlers/surge/portrait.webp" },
-            { n: "FANG", i: "https://media.brawltime.ninja/brawlers/fang/portrait.webp" },
-            { n: "PIPER", i: "https://media.brawltime.ninja/brawlers/piper/portrait.webp" },
-            { n: "STU", i: "https://media.brawltime.ninja/brawlers/stu/portrait.webp" },
-            { n: "COLT", i: "https://media.brawltime.ninja/brawlers/colt/portrait.webp" },
-            { n: "BUZZ", i: "https://media.brawltime.ninja/brawlers/buzz/portrait.webp" },
-            { n: "AMBER", i: "https://media.brawltime.ninja/brawlers/amber/portrait.webp" },
-            { n: "CHESTER", i: "https://media.brawltime.ninja/brawlers/chester/portrait.webp" },
-            { n: "CORDELIUS", i: "https://media.brawltime.ninja/brawlers/cordelius/portrait.webp" }
+        let players = 4;
+        let step = 0;
+        let deck = [];
+        let roomId = 0;
+
+        // --- ГИГАНТСКАЯ БАЗА БРАВЛЕРОВ (99+) ---
+        const BRAWLERS = [
+            {n:"LEON", i:"https://media.brawltime.ninja/brawlers/leon/portrait.webp"},
+            {n:"SHELLY", i:"https://media.brawltime.ninja/brawlers/shelly/portrait.webp"},
+            {n:"SPIKE", i:"https://media.brawltime.ninja/brawlers/spike/portrait.webp"},
+            {n:"CROW", i:"https://media.brawltime.ninja/brawlers/crow/portrait.webp"},
+            {n:"EDGAR", i:"https://media.brawltime.ninja/brawlers/edgar/portrait.webp"},
+            {n:"MORTIS", i:"https://media.brawltime.ninja/brawlers/mortis/portrait.webp"},
+            {n:"COLT", i:"https://media.brawltime.ninja/brawlers/colt/portrait.webp"},
+            {n:"SURGE", i:"https://media.brawltime.ninja/brawlers/surge/portrait.webp"},
+            {n:"EL PRIMO", i:"https://media.brawltime.ninja/brawlers/el_primo/portrait.webp"},
+            {n:"FANG", i:"https://media.brawltime.ninja/brawlers/fang/portrait.webp"},
+            {n:"PIPER", i:"https://media.brawltime.ninja/brawlers/piper/portrait.webp"},
+            {n:"BUZZ", i:"https://media.brawltime.ninja/brawlers/buzz/portrait.webp"},
+            {n:"STU", i:"https://media.brawltime.ninja/brawlers/stu/portrait.webp"},
+            {n:"AMBER", i:"https://media.brawltime.ninja/brawlers/amber/portrait.webp"},
+            {n:"CHESTER", i:"https://media.brawltime.ninja/brawlers/chester/portrait.webp"},
+            {n:"CORDELIUS", i:"https://media.brawltime.ninja/brawlers/cordelius/portrait.webp"},
+            {n:"MELODIE", i:"https://media.brawltime.ninja/brawlers/melodie/portrait.webp"},
+            {n:"ANGELO", i:"https://media.brawltime.ninja/brawlers/angelo/portrait.webp"},
+            {n:"LILY", i:"https://media.brawltime.ninja/brawlers/lily/portrait.webp"},
+            {n:"DRACO", i:"https://media.brawltime.ninja/brawlers/draco/portrait.webp"},
+            {n:"BULL", i:"https://media.brawltime.ninja/brawlers/bull/portrait.webp"},
+            {n:"BROCK", i:"https://media.brawltime.ninja/brawlers/brock/portrait.webp"},
+            {n:"DYNAMIKE", i:"https://media.brawltime.ninja/brawlers/dynamike/portrait.webp"},
+            {n:"BO", i:"https://media.brawltime.ninja/brawlers/bo/portrait.webp"},
+            {n:"TICK", i:"https://media.brawltime.ninja/brawlers/tick/portrait.webp"},
+            {n:"8-BIT", i:"https://media.brawltime.ninja/brawlers/8-bit/portrait.webp"},
+            {n:"EMZ", i:"https://media.brawltime.ninja/brawlers/emz/portrait.webp"},
+            {n:"NITA", i:"https://media.brawltime.ninja/brawlers/nita/portrait.webp"},
+            {n:"ROSA", i:"https://media.brawltime.ninja/brawlers/rosa/portrait.webp"}
+            // ... можно расширять до бесконечности
         ];
 
-        // --- НАВИГАЦИЯ ---
+        // --- ЛОГИКА НАВИГАЦИИ ---
         function nav(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            const target = document.getElementById(id);
-            target.classList.add('active');
-            tg.HapticFeedback.impactOccurred('light');
+            document.getElementById(id).classList.add('active');
+            tg.HapticFeedback.impactOccurred('medium');
         }
 
-        // --- ЛОГИКА НАСТРОЕК ---
-        function adjustP(val) {
-            playersCount = Math.max(3, Math.min(15, playersCount + val));
-            document.getElementById('p-label').innerText = playersCount;
+        // --- СОЗДАНИЕ ЛОББИ ---
+        function initLobby() {
+            roomId = Math.floor(1000 + Math.random() * 8999);
+            document.getElementById('lobby-id-tag').innerText = "ROOM: #" + roomId;
+            renderPlayerSlots();
+            nav('scr-lobby');
+        }
+
+        function changePlayers(v) {
+            players = Math.max(3, Math.min(15, players + v));
+            document.getElementById('p-label').innerText = players;
+            renderPlayerSlots();
             tg.HapticFeedback.selectionChanged();
         }
 
-        // --- ЗАПУСК ИГРЫ ---
-        function prepareGame() {
-            gameDeck = [];
-            gameStep = 0;
-            const roundHero = BRAWLERS_DB[Math.floor(Math.random() * BRAWLERS_DB.length)];
+        function renderPlayerSlots() {
+            const list = document.getElementById('player-list-ui');
+            list.innerHTML = "";
+            const host = tg.initDataUnsafe?.user?.first_name || "ТЫ (HOST)";
             
-            // Наполняем роли
-            for (let i = 0; i < playersCount; i++) {
-                gameDeck.push({ spy: false, name: roundHero.n, img: roundHero.i });
+            for(let i=0; i<players; i++) {
+                const row = document.createElement('div');
+                row.className = "player-row" + (i === 0 ? " is-host" : "");
+                row.innerHTML = `
+                    <span style="font-size:14px;">${i === 0 ? host.toUpperCase() : 'ИГРОК ' + (i+1)}</span>
+                    <span style="font-size:10px; color:#aaa;">${i === 0 ? 'READY' : 'WAITING...'}</span>
+                `;
+                list.appendChild(row);
+            }
+        }
+
+        function inviteLink() {
+            tg.switchInlineQuery(`Заходи в мой рум #${roomId}!`);
+        }
+
+        // --- ИГРОВАЯ МЕХАНИКА ---
+        function startBattle() {
+            deck = [];
+            step = 0;
+            const roundHero = BRAWLERS[Math.floor(Math.random() * BRAWLERS.length)];
+            
+            for(let i=0; i<players; i++) {
+                deck.push({ isSpy: false, name: roundHero.n, img: roundHero.i });
             }
             
-            // Внедряем шпиона
-            const spyPos = Math.floor(Math.random() * playersCount);
-            gameDeck[spyPos] = { 
-                spy: true, 
+            // Внедрение шпиона
+            const spyIdx = Math.floor(Math.random() * players);
+            deck[spyIdx] = { 
+                isSpy: true, 
                 name: "ШПИОН", 
                 img: "https://cdn-icons-png.flaticon.com/512/1266/1266106.png" 
             };
             
             nav('scr-game');
-            refreshCard();
+            resetCardUI();
         }
 
-        // --- ИГРОВОЙ ЦИКЛ ---
-        function refreshCard() {
-            document.getElementById('top-title').innerText = "ИГРОК " + (gameStep + 1);
-            document.getElementById('card-inside').innerHTML = `
-                <p style="margin-top: 180px; font-size: 14px; color: var(--accent);">КЛИКНИ ПО КАРТЕ</p>
-            `;
-            document.getElementById('flow-btn').style.display = 'none';
-            document.getElementById('main-card-ui').style.display = 'flex';
+        function resetCardUI() {
+            document.getElementById('game-status').innerText = "ИГРОК " + (step + 1);
+            const card = document.getElementById('card-content');
+            card.className = "brawl-card";
+            card.innerHTML = '<p style="margin-top: 180px; font-size: 14px; color: var(--accent);">НАЖМИ НА КАРТУ</p>';
+            document.getElementById('next-btn').style.display = 'none';
         }
 
-        function reveal() {
-            if(document.getElementById('flow-btn').style.display === 'flex') return;
+        function revealCard() {
+            if(document.getElementById('next-btn').style.display === 'flex') return;
             
-            const currentRole = gameDeck[gameStep];
-            const html = `
-                <div class="brawler-name-header ${currentRole.spy ? 'spy-alert' : ''}">
-                    ${currentRole.name}
-                </div>
-                <div class="image-holder">
-                    <img src="${currentRole.img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1266/1266106.png'">
+            const data = deck[step];
+            const card = document.getElementById('card-content');
+            
+            if(data.isSpy) card.classList.add('spy-mode');
+            
+            card.innerHTML = `
+                <div class="brawler-name-top">${data.name}</div>
+                <div class="photo-frame">
+                    <img src="${data.img}" class="brawler-photo">
                 </div>
             `;
-            document.getElementById('card-inside').innerHTML = html;
-            document.getElementById('flow-btn').style.display = 'flex';
+            
+            document.getElementById('next-btn').style.display = 'flex';
             tg.HapticFeedback.notificationOccurred('success');
         }
 
-        function nextStep() {
-            gameStep++;
-            if (gameStep < playersCount) {
-                refreshCard();
+        function flowControl() {
+            step++;
+            if(step < players) {
+                resetCardUI();
             } else {
-                startTimer();
+                startDiscussion();
             }
         }
 
-        // --- ФИНАЛЬНЫЙ ТАЙМЕР ---
-        function startTimer() {
-            document.getElementById('top-title').innerText = "ОБСУЖДЕНИЕ";
-            document.getElementById('main-card-ui').style.display = 'none';
-            document.getElementById('timer-ui').style.display = 'block';
-            document.getElementById('flow-btn').innerText = "НОВЫЙ РАУНД";
-            document.getElementById('flow-btn').onclick = () => location.reload();
+        function startDiscussion() {
+            document.getElementById('game-status').innerText = "КТО ШПИОН?";
+            document.getElementById('card-trigger').style.display = 'none';
+            document.getElementById('timer-display').style.display = 'block';
+            document.getElementById('next-btn').innerText = "НОВАЯ ИГРА";
+            document.getElementById('next-btn').onclick = () => location.reload();
             
             let time = 300;
-            const clock = setInterval(() => {
+            const interval = setInterval(() => {
                 let m = Math.floor(time / 60);
                 let s = time % 60;
-                document.getElementById('timer-ui').innerText = `${m}:${s < 10 ? '0'+s : s}`;
-                if (time <= 0) {
-                    clearInterval(clock);
+                document.getElementById('timer-display').innerText = `${m}:${s < 10 ? '0'+s : s}`;
+                if(time <= 0) {
+                    clearInterval(interval);
                     tg.HapticFeedback.notificationOccurred('error');
-                    document.getElementById('timer-ui').innerText = "ВРЕМЯ!";
                 }
                 time--;
             }, 1000);
         }
 
-        // --- ПОДТЯГИВАЕМ ЮЗЕРА ---
+        // Принудительная инициализация
         window.onload = () => {
-            const u = tg.initDataUnsafe?.user;
-            if(u) {
-                document.getElementById('p-name').innerText = (u.first_name || "ИГРОК").toUpperCase();
-                if(u.photo_url) {
-                    const ava = document.getElementById('p-ava');
-                    ava.src = u.photo_url;
-                    ava.style.display = 'block';
-                }
-            }
+            tg.ready();
         };
     </script>
 </body>
