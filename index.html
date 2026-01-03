@@ -3,21 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Brawl Spy Dark</title>
+    <title>Brawl Spy</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Rubik+One&display=swap" rel="stylesheet">
     <style>
-        /* БАЗОВЫЕ НАСТРОЙКИ */
-        * { 
-            box-sizing: border-box; 
-            -webkit-tap-highlight-color: transparent; 
-            margin: 0; 
-            padding: 0; 
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
         
         body {
-            /* Твой цвет фона */
-            background-color: #0A0A0F;
+            background-color: #0A0A0F !important; /* Гарантируем черный цвет */
             color: white;
             font-family: 'Rubik One', sans-serif;
             height: 100vh;
@@ -28,63 +21,124 @@
             overflow: hidden;
         }
 
-        /* ГЛАВНЫЙ КОНТЕЙНЕР */
         .app-container {
             width: 100%;
             height: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: space-around; /* Распределяем элементы, чтобы не было пустоты */
+            justify-content: space-around;
             align-items: center;
-            padding: 40px 25px;
+            padding: 40px 20px;
+            opacity: 0; /* Скрыто до загрузки */
+            transition: opacity 0.3s;
         }
 
-        /* ЭКРАНЫ */
         .screen {
             display: none;
             width: 100%;
-            height: 100%;
             flex-direction: column;
             align-items: center;
-            justify-content: space-around;
-            animation: fadeIn 0.3s ease-in-out;
+            gap: 30px;
         }
 
-        .active { 
-            display: flex; 
-        }
+        .active { display: flex; }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ЗАГОЛОВКИ */
         h1 {
             font-size: 46px;
             text-transform: uppercase;
             text-align: center;
-            color: #FFFFFF;
-            /* Минимальное фиолетовое свечение */
-            text-shadow: 
-                0 0 8px rgba(114, 9, 183, 0.4),
-                3px 3px 0px #000;
+            text-shadow: 0 0 10px rgba(114, 9, 183, 0.5), 3px 3px 0px #000;
         }
 
-        .menu-title {
-            font-size: 56px;
-        }
-
-        /* КАРТОЧКА ПРОФИЛЯ С НЕОНОМ */
-        .profile-box {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-            margin-top: 10px;
-        }
-
-        .user-neon-card {
+        /* Профиль под Brawl Spy */
+        .profile-neon {
             background: rgba(255, 255, 255, 0.03);
+            border: 2px solid #7209B7;
+            border-radius: 50px;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 0 15px rgba(114, 9, 183, 0.3);
+        }
+
+        .avatar {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            border: 2px solid #7209B7;
+            margin-right: 12px;
+        }
+
+        /* Кнопки "Стекло" */
+        .btn-action {
+            background: rgba(255, 255, 255, 0.07);
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            color: white;
+            font-family: 'Rubik One', sans-serif;
+            font-size: 24px;
+            padding: 20px;
+            width: 100%;
+            max-width: 320px;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .btn-action:active { transform: scale(0.95); background: rgba(114, 9, 183, 0.2); }
+
+        /* Настройки комнаты */
+        .settings-card {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(114, 9, 183, 0.3);
+            border-radius: 25px;
+            padding: 10px;
+        }
+
+        .row {
+            display: flex; justify-content: space-between;
+            align-items: center; padding: 15px;
+        }
+
+        .ctrl-btn {
+            width: 45px; height: 45px;
+            background: #560bad;
+            border: none; border-radius: 12px;
+            color: white; font-family: 'Rubik One'; font-size: 24px;
+        }
+
+        .back { opacity: 0.5; font-size: 14px; text-transform: uppercase; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div id="main-wrapper" class="app-container">
+        
+        <div id="s-main" class="screen active">
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                <h1>BRAWL SPY</h1>
+                <div class="profile-neon">
+                    <img id="p-img" src="https://cdn-icons-png.flaticon.com/512/847/847969.png" class="avatar">
+                    <span id="p-name">ИГРОК</span>
+                </div>
+            </div>
+            <button class="btn-action" onclick="nav('s-menu')">ИГРАТЬ</button>
+        </div>
+
+        <div id="s-menu" class="screen">
+            <h1 style="font-size: 52px;">МЕНЮ</h1>
+            <div style="width: 100%; display: flex; flex-direction: column; align-items: center; gap: 15px;">
+                <button class="btn-action" onclick="nav('s-room')">Создать комнату</button>
+                <button class="btn-action" onclick="inv()">Пригласить друга</button>
+            </div>
+            <div class="back" onclick="nav('s-main')">назад</div>
+        </div>
+
+        <div id="s-room" class="screen">
+            <h1>КОМНАТА</h1>
+            <div class="settings-card">
+                <div class="row">
+                    <span>ИГРОКОВ</span>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <button class="ctrl-btn" onclick="cnt('p',-1)">-</button>
+                        <span
