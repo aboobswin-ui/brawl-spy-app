@@ -2,23 +2,34 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Brawl Spy: Brawlers Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Brawl Spy: Ultimate Brawler Edition</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Rubik+One&display=swap" rel="stylesheet">
     
     <style>
-        /* ОСНОВНОЙ СТИЛЬ */
+        /* --- ГЛОБАЛЬНЫЕ СТИЛИ (МАССИВНЫЙ БЛОК) --- */
+        :root {
+            --accent: #7209B7;
+            --accent-light: #B5179E;
+            --spy-color: #F72585;
+            --bg-dark: #0A0A0F;
+            --matte-gray: #1c1c1f;
+        }
+
         * { 
             box-sizing: border-box; 
             -webkit-tap-highlight-color: transparent; 
             margin: 0; 
             padding: 0; 
+            user-select: none;
         }
         
         body {
-            background-color: #0A0A0F;
-            background-image: radial-gradient(circle at 50% 50%, #1a0b2e 0%, #0A0A0F 100%);
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(114, 9, 183, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(247, 37, 133, 0.1) 0%, transparent 40%);
             color: white;
             font-family: 'Rubik One', sans-serif;
             height: 100vh;
@@ -26,9 +37,9 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            user-select: none;
         }
 
+        /* --- КОНТЕЙНЕР ПРИЛОЖЕНИЯ --- */
         .app-container {
             flex: 1;
             display: flex;
@@ -36,8 +47,10 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            position: relative;
         }
 
+        /* --- ЭКРАНЫ И АНИМАЦИИ --- */
         .screen {
             display: none;
             width: 100%;
@@ -45,325 +58,354 @@
             flex-direction: column;
             align-items: center;
             justify-content: space-around;
-            padding: 30px 0;
-            animation: fadeIn 0.3s ease-in-out;
+            padding: 40px 0;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .screen.active { 
+            display: flex !important; 
+            opacity: 1; 
+            transform: translateY(0);
         }
 
-        .active { display: flex !important; }
-
+        /* --- ШАПКИ И ЗАГОЛОВКИ --- */
         h1 {
-            font-size: 34px;
+            font-size: 38px;
             text-transform: uppercase;
             text-align: center;
-            text-shadow: 0 0 15px rgba(114, 9, 183, 0.8);
-            letter-spacing: 1px;
+            line-height: 1.1;
+            background: linear-gradient(to bottom, #fff 40%, #ccc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(114, 9, 183, 0.5));
         }
 
-        /* ЮЗЕРБАР ТГ */
-        .tg-user {
-            background: rgba(114, 9, 183, 0.2);
-            border: 2px solid #7209B7;
-            border-radius: 50px;
-            padding: 8px 18px;
+        /* --- КАРТОЧКА ЮЗЕРА ТГ --- */
+        .user-profile {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--accent);
+            border-radius: 60px;
+            padding: 10px 25px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
+            backdrop-filter: blur(10px);
             margin-bottom: 10px;
         }
 
-        .tg-avatar {
-            width: 35px;
-            height: 35px;
+        .avatar-img {
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
             border: 2px solid white;
+            background: #222;
         }
 
-        /* КНОПКИ (ТЕМНО-СЕРЫЙ МАТОВЫЙ) */
+        /* --- КНОПКИ (ТВОЙ МАТОВЫЙ СТИЛЬ) --- */
         .btn-matte {
-            background-color: #1c1c1f;
-            border: 3px solid #7209B7;
-            border-radius: 22px;
+            background-color: var(--matte-gray);
+            border: 3px solid var(--accent);
+            border-radius: 24px;
             color: white;
             font-family: 'Rubik One', sans-serif;
-            font-size: 18px;
-            padding: 22px;
+            font-size: 20px;
+            padding: 24px;
             width: 100%;
-            max-width: 320px;
+            max-width: 340px;
             text-transform: uppercase;
             cursor: pointer;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-            transition: 0.1s;
-            z-index: 10;
+            box-shadow: 0 12px 0px rgba(0, 0, 0, 0.3), 0 20px 40px rgba(0, 0, 0, 0.5);
+            transition: all 0.1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            letter-spacing: 1px;
         }
 
         .btn-matte:active {
-            transform: scale(0.94);
+            transform: translateY(4px);
+            box-shadow: 0 4px 0px rgba(0, 0, 0, 0.3);
             background-color: #252529;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.8);
         }
 
-        /* КАРТОЧКА С БРАВЛЕРОМ */
-        .game-card {
-            background: #1c1c1f;
-            border: 4px solid #7209B7;
-            border-radius: 35px;
-            width: 300px;
-            height: 420px;
+        /* --- ИГРОВАЯ КАРТОЧКА (VIP ДИЗАЙН) --- */
+        .card-main {
+            background: var(--matte-gray);
+            border: 5px solid var(--accent);
+            border-radius: 40px;
+            width: 310px;
+            height: 460px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 25px;
+            padding: 35px 20px;
             position: relative;
-            box-shadow: 0 0 40px rgba(114, 9, 183, 0.5);
-            cursor: pointer;
+            box-shadow: 0 0 50px rgba(114, 9, 183, 0.3);
+            transition: transform 0.6s;
         }
 
-        .brawler-img-frame {
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle, rgba(114, 9, 183, 0.4) 0%, transparent 70%);
+        .brawler-name-header {
+            font-size: 30px;
+            height: 40px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            text-align: center;
+            width: 100%;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .spy-alert { color: var(--spy-color); text-shadow: 0 0 15px var(--spy-color); }
+
+        .image-holder {
+            width: 230px;
+            height: 230px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 20px;
+            background: radial-gradient(circle, rgba(114, 9, 183, 0.25) 0%, transparent 70%);
+            border-radius: 50%;
         }
 
-        .brawler-photo {
+        .image-holder img {
             width: 100%;
             height: 100%;
             object-fit: contain;
-            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.2));
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
         }
 
-        .brawler-title {
-            font-size: 26px;
-            color: #FFFFFF;
-            letter-spacing: 2px;
-        }
-
-        .spy-alert {
-            color: #f72585;
-            text-shadow: 0 0 10px #f72585;
-        }
-
-        /* НАСТРОЙКИ КОМНАТЫ */
-        .settings-panel {
+        /* --- НАСТРОЙКИ --- */
+        .settings-wrap {
             background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(114, 9, 183, 0.3);
-            border-radius: 30px;
+            border-radius: 35px;
+            padding: 30px;
             width: 100%;
-            max-width: 340px;
-            padding: 25px;
+            max-width: 350px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .row-item {
+        .count-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin: 15px 0;
+            margin: 10px 0;
         }
 
-        .step-btn {
-            width: 50px;
-            height: 50px;
-            background: #560bad;
+        .circle-btn {
+            width: 55px;
+            height: 55px;
+            background: var(--accent);
             border: none;
-            border-radius: 15px;
+            border-radius: 18px;
             color: white;
             font-family: 'Rubik One', sans-serif;
-            font-size: 22px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 0 #560bad;
         }
 
-        .timer-display {
-            font-size: 56px;
-            color: #f72585;
-            margin-top: 10px;
-            letter-spacing: 3px;
+        .circle-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #560bad; }
+
+        /* --- ТАЙМЕР --- */
+        .timer-val {
+            font-size: 64px;
+            color: var(--spy-color);
+            text-shadow: 0 0 20px rgba(247, 37, 133, 0.4);
         }
 
-        .footer-link {
-            color: #444;
+        .small-link {
+            margin-top: 20px;
+            color: #555;
             text-transform: uppercase;
-            font-size: 12px;
-            margin-top: 15px;
+            font-size: 13px;
+            letter-spacing: 2px;
             cursor: pointer;
         }
-
     </style>
 </head>
 <body>
 
     <div class="app-container">
         
-        <div id="scr-main" class="screen active">
-            <h1>BRAWL SPY</h1>
-            <div class="tg-user">
-                <img id="tg-ava" src="https://cdn-icons-png.flaticon.com/512/847/847969.png" class="tg-avatar">
-                <span id="tg-name">ИГРОК</span>
+        <div id="scr-start" class="screen active">
+            <h1>BRAWL<br>SPY</h1>
+            <div class="user-profile">
+                <img id="p-ava" src="" class="avatar-img" style="display:none;">
+                <span id="p-name">ИГРОК</span>
             </div>
-            <button class="btn-matte" onclick="nav('scr-lobby')">ИГРАТЬ</button>
+            <button class="btn-matte" onclick="nav('scr-setup')">ИГРАТЬ</button>
         </div>
 
-        <div id="scr-lobby" class="screen">
+        <div id="scr-setup" class="screen">
             <h1>КОМНАТА</h1>
-            <div class="settings-panel">
-                <div class="row-item">
-                    <span>ИГРОКИ</span>
+            <div class="settings-wrap">
+                <div class="count-row">
+                    <span style="font-size: 18px;">ИГРОКИ</span>
                     <div style="display:flex; align-items:center;">
-                        <button class="step-btn" onclick="updatePlayers(-1)">-</button>
-                        <span id="p-count" style="margin: 0 15px; font-size: 24px;">4</span>
-                        <button class="step-btn" onclick="updatePlayers(1)">+</button>
+                        <button class="circle-btn" onclick="adjustP(-1)">-</button>
+                        <span id="p-label" style="margin: 0 20px; font-size: 28px;">4</span>
+                        <button class="circle-btn" onclick="adjustP(1)">+</button>
                     </div>
                 </div>
             </div>
-            <button class="btn-matte" onclick="generateGame()">СТАРТ</button>
-            <div class="footer-link" onclick="nav('scr-main')">назад</div>
+            <button class="btn-matte" onclick="prepareGame()">НАЧАТЬ</button>
+            <div class="small-link" onclick="nav('scr-start')">назад</div>
         </div>
 
         <div id="scr-game" class="screen">
-            <h1 id="player-num">ИГРОК 1</h1>
+            <h1 id="top-title">ИГРОК 1</h1>
             
-            <div id="card-box" class="game-card" onclick="openCard()">
-                <div id="card-inner">
-                    <p style="color: #7209B7; font-size: 12px;">НАЖМИ, ЧТОБЫ УЗНАТЬ РОЛЬ</p>
+            <div id="main-card-ui" class="card-main" onclick="reveal()">
+                <div id="card-inside" style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center;">
+                    <p style="margin-top: 180px; font-size: 14px; color: var(--accent);">КЛИКНИ ПО КАРТЕ</p>
                 </div>
             </div>
 
-            <div id="timer-box" class="timer-display" style="display:none;">05:00</div>
+            <div id="timer-ui" class="timer-val" style="display:none;">05:00</div>
             
-            <button class="btn-matte" id="next-player-btn" style="display:none;" onclick="handleFlow()">СЛЕДУЮЩИЙ</button>
+            <button class="btn-matte" id="flow-btn" style="display:none;" onclick="nextStep()">СЛЕДУЮЩИЙ</button>
             
-            <div class="footer-link" onclick="location.reload()">завершить</div>
+            <div class="small-link" onclick="location.reload()">завершить</div>
         </div>
 
     </div>
 
     <script>
-        // Инициализация ТГ
+        // --- ИНИЦИАЛИЗАЦИЯ TG ---
         const tg = window.Telegram.WebApp;
         tg.expand();
+        tg.ready();
 
-        let playerCount = 4;
-        let currentStep = 0;
-        let deck = [];
+        let playersCount = 4;
+        let gameStep = 0;
+        let gameDeck = [];
         
-        // БАЗА БРАВЛЕРОВ С КАРТИНКАМИ (99 бравлеров можно добавить сюда)
-        const brawlersBase = [
-            { name: "LEON", img: "https://media.brawltime.ninja/brawlers/leon/portrait.webp" },
-            { name: "SHELLY", img: "https://media.brawltime.ninja/brawlers/shelly/portrait.webp" },
-            { name: "SPIKE", img: "https://media.brawltime.ninja/brawlers/spike/portrait.webp" },
-            { name: "CROW", img: "https://media.brawltime.ninja/brawlers/crow/portrait.webp" },
-            { name: "EDGAR", img: "https://media.brawltime.ninja/brawlers/edgar/portrait.webp" },
-            { name: "MORTIS", img: "https://media.brawltime.ninja/brawlers/mortis/portrait.webp" },
-            { name: "STU", img: "https://media.brawltime.ninja/brawlers/stu/portrait.webp" },
-            { name: "COLT", img: "https://media.brawltime.ninja/brawlers/colt/portrait.webp" },
-            { name: "SURGE", img: "https://media.brawltime.ninja/brawlers/surge/portrait.webp" },
-            { name: "EL PRIMO", img: "https://media.brawltime.ninja/brawlers/el_primo/portrait.webp" },
-            { name: "PIPER", img: "https://media.brawltime.ninja/brawlers/piper/portrait.webp" },
-            { name: "BUZZ", img: "https://media.brawltime.ninja/brawlers/buzz/portrait.webp" }
+        // --- БАЗА ДАННЫХ БРАВЛЕРОВ (МАССИВНЫЙ БЛОК) ---
+        const BRAWLERS_DB = [
+            { n: "LEON", i: "https://media.brawltime.ninja/brawlers/leon/portrait.webp" },
+            { n: "SHELLY", i: "https://media.brawltime.ninja/brawlers/shelly/portrait.webp" },
+            { n: "CROW", i: "https://media.brawltime.ninja/brawlers/crow/portrait.webp" },
+            { n: "SPIKE", i: "https://media.brawltime.ninja/brawlers/spike/portrait.webp" },
+            { n: "MORTIS", i: "https://media.brawltime.ninja/brawlers/mortis/portrait.webp" },
+            { n: "EDGAR", i: "https://media.brawltime.ninja/brawlers/edgar/portrait.webp" },
+            { n: "SURGE", i: "https://media.brawltime.ninja/brawlers/surge/portrait.webp" },
+            { n: "FANG", i: "https://media.brawltime.ninja/brawlers/fang/portrait.webp" },
+            { n: "PIPER", i: "https://media.brawltime.ninja/brawlers/piper/portrait.webp" },
+            { n: "STU", i: "https://media.brawltime.ninja/brawlers/stu/portrait.webp" },
+            { n: "COLT", i: "https://media.brawltime.ninja/brawlers/colt/portrait.webp" },
+            { n: "BUZZ", i: "https://media.brawltime.ninja/brawlers/buzz/portrait.webp" },
+            { n: "AMBER", i: "https://media.brawltime.ninja/brawlers/amber/portrait.webp" },
+            { n: "CHESTER", i: "https://media.brawltime.ninja/brawlers/chester/portrait.webp" },
+            { n: "CORDELIUS", i: "https://media.brawltime.ninja/brawlers/cordelius/portrait.webp" }
         ];
 
+        // --- НАВИГАЦИЯ ---
         function nav(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            tg.HapticFeedback.impactOccurred('medium');
+            const target = document.getElementById(id);
+            target.classList.add('active');
+            tg.HapticFeedback.impactOccurred('light');
         }
 
-        function updatePlayers(v) {
-            playerCount = Math.max(3, Math.min(15, playerCount + v));
-            document.getElementById('p-count').innerText = playerCount;
+        // --- ЛОГИКА НАСТРОЕК ---
+        function adjustP(val) {
+            playersCount = Math.max(3, Math.min(15, playersCount + val));
+            document.getElementById('p-label').innerText = playersCount;
             tg.HapticFeedback.selectionChanged();
         }
 
-        function generateGame() {
-            deck = [];
-            currentStep = 0;
+        // --- ЗАПУСК ИГРЫ ---
+        function prepareGame() {
+            gameDeck = [];
+            gameStep = 0;
+            const roundHero = BRAWLERS_DB[Math.floor(Math.random() * BRAWLERS_DB.length)];
             
-            // Выбираем бравлера на раунд
-            const roundBrawler = brawlersBase[Math.floor(Math.random() * brawlersBase.length)];
-            
-            // Заполняем колоду
-            for (let i = 0; i < playerCount; i++) {
-                deck.push({ isSpy: false, name: roundBrawler.name, img: roundBrawler.img });
+            // Наполняем роли
+            for (let i = 0; i < playersCount; i++) {
+                gameDeck.push({ spy: false, name: roundHero.n, img: roundHero.i });
             }
             
-            // Один становится шпионом
-            const spyIdx = Math.floor(Math.random() * playerCount);
-            deck[spyIdx] = { 
-                isSpy: true, 
+            // Внедряем шпиона
+            const spyPos = Math.floor(Math.random() * playersCount);
+            gameDeck[spyPos] = { 
+                spy: true, 
                 name: "ШПИОН", 
                 img: "https://cdn-icons-png.flaticon.com/512/1266/1266106.png" 
             };
             
             nav('scr-game');
-            resetCardScreen();
+            refreshCard();
         }
 
-        function resetCardScreen() {
-            document.getElementById('player-num').innerText = "ИГРОК " + (currentStep + 1);
-            document.getElementById('card-inner').innerHTML = '<p style="color: #7209B7; font-size: 12px;">НАЖМИ, ЧТОБЫ УЗНАТЬ РОЛЬ</p>';
-            document.getElementById('next-player-btn').style.display = 'none';
-            document.getElementById('card-box').style.display = 'flex';
-        }
-
-        function openCard() {
-            const role = deck[currentStep];
-            const content = `
-                <div class="brawler-img-frame">
-                    <img src="${role.img}" class="brawler-photo">
-                </div>
-                <div class="brawler-title ${role.isSpy ? 'spy-alert' : ''}">${role.name}</div>
+        // --- ИГРОВОЙ ЦИКЛ ---
+        function refreshCard() {
+            document.getElementById('top-title').innerText = "ИГРОК " + (gameStep + 1);
+            document.getElementById('card-inside').innerHTML = `
+                <p style="margin-top: 180px; font-size: 14px; color: var(--accent);">КЛИКНИ ПО КАРТЕ</p>
             `;
-            document.getElementById('card-inner').innerHTML = content;
-            document.getElementById('next-player-btn').style.display = 'block';
+            document.getElementById('flow-btn').style.display = 'none';
+            document.getElementById('main-card-ui').style.display = 'flex';
+        }
+
+        function reveal() {
+            if(document.getElementById('flow-btn').style.display === 'flex') return;
+            
+            const currentRole = gameDeck[gameStep];
+            const html = `
+                <div class="brawler-name-header ${currentRole.spy ? 'spy-alert' : ''}">
+                    ${currentRole.name}
+                </div>
+                <div class="image-holder">
+                    <img src="${currentRole.img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1266/1266106.png'">
+                </div>
+            `;
+            document.getElementById('card-inside').innerHTML = html;
+            document.getElementById('flow-btn').style.display = 'flex';
             tg.HapticFeedback.notificationOccurred('success');
         }
 
-        function handleFlow() {
-            currentStep++;
-            if (currentStep < playerCount) {
-                resetCardScreen();
+        function nextStep() {
+            gameStep++;
+            if (gameStep < playersCount) {
+                refreshCard();
             } else {
-                startDiscussion();
+                startTimer();
             }
         }
 
-        function startDiscussion() {
-            document.getElementById('player-num').innerText = "КТО ШПИОН?";
-            document.getElementById('card-box').style.display = 'none';
-            document.getElementById('next-player-btn').innerText = "НОВАЯ ИГРА";
-            document.getElementById('next-player-btn').onclick = () => location.reload();
-            document.getElementById('timer-box').style.display = 'block';
+        // --- ФИНАЛЬНЫЙ ТАЙМЕР ---
+        function startTimer() {
+            document.getElementById('top-title').innerText = "ОБСУЖДЕНИЕ";
+            document.getElementById('main-card-ui').style.display = 'none';
+            document.getElementById('timer-ui').style.display = 'block';
+            document.getElementById('flow-btn').innerText = "НОВЫЙ РАУНД";
+            document.getElementById('flow-btn').onclick = () => location.reload();
             
             let time = 300;
-            const timerInt = setInterval(() => {
+            const clock = setInterval(() => {
                 let m = Math.floor(time / 60);
                 let s = time % 60;
-                document.getElementById('timer-box').innerText = `${m}:${s < 10 ? '0'+s : s}`;
+                document.getElementById('timer-ui').innerText = `${m}:${s < 10 ? '0'+s : s}`;
                 if (time <= 0) {
-                    clearInterval(timerInt);
+                    clearInterval(clock);
                     tg.HapticFeedback.notificationOccurred('error');
+                    document.getElementById('timer-ui').innerText = "ВРЕМЯ!";
                 }
                 time--;
             }, 1000);
         }
 
-        // Загрузка ТГ данных
+        // --- ПОДТЯГИВАЕМ ЮЗЕРА ---
         window.onload = () => {
-            const user = tg.initDataUnsafe?.user;
-            if(user) {
-                document.getElementById('tg-name').innerText = (user.first_name || "ИГРОК").toUpperCase();
-                if(user.photo_url) document.getElementById('tg-ava').src = user.photo_url;
+            const u = tg.initDataUnsafe?.user;
+            if(u) {
+                document.getElementById('p-name').innerText = (u.first_name || "ИГРОК").toUpperCase();
+                if(u.photo_url) {
+                    const ava = document.getElementById('p-ava');
+                    ava.src = u.photo_url;
+                    ava.style.display = 'block';
+                }
             }
         };
     </script>
