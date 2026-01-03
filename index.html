@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Brawl Spy Ultra</title>
+    <title>Brawl Spy Dark</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Rubik+One&display=swap" rel="stylesheet">
     <style>
@@ -16,9 +16,8 @@
         }
         
         body {
-            /* Возвращаем классический синий фон */
-            background-color: #1a237e;
-            background-image: radial-gradient(circle at center, #283593 0%, #1a237e 100%);
+            /* Твой цвет фона */
+            background-color: #0A0A0F;
             color: white;
             font-family: 'Rubik One', sans-serif;
             height: 100vh;
@@ -35,9 +34,9 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: space-around; /* Распределяем элементы, чтобы не было пустоты */
             align-items: center;
-            padding: 50px 25px;
+            padding: 40px 25px;
         }
 
         /* ЭКРАНЫ */
@@ -47,7 +46,7 @@
             height: 100%;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between;
+            justify-content: space-around;
             animation: fadeIn 0.3s ease-in-out;
         }
 
@@ -56,8 +55,8 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.98); }
-            to { opacity: 1; transform: scale(1); }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* ЗАГОЛОВКИ */
@@ -68,79 +67,24 @@
             color: #FFFFFF;
             /* Минимальное фиолетовое свечение */
             text-shadow: 
-                0 0 10px rgba(114, 9, 183, 0.4),
+                0 0 8px rgba(114, 9, 183, 0.4),
                 3px 3px 0px #000;
-            letter-spacing: -1px;
         }
 
         .menu-title {
-            font-size: 58px; /* Огромное МЕНЮ */
-            margin-top: 20px;
+            font-size: 56px;
         }
 
-        /* КАРТОЧКА ПРОФИЛЯ */
-        .user-section {
+        /* КАРТОЧКА ПРОФИЛЯ С НЕОНОМ */
+        .profile-box {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
+            margin-top: 10px;
         }
 
         .user-neon-card {
-            background: rgba(255, 255, 255, 0.07);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 2px solid rgba(114, 9, 183, 0.7); /* Фиолетовый неон */
-            border-radius: 60px;
-            padding: 10px 25px;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 0 15px rgba(114, 9, 183, 0.3);
-        }
-
-        .avatar-img {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            border: 2px solid #7209B7;
-            margin-right: 15px;
-            object-fit: cover;
-        }
-
-        .username-text {
-            font-size: 18px;
-            color: #FFFFFF;
-            text-transform: uppercase;
-        }
-
-        /* КНОПКИ (ИГРАТЬ, ПОЗВАТЬ) */
-        .main-action-btn {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 24px;
-            color: #FFFFFF;
-            font-family: 'Rubik One', sans-serif;
-            font-size: 26px;
-            padding: 22px;
-            width: 100%;
-            max-width: 340px;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        }
-
-        .main-action-btn:active {
-            transform: scale(0.96);
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(114, 9, 183, 0.5);
-        }
-
-        /* КНОПКИ МЕНЮ */
-        .menu-buttons-list {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap:
+            -webkit-backdrop-filter: blur(
