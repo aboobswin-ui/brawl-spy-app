@@ -3,88 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Brawl Spy Ultimate Fixed</title>
+    <title>Brawl Stars: Spy Edition</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Rubik+One&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0b0b10;
-            --panel: #1a1a24;
+            --bg: #050508;
+            --panel: #121217;
             --primary: #7209B7;
-            --accent: #F72585;
+            --accent: #F72585; /* Красный неон */
             --text: #FFFFFF;
-            --secondary: #4CC9F0;
+            --glass: rgba(255, 255, 255, 0.05);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; font-family: 'Rubik One', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg); color: var(--text); height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         
-        .screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: space-between; padding: 40px 20px; text-align: center; }
+        body { 
+            background-color: var(--bg); 
+            color: var(--text); 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center; 
+            overflow: hidden; 
+        }
+
+        .screen { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: space-between; padding: 60px 25px; }
         .screen.active { display: flex; }
 
-        .main-title { font-size: 50px; line-height: 0.9; margin-top: 20px; text-transform: uppercase; }
-        .main-title span { color: var(--primary); display: block; font-size: 60px; }
-
-        .btn-main {
-            width: 100%; max-width: 320px; padding: 22px; border-radius: 25px;
-            background: var(--primary); color: white; border: none; font-size: 24px;
-            box-shadow: 0 6px 0 #4a0577; transition: 0.1s; cursor: pointer;
-            text-transform: uppercase; margin-bottom: 20px;
+        /* Новый заголовок "ШПИОН" с красным неоном */
+        .neon-title {
+            font-size: 70px; /* Очень крупный */
+            color: var(--text);
+            text-shadow: 
+                0 0 10px var(--accent), /* Мягкое свечение */
+                0 0 20px var(--accent),
+                0 0 30px var(--accent),
+                0 0 40px var(--accent); /* Сильный неон */
+            line-height: 0.8;
+            margin-top: 50px; /* Отступ сверху */
+            margin-bottom: 20px; /* Отступ до следующей строки */
+            animation: neonPulse 1.5s ease-in-out infinite alternate; /* Анимация пульсации */
         }
-        .btn-main:active { transform: translateY(4px); box-shadow: 0 2px 0 #4a0577; }
-        
-        .controls-row { display: flex; align-items: center; gap: 30px; background: var(--panel); padding: 20px; border-radius: 20px; border: 1px solid #333; }
-        .btn-step { width: 60px; height: 60px; background: var(--primary); border: none; border-radius: 15px; color: white; font-size: 30px; cursor: pointer; }
 
-        .card-wrap { width: 280px; height: 400px; perspective: 1000px; margin: 20px 0; }
-        .card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-style: preserve-3d; }
+        /* Анимация неонового свечения */
+        @keyframes neonPulse {
+            from { text-shadow: 0 0 5px var(--accent), 0 0 10px var(--accent), 0 0 15px var(--accent); }
+            to { text-shadow: 0 0 15px var(--accent), 0 0 25px var(--accent), 0 0 35px var(--accent), 0 0 45px var(--accent); }
+        }
+
+        /* "BRAWL STARS edition" стиль */
+        .subtitle {
+            font-size: 35px; /* "BRAWL STARS" крупнее */
+            color: var(--accent); /* Красный цвет */
+            line-height: 1;
+            margin-top: 10px; /* Отступ после "ШПИОН" */
+            margin-bottom: 80px; /* Отступ до кнопки */
+        }
+        .subtitle span {
+            font-size: 20px; /* "edition" мелким шрифтом */
+            display: block; /* С новой строки */
+            color: rgba(255, 255, 255, 0.7); /* Чуть приглушенный белый */
+            margin-top: -5px; /* Поднимаем ближе к BRAWL STARS */
+        }
+
+        /* Кнопки как в оригинале */
+        .btn-main {
+            width: 100%; 
+            max-width: 340px; 
+            padding: 24px; 
+            border-radius: 28px;
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            font-size: 26px;
+            box-shadow: 0 8px 0 #4a0577; 
+            transition: 0.1s; 
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        .btn-main:active { transform: translateY(4px); box-shadow: 0 3px 0 #4a0577; }
+
+        /* Панель выбора игроков */
+        .counter-box {
+            background: var(--panel);
+            padding: 25px;
+            border-radius: 30px;
+            border: 2px solid var(--glass);
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            margin-bottom: 20px;
+        }
+        .btn-circle {
+            width: 65px; height: 65px;
+            border-radius: 20px;
+            background: var(--primary);
+            border: none;
+            color: white;
+            font-size: 35px;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* 3D Карта */
+        .card-wrap { width: 300px; height: 420px; perspective: 1200px; }
+        .card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-style: preserve-3d; }
         .card-inner.flipped { transform: rotateY(180deg); }
-        .card-side { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 35px; border: 8px solid var(--primary); display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--panel); }
-        .card-front { transform: rotateY(180deg); background: #fff; color: #000; border-color: var(--accent); }
+        .card-side { 
+            position: absolute; width: 100%; height: 100%; 
+            backface-visibility: hidden; border-radius: 40px; 
+            border: 10px solid var(--primary); 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            background: var(--panel); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+        .card-front { transform: rotateY(180deg); background: #FFFFFF; color: #000; border-color: var(--accent); }
         
-        .brawler-img { width: 220px; height: 220px; object-fit: contain; }
-        #timer-display { font-size: 80px; color: var(--accent); }
+        .brawler-img { width: 240px; height: 240px; object-fit: contain; margin-top: 10px; }
+        .role-name { font-size: 32px; color: #000; text-transform: uppercase; }
+
+        #timer-display { font-size: 90px; color: var(--accent); text-shadow: 0 0 20px rgba(247, 37, 133, 0.3); }
     </style>
 </head>
 <body>
 
-    <div id="menu" class="screen active">
-        <h1 class="main-title">BRAWL<span>SPY</span></h1>
-        <button class="btn-main" onclick="nav('lobby')">Играть</button>
+    <div id="scr-menu" class="screen active">
+        <h1 class="neon-title">ШПИОН</h1>
+        <h2 class="subtitle">BRAWL STARS <span>edition</span></h2>
+        <button class="btn-main" onclick="nav('scr-lobby')">Играть</button>
     </div>
 
-    <div id="lobby" class="screen">
-        <h2 style="font-size: 30px;">КОЛИЧЕСТВО ИГРОКОВ</h2>
-        <div class="controls-row">
-            <button class="btn-step" onclick="changeP(-1)">-</button>
-            <span id="p-count" style="font-size: 45px;">3</span>
-            <button class="btn-step" onclick="changeP(1)">+</button>
+    <div id="scr-lobby" class="screen">
+        <h2 style="font-size: 24px; opacity: 0.8;">КТО В ИГРЕ?</h2>
+        <div class="counter-box">
+            <button class="btn-circle" onclick="changeP(-1)">-</button>
+            <span id="p-count" style="font-size: 55px;">3</span>
+            <button class="btn-circle" onclick="changeP(1)">+</button>
         </div>
-        <button class="btn-main" onclick="startGame()">Раздать роли</button>
+        <button class="btn-main" onclick="startGame()">Раздать</button>
     </div>
 
-    <div id="game" class="screen">
-        <h3 id="p-label" style="color:var(--secondary); font-size: 25px;">ИГРОК 1</h3>
+    <div id="scr-game" class="screen">
+        <h3 id="p-label" style="color:var(--secondary); font-size: 22px;">ИГРОК 1</h3>
         <div class="card-wrap" onclick="flip()">
             <div id="card-obj" class="card-inner">
                 <div class="card-side">
-                    <h1 style="font-size: 80px;">?</h1>
-                    <p style="font-size: 14px; opacity: 0.7;">НАЖМИ, ЧТОБЫ УЗНАТЬ РОЛЬ</p>
+                    <h1 style="font-size: 100px; color: var(--primary);">?</h1>
+                    <p style="font-size: 14px; opacity: 0.5;">НАЖМИ НА КАРТУ</p>
                 </div>
                 <div class="card-side card-front" id="role-ui"></div>
             </div>
         </div>
         <div id="timer-ui" style="display:none;">
             <div id="timer-display">05:00</div>
-            <p>КТО ШПИОН?</p>
+            <p style="font-size: 20px;">ОБСУЖДАЙТЕ!</p>
         </div>
-        <button id="btn-action" class="btn-main" style="visibility:hidden;" onclick="next()">Далее</button>
+        <button id="btn-next" class="btn-main" style="visibility:hidden;" onclick="next()">Далее</button>
         <button id="btn-restart" class="btn-main" style="display:none;" onclick="location.reload()">В меню</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         
-        // Исправленный список: Имя на русском + Точная картинка
         const BRAWLERS = [
             { n: "ШЕЛЛИ", i: "https://cdn.brawlstats.com/character-arts/16000000.png" },
             { n: "КОЛЬТ", i: "https://cdn.brawlstats.com/character-arts/16000001.png" },
@@ -95,15 +175,9 @@
             { n: "ДИНАМАЙК", i: "https://cdn.brawlstats.com/character-arts/16000006.png" },
             { n: "СПАЙК", i: "https://cdn.brawlstats.com/character-arts/16000007.png" },
             { n: "КРОУ", i: "https://cdn.brawlstats.com/character-arts/16000008.png" },
-            { n: "БАРЛИ", i: "https://cdn.brawlstats.com/character-arts/16000009.png" },
-            { n: "БО", i: "https://cdn.brawlstats.com/character-arts/16000010.png" },
-            { n: "ПОКО", i: "https://cdn.brawlstats.com/character-arts/16000011.png" },
-            { n: "ЭЛЬ ПРИМО", i: "https://cdn.brawlstats.com/character-arts/16000012.png" },
-            { n: "ПАЙПЕР", i: "https://cdn.brawlstats.com/character-arts/16000013.png" },
+            { n: "ЛЕОН", i: "https://cdn.brawlstats.com/character-arts/16000017.png" },
             { n: "МОРТИС", i: "https://cdn.brawlstats.com/character-arts/16000014.png" },
-            { n: "ДЭРРИЛ", i: "https://cdn.brawlstats.com/character-arts/16000015.png" },
-            { n: "ПЕННИ", i: "https://cdn.brawlstats.com/character-arts/16000016.png" },
-            { n: "ЛЕОН", i: "https://cdn.brawlstats.com/character-arts/16000017.png" }
+            { n: "ЭДГАР", i: "https://cdn.brawlstats.com/character-arts/16000042.png" }
         ];
 
         let state = { p: 3, cur: 0, roles: [], isFlipped: false, time: 300 };
@@ -124,20 +198,19 @@
             state.cur = 0; state.roles = []; state.isFlipped = false;
             let spyIdx = Math.floor(Math.random() * state.p);
             let brawler = BRAWLERS[Math.floor(Math.random() * BRAWLERS.length)];
-            for(let i=0; i<state.p; i++) {
-                // Картинка для шпиона (иконка маски)
+            for(let i=0; i<state.p; i) {
                 state.roles.push(i === spyIdx ? {n: "ШПИОН", i: "https://cdn-icons-png.flaticon.com/512/953/953791.png"} : brawler);
             }
-            nav('game');
+            nav('scr-game');
             updateUI();
         }
 
         function flip() {
             if(state.isFlipped) return;
             const role = state.roles[state.cur];
-            document.getElementById('role-ui').innerHTML = `<h2 style="font-size:28px;margin-bottom:10px">${role.n}</h2><img src="${role.i}" class="brawler-img">`;
+            document.getElementById('role-ui').innerHTML = `<span class="role-name">${role.n}</span><img src="${role.i}" class="brawler-img">`;
             document.getElementById('card-obj').classList.add('flipped');
-            document.getElementById('btn-action').style.visibility = 'visible';
+            document.getElementById('btn-next').style.visibility = 'visible';
             state.isFlipped = true;
             tg.HapticFeedback.impactOccurred('heavy');
         }
@@ -147,7 +220,7 @@
             if(state.cur < state.p) {
                 state.isFlipped = false;
                 document.getElementById('card-obj').classList.remove('flipped');
-                document.getElementById('btn-action').style.visibility = 'hidden';
+                document.getElementById('btn-next').style.visibility = 'hidden';
                 setTimeout(updateUI, 300);
             } else {
                 startTimer();
@@ -158,8 +231,8 @@
 
         function startTimer() {
             document.querySelector('.card-wrap').style.display = 'none';
-            document.getElementById('btn-action').style.display = 'none';
-            document.getElementById('p-label').innerText = "ОБСУЖДЕНИЕ";
+            document.getElementById('btn-next').style.display = 'none';
+            document.getElementById('p-label').innerText = "КТО ПРЕДАТЕЛЬ?";
             document.getElementById('timer-ui').style.display = 'block';
             document.getElementById('btn-restart').style.display = 'block';
             
@@ -170,7 +243,7 @@
                 if(state.time <= 0) {
                     clearInterval(countdown);
                     tg.HapticFeedback.notificationOccurred('error');
-                    tg.showAlert("ВРЕМЯ ВЫШЛО! КТО ЖЕ ШПИОН?");
+                    tg.showAlert("ВРЕМЯ ВЫШЛО!");
                 }
             }, 1000);
         }
