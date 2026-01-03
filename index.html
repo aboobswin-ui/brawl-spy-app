@@ -3,21 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Brawl Spy Working</title>
+    <title>Brawl Spy Full Matte</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Rubik+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500&display=swap" rel="stylesheet">
+    
     <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+        /* БАЗОВЫЕ СТИЛИ */
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            margin: 0; 
+            padding: 0; 
+        }
         
         body {
             background-color: #0A0A0F;
             background-image: radial-gradient(circle at 50% 50%, #1a0b2e 0%, #0A0A0F 100%);
             color: white;
-            font-family: 'Rubik One', sans-serif;
+            font-family: 'Rubik', sans-serif; /* Измененный шрифт */
             height: 100vh;
+            width: 100vw;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            user-select: none;
         }
 
         .app-container {
@@ -25,9 +34,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             padding: 20px;
         }
 
+        /* ЭКРАНЫ */
         .screen {
             display: none;
             width: 100%;
@@ -38,90 +49,109 @@
             padding: 40px 0;
         }
 
-        .active { display: flex !important; }
+        .active { 
+            display: flex !important; 
+        }
 
+        /* ЗАГОЛОВКИ */
         h1 {
             font-size: 42px;
             text-transform: uppercase;
             text-align: center;
             color: #FFFFFF;
-            text-shadow: 0 0 10px rgba(114, 9, 183, 0.4), 3px 3px 0px #000;
+            text-shadow: 0 0 10px rgba(114, 9, 183, 0.4);
+            font-weight: 500;
         }
 
-        .user-info {
-            background: rgba(114, 9, 183, 0.15);
+        /* ПРОФИЛЬ ЮЗЕРА */
+        .user-card {
+            background: rgba(114, 9, 183, 0.1);
             border: 2px solid #7209B7;
             border-radius: 50px;
             padding: 10px 25px;
             display: flex;
             align-items: center;
-            box-shadow: 0 0 15px rgba(114, 9, 183, 0.2);
             margin-top: 15px;
         }
 
-        .avatar {
-            width: 45px; height: 45px;
+        .user-avatar {
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             border: 2px solid #FFFFFF;
             margin-right: 15px;
+            object-fit: cover;
         }
 
-        /* ЕДИНЫЙ СТИЛЬ КНОПОК ДЛЯ ВСЕХ ЭКРАНОВ */
-        .btn-style {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(5px);
-            border: 2px solid #7209B7;
+        /* ТОТ САМЫЙ ЧЕРНЫЙ МАТОВЫЙ СТИЛЬ КНОПОК */
+        .btn-action {
+            background-color: #000000; /* Глубокий черный матовый */
+            border: 2px solid #7209B7; /* Фиолетовая рамка */
             border-radius: 20px;
             color: white;
-            font-family: 'Rubik One', sans-serif;
-            font-size: 22px;
+            font-family: 'Rubik', sans-serif;
+            font-weight: 500; /* Не жирный шрифт */
+            font-size: 20px;
             padding: 20px;
             width: 100%;
             max-width: 300px;
             text-transform: uppercase;
             cursor: pointer;
             text-align: center;
-            outline: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            transition: transform 0.1s;
+            letter-spacing: 1px;
         }
 
-        .btn-style:active { transform: scale(0.95); background: rgba(114, 9, 183, 0.2); }
+        .btn-action:active {
+            transform: scale(0.96);
+            background-color: #080808;
+        }
 
-        .settings-card {
+        /* НАСТРОЙКИ КОМНАТЫ */
+        .settings-box {
             background: rgba(255, 255, 255, 0.03);
-            border-radius: 20px;
+            border-radius: 25px;
             width: 100%;
             max-width: 320px;
-            padding: 10px;
+            padding: 15px;
             border: 1px solid rgba(114, 9, 183, 0.2);
         }
 
-        .setting-item {
+        .setting-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px;
+            padding: 12px 5px;
         }
 
-        .circle-btn {
-            width: 44px; height: 44px;
+        .counter-btn {
+            width: 44px;
+            height: 44px;
             background: #560bad;
             border: none;
             border-radius: 12px;
             color: white;
-            font-size: 26px;
-            font-family: 'Rubik One';
+            font-size: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .back-btn {
-            color: #B0B7C3;
+        .counter-value {
+            font-size: 26px;
+            min-width: 35px;
+            text-align: center;
+            margin: 0 10px;
+        }
+
+        .btn-back {
+            color: #666;
             text-transform: uppercase;
             font-size: 14px;
             margin-top: 10px;
             cursor: pointer;
-            padding: 10px;
+            letter-spacing: 2px;
         }
     </style>
 </head>
@@ -129,102 +159,98 @@
 
     <div class="app-container">
         
-        <div id="screen-main" class="screen active">
-            <div style="display: flex; flex-direction: column; align-items: center;">
+        <div id="main-screen" class="screen active">
+            <div style="text-align: center;">
                 <h1>BRAWL SPY</h1>
-                <div class="user-info">
-                    <img id="u-pic" src="https://cdn-icons-png.flaticon.com/512/847/847969.png" class="avatar">
-                    <span id="u-name">ЗАГРУЗКА...</span>
+                <div class="user-card">
+                    <img id="player-avatar" src="https://cdn-icons-png.flaticon.com/512/847/847969.png" class="user-avatar">
+                    <span id="player-name">ИГРОК</span>
                 </div>
             </div>
-            <button class="btn-style" onclick="go('screen-menu')">ИГРАТЬ</button>
+            <button class="btn-action" onclick="navigateTo('menu-screen')">ИГРАТЬ</button>
         </div>
 
-        <div id="screen-menu" class="screen">
-            <h1 style="font-size: 60px;">МЕНЮ</h1>
-            <div style="width: 100%; display: flex; flex-direction: column; align-items: center; gap: 15px;">
-                <button class="btn-style" onclick="go('screen-settings')">Создать комнату</button>
-                <button class="btn-style" onclick="invite()">Пригласить друга</button>
+        <div id="menu-screen" class="screen">
+            <h1>МЕНЮ</h1>
+            <div style="width: 100%; display: flex; flex-direction: column; align-items: center; gap: 20px;">
+                <button class="btn-action" onclick="navigateTo('room-screen')">Создать комнату</button>
+                <button class="btn-action" onclick="sendInvite()">Пригласить друга</button>
             </div>
-            <div class="back-btn" onclick="go('screen-main')">назад</div>
+            <div class="btn-back" onclick="navigateTo('main-screen')">назад</div>
         </div>
 
-        <div id="screen-settings" class="screen">
+        <div id="room-screen" class="screen">
             <h1>КОМНАТА</h1>
-            <div class="settings-card">
-                <div class="setting-item">
+            <div class="settings-box">
+                <div class="setting-row">
                     <span>ИГРОКОВ</span>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <button class="circle-btn" onclick="adj('p',-1)">-</button>
-                        <span id="p-v" style="font-size: 26px; min-width: 30px; text-align: center;">4</span>
-                        <button class="circle-btn" onclick="adj('p',1)">+</button>
+                    <div style="display: flex; align-items: center;">
+                        <button class="counter-btn" onclick="updateValue('players', -1)">-</button>
+                        <span id="players-count" class="counter-value">4</span>
+                        <button class="counter-btn" onclick="updateValue('players', 1)">+</button>
                     </div>
                 </div>
-                <div class="setting-item">
+                <div class="setting-row">
                     <span>ШПИОНОВ</span>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <button class="circle-btn" onclick="adj('s',-1)">-</button>
-                        <span id="s-v" style="font-size: 26px; min-width: 30px; text-align: center;">1</span>
-                        <button class="circle-btn" onclick="adj('s',1)">+</button>
+                    <div style="display: flex; align-items: center;">
+                        <button class="counter-btn" onclick="updateValue('spies', -1)">-</button>
+                        <span id="spies-count" class="counter-value">1</span>
+                        <button class="counter-btn" onclick="updateValue('spies', 1)">+</button>
                     </div>
                 </div>
             </div>
-            <button class="btn-style" onclick="invite()">ПОЗВАТЬ ДРУЗЕЙ</button>
-            <div class="back-btn" onclick="go('screen-menu')">назад</div>
+            <button class="btn-action" onclick="sendInvite()">ПОЗВАТЬ ДРУЗЕЙ</button>
+            <div class="btn-back" onclick="navigateTo('menu-screen')">назад</div>
         </div>
 
     </div>
 
     <script>
-        let tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.ready();
+        const webApp = window.Telegram.WebApp;
+        webApp.expand();
+        webApp.ready();
 
-        // Подгружаем юзера сразу
-        const user = tg.initDataUnsafe?.user;
-        if (user) {
-            document.getElementById('u-name').innerText = user.first_name.toUpperCase();
-            if (user.photo_url) document.getElementById('u-pic').src = user.photo_url;
-        } else {
-            document.getElementById('u-name').innerText = "ИГРОК";
+        // Данные юзера
+        function setupUser() {
+            const userData = webApp.initDataUnsafe?.user;
+            if (userData) {
+                document.getElementById('player-name').innerText = (userData.first_name || "ИГРОК").toUpperCase();
+                if (userData.photo_url) document.getElementById('player-avatar').src = userData.photo_url;
+            }
         }
 
-        // Рабочая навигация
-        function go(screenId) {
-            // Скрываем все экраны
-            const screens = document.getElementsByClassName('screen');
-            for (let i = 0; i < screens.length; i++) {
-                screens[i].classList.remove('active');
-            }
-            // Показываем нужный
-            const target = document.getElementById(screenId);
-            if (target) {
-                target.classList.add('active');
-            }
-            tg.HapticFeedback.impactOccurred('medium');
+        // Навигация
+        function navigateTo(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            webApp.HapticFeedback.impactOccurred('medium');
         }
 
-        // Настройка количества
-        function adj(type, delta) {
-            const el = document.getElementById(type + '-v');
-            let val = parseInt(el.innerText) + delta;
-            
-            if(type === 'p') { 
-                if(val < 3) val = 3; 
-                if(val > 12) val = 12; 
+        // Логика цифр
+        function updateValue(type, change) {
+            const pEl = document.getElementById('players-count');
+            const sEl = document.getElementById('spies-count');
+            let p = parseInt(pEl.innerText);
+            let s = parseInt(sEl.innerText);
+
+            if (type === 'players') {
+                p += change;
+                if (p < 3) p = 3; if (p > 15) p = 15;
+                pEl.innerText = p;
+                if (s >= p) sEl.innerText = p - 1;
+            } else {
+                s += change;
+                if (s < 1) s = 1; if (s >= p) s = p - 1;
+                sEl.innerText = s;
             }
-            if(type === 's') { 
-                let p = parseInt(document.getElementById('p-v').innerText);
-                if(val < 1) val = 1; 
-                if(val >= p) val = 1; 
-            }
-            el.innerText = val;
-            tg.HapticFeedback.selectionChanged();
+            webApp.HapticFeedback.selectionChanged();
         }
 
-        function invite() {
-            tg.switchInlineQuery("Го в Brawl Spy!");
+        function sendInvite() {
+            webApp.switchInlineQuery("Го в Brawl Spy!");
         }
+
+        window.onload = setupUser;
     </script>
 </body>
 </html>
