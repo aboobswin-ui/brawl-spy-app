@@ -3,20 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Brawl Spy: Ultimate 400+ Edition</title>
+    <title>Brawl Spy: Pro Edition v2.0</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Rubik+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik+One&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ И СТИЛИ --- */
+        /* --- ПЕРЕМЕННЫЕ И ОСНОВА --- */
         :root {
-            --accent: #7209B7;
-            --accent-dark: #560bad;
-            --spy-neon: #F72585;
-            --bg-deep: #0A0A0F;
-            --card-gray: #1c1c1f;
-            --text-main: #FFFFFF;
+            --bg-main: #0A0A0F;
+            --purp: #7209B7;
+            --purp-dark: #3c096c;
+            --blue-neon: #4CC9F0;
+            --pink-spy: #F72585;
+            --gray-matte: #1c1c1f;
+            --white: #ffffff;
             --glass: rgba(255, 255, 255, 0.05);
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * { 
@@ -25,14 +27,15 @@
             margin: 0; 
             padding: 0; 
             user-select: none;
+            -webkit-user-drag: none;
         }
         
         body {
-            background-color: var(--bg-deep);
+            background-color: var(--bg-main);
             background-image: 
-                radial-gradient(circle at 0% 0%, rgba(114, 9, 183, 0.2) 0%, transparent 50%),
-                radial-gradient(circle at 100% 100%, rgba(247, 37, 133, 0.15) 0%, transparent 50%);
-            color: var(--text-main);
+                radial-gradient(circle at top left, rgba(114, 9, 183, 0.25), transparent 40%),
+                radial-gradient(circle at bottom right, rgba(76, 201, 240, 0.15), transparent 40%);
+            color: var(--white);
             font-family: 'Rubik One', sans-serif;
             height: 100vh;
             width: 100vw;
@@ -42,28 +45,18 @@
         }
 
         /* --- АНИМАЦИИ --- */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.9) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
-        @keyframes pulseSpy {
-            0% { box-shadow: 0 0 10px var(--spy-neon); }
-            50% { box-shadow: 0 0 30px var(--spy-neon); }
-            100% { box-shadow: 0 0 10px var(--spy-neon); }
+        @keyframes rotateGlow {
+            0% { filter: drop-shadow(0 0 5px var(--purp)); }
+            50% { filter: drop-shadow(0 0 20px var(--purp)); }
+            100% { filter: drop-shadow(0 0 5px var(--purp)); }
         }
 
-        /* --- КОНТЕЙНЕРЫ --- */
-        .app-wrapper {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            z-index: 2;
-        }
-
+        /* --- ЭКРАНЫ --- */
         .screen {
             display: none;
             width: 100%;
@@ -71,353 +64,372 @@
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
-            padding: 30px 0;
-            animation: fadeIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            padding: 40px 20px;
+            animation: fadeInScale 0.4s forwards;
         }
 
-        .screen.active { display: flex !important; }
+        .active { display: flex !important; }
 
-        /* --- ШАПКА И ЛОББИ ЭЛЕМЕНТЫ --- */
-        .header-box {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
+        /* --- ЗАГОЛОВКИ --- */
         .main-title {
-            font-size: 42px;
+            font-size: 44px;
+            text-align: center;
             text-transform: uppercase;
-            background: linear-gradient(180deg, #FFF 0%, #AAA 100%);
+            line-height: 0.9;
+            background: linear-gradient(to bottom, #fff, #bbb);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.5));
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.8));
+            margin-bottom: 10px;
         }
 
-        .room-badge {
-            background: var(--accent);
-            padding: 6px 16px;
-            border-radius: 12px;
-            font-size: 14px;
-            margin-top: 10px;
-            display: inline-block;
+        .room-info-pill {
+            background: var(--purp);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 12px;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
-        /* --- СПИСОК ИГРОКОВ (ЛОББИ) --- */
-        .lobby-container {
+        /* --- ЛОББИ: СПИСОК ИГРОКОВ --- */
+        .lobby-box {
             width: 100%;
             max-width: 360px;
             background: var(--glass);
-            border: 1px solid rgba(114, 9, 183, 0.3);
-            border-radius: 25px;
-            padding: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 30px;
+            padding: 20px;
             flex: 1;
             margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
             overflow-y: auto;
         }
 
-        .player-row {
-            background: var(--card-gray);
-            margin-bottom: 10px;
-            padding: 12px 20px;
-            border-radius: 15px;
+        .player-card {
+            background: var(--gray-matte);
+            padding: 16px 20px;
+            border-radius: 20px;
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            border-left: 4px solid var(--accent);
-            transition: 0.2s;
+            align-items: center;
+            border-left: 5px solid var(--purp);
+            transition: var(--transition);
         }
 
-        .player-row.is-host { border-left-color: #00f2ff; }
+        .player-card.host { border-left-color: var(--blue-neon); }
 
-        /* --- КНОПКИ (МАТОВЫЙ СЕРЫЙ) --- */
-        .btn-matte {
-            background-color: var(--card-gray);
-            border: 3px solid var(--accent);
+        .status-ready { font-size: 10px; color: var(--blue-neon); text-transform: uppercase; }
+
+        /* --- КНОПКИ (МАТОВЫЙ СТИЛЬ) --- */
+        .btn {
+            background-color: var(--gray-matte);
+            border: 3px solid var(--purp);
             border-radius: 22px;
             color: white;
             font-family: 'Rubik One', sans-serif;
-            font-size: 18px;
+            font-size: 20px;
             padding: 22px;
             width: 100%;
             max-width: 340px;
             text-transform: uppercase;
             cursor: pointer;
-            box-shadow: 0 10px 0px rgba(0, 0, 0, 0.2), 0 15px 30px rgba(0,0,0,0.4);
+            box-shadow: 0 10px 0px rgba(0,0,0,0.3);
             transition: 0.1s;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 15px;
+            position: relative;
         }
 
-        .btn-matte:active {
-            transform: translateY(4px);
-            box-shadow: 0 4px 0px rgba(0, 0, 0, 0.2);
+        .btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 4px 0px rgba(0,0,0,0.3);
             background-color: #252529;
         }
 
-        .btn-secondary {
-            border-color: #444;
+        .btn-cyan { border-color: var(--blue-neon); color: var(--blue-neon); }
+        
+        .btn-nav {
+            background: transparent;
+            border: 2px solid #444;
+            color: #777;
             font-size: 14px;
-            padding: 15px;
-        }
-
-        /* --- ИГРОВАЯ КАРТА --- */
-        .card-container {
-            perspective: 1000px;
-            width: 300px;
-            height: 440px;
-        }
-
-        .brawl-card {
-            background: var(--card-gray);
-            border: 5px solid var(--accent);
-            border-radius: 35px;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 30px 20px;
-            box-shadow: 0 0 40px rgba(114, 9, 183, 0.3);
-            cursor: pointer;
-        }
-
-        .brawler-name-top {
-            font-size: 28px;
-            color: white;
-            margin-bottom: 25px;
-            text-align: center;
-            text-transform: uppercase;
-            min-height: 40px;
-        }
-
-        .photo-frame {
-            width: 220px;
-            height: 220px;
-            background: radial-gradient(circle, rgba(114, 9, 183, 0.3) 0%, transparent 70%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .brawler-photo {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
-        }
-
-        .spy-mode {
-            border-color: var(--spy-neon);
-            animation: pulseSpy 2s infinite;
-        }
-
-        .spy-mode .brawler-name-top {
-            color: var(--spy-neon);
-            text-shadow: 0 0 10px var(--spy-neon);
-        }
-
-        /* --- ТАЙМЕР --- */
-        .timer-text {
-            font-size: 70px;
-            color: var(--spy-neon);
-            text-shadow: 0 0 20px rgba(247, 37, 133, 0.5);
-            margin: 20px 0;
+            padding: 14px;
+            box-shadow: none;
+            margin-top: 10px;
         }
 
         /* --- НАСТРОЙКИ --- */
-        .setting-panel {
+        .setting-row {
+            background: var(--gray-matte);
             width: 100%;
             max-width: 340px;
-            background: var(--glass);
-            border-radius: 30px;
-            padding: 25px;
-            margin-bottom: 20px;
-        }
-
-        .control-row {
+            padding: 20px;
+            border-radius: 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border: 1px solid rgba(114, 9, 183, 0.3);
         }
 
-        .stepper-btn {
-            width: 55px;
-            height: 55px;
-            background: var(--accent);
+        .step-control {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .round-btn {
+            width: 50px;
+            height: 50px;
+            background: var(--purp);
             border: none;
-            border-radius: 18px;
+            border-radius: 15px;
             color: white;
-            font-family: 'Rubik One', sans-serif;
             font-size: 24px;
+            font-family: 'Rubik One';
         }
 
-        .back-link {
-            color: #555;
-            font-size: 12px;
+        /* --- ИГРОВАЯ КАРТОЧКА --- */
+        .game-card-display {
+            background: var(--gray-matte);
+            border: 5px solid var(--purp);
+            border-radius: 40px;
+            width: 310px;
+            height: 460px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 35px 20px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            transition: var(--transition);
+        }
+
+        /* ИМЯ НАД КАРТИНКОЙ */
+        .brawler-name-label {
+            font-size: 30px;
+            text-align: center;
+            margin-bottom: 30px;
             text-transform: uppercase;
-            margin-top: 10px;
-            cursor: pointer;
+            min-height: 40px;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        .brawler-img-box {
+            width: 230px;
+            height: 230px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle, rgba(114, 9, 183, 0.2) 0%, transparent 75%);
+            animation: rotateGlow 3s infinite ease-in-out;
+        }
+
+        .brawler-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .spy-theme {
+            border-color: var(--pink-spy);
+            box-shadow: 0 0 40px rgba(247, 37, 133, 0.4);
+        }
+
+        .spy-theme .brawler-name-label { color: var(--pink-spy); }
+
+        /* --- ФИНАЛЬНЫЙ ТАЙМЕР --- */
+        .timer-display {
+            font-size: 70px;
+            color: var(--pink-spy);
+            text-shadow: 0 0 20px rgba(247, 37, 133, 0.3);
         }
 
     </style>
 </head>
 <body>
 
-    <div class="app-wrapper">
+    <div id="app" style="height:100%; display:flex; flex-direction:column;">
         
-        <div id="scr-start" class="screen active">
-            <div class="header-box">
+        <div id="scr-menu" class="screen active">
+            <div style="text-align:center">
                 <h1 class="main-title">BRAWL<br>SPY</h1>
+                <p style="font-size:12px; color:var(--purp); letter-spacing:4px">MOBILE EDITION</p>
             </div>
-            <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
-                <button class="btn-matte" onclick="initLobby()">СОЗДАТЬ ЛОББИ</button>
-                <button class="btn-matte btn-secondary" onclick="tg.showAlert('В разработке...')">ВХОД ПО ID</button>
+            
+            <div style="width:100%; display:flex; flex-direction:column; align-items:center; gap:15px;">
+                <button class="btn" onclick="openLobby()">СОЗДАТЬ ХОЛЛ</button>
+                <button class="btn btn-cyan" onclick="tg.showAlert('Сетевой режим в разработке!')">ПОИСК ИГРЫ</button>
             </div>
         </div>
 
         <div id="scr-lobby" class="screen">
-            <div class="header-box">
-                <div class="room-badge" id="lobby-id-tag">ROOM: #0000</div>
-                <h2 style="margin-top:10px;">ЛОББИ</h2>
+            <div style="text-align:center">
+                <div class="room-info-pill" id="room-id">ROOM #4412</div>
+                <h2 style="margin-top:10px; font-size:24px">ПОДГОТОВКА</h2>
             </div>
 
-            <div class="setting-panel">
-                <div class="control-row">
-                    <span>ИГРОКИ:</span>
-                    <div style="display:flex; align-items:center;">
-                        <button class="stepper-btn" onclick="changePlayers(-1)">-</button>
-                        <span id="p-label" style="margin: 0 20px; font-size: 28px;">4</span>
-                        <button class="stepper-btn" onclick="changePlayers(1)">+</button>
-                    </div>
+            <div class="setting-row">
+                <span>ИГРОКИ</span>
+                <div class="step-control">
+                    <button class="round-btn" onclick="setPlayers(-1)">-</button>
+                    <span id="player-val" style="font-size:24px; width:30px; text-align:center">4</span>
+                    <button class="round-btn" onclick="setPlayers(1)">+</button>
                 </div>
             </div>
 
-            <div class="lobby-list" id="player-list-ui" style="width:100%; max-width:340px; flex:1; overflow-y:auto; margin-bottom:20px;">
+            <div class="lobby-box" id="lobby-list-ui">
                 </div>
 
             <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
-                <button class="btn-matte" onclick="startBattle()">СТАРТ</button>
-                <button class="btn-matte btn-secondary" style="border-color:#4CC9F0; color:#4CC9F0;" onclick="inviteLink()">ПРИГЛАСИТЬ</button>
+                <button class="btn" onclick="startGame()">НАЧАТЬ МАТЧ</button>
+                <button class="btn btn-nav" onclick="nav('scr-menu')">ВЕРНУТЬСЯ В МЕНЮ</button>
             </div>
         </div>
 
         <div id="scr-game" class="screen">
-            <h1 id="game-status" style="font-size: 24px;">ИГРОК 1</h1>
-            
-            <div class="card-container" id="card-trigger" onclick="revealCard()">
-                <div id="card-content" class="brawl-card">
-                    <p style="margin-top: 180px; font-size: 14px; color: var(--accent);">НАЖМИ НА КАРТУ</p>
+            <h1 id="status-header" style="font-size:22px">ИГРОК 1</h1>
+
+            <div class="game-card-display" id="main-card" onclick="flipCard()">
+                <div id="card-inner-view" style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; width:100%">
+                    <p style="color:var(--purp); font-size:14px; text-align:center">НАЖМИ НА КАРТУ,<br>ЧТОБЫ УЗНАТЬ РОЛЬ</p>
                 </div>
             </div>
 
-            <div id="timer-display" class="timer-text" style="display:none;">05:00</div>
-            
-            <button class="btn-matte" id="next-btn" style="display:none;" onclick="flowControl()">СЛЕДУЮЩИЙ</button>
-            
-            <div class="back-link" onclick="location.reload()">закончить</div>
+            <div id="timer-ui" class="timer-display" style="display:none">05:00</div>
+
+            <div style="width:100%; display:flex; flex-direction:column; align-items:center;">
+                <button class="btn" id="btn-next" style="display:none" onclick="nextPlayer()">СЛЕДУЮЩИЙ</button>
+                <button class="btn btn-nav" onclick="location.reload()">СБРОСИТЬ ИГРУ</button>
+            </div>
         </div>
 
     </div>
 
     <script>
+        // Инициализация Telegram
         const tg = window.Telegram.WebApp;
         tg.expand();
+        tg.enableClosingConfirmation();
 
-        let players = 4;
-        let step = 0;
-        let deck = [];
-        let roomId = 0;
+        // Состояние игры
+        let config = {
+            pCount: 4,
+            current: 0,
+            deck: [],
+            isFlipped: false
+        };
 
-        // --- ГИГАНТСКАЯ БАЗА БРАВЛЕРОВ (99+) ---
-        const BRAWLERS = [
-            {n:"LEON", i:"https://media.brawltime.ninja/brawlers/leon/portrait.webp"},
-            {n:"SHELLY", i:"https://media.brawltime.ninja/brawlers/shelly/portrait.webp"},
-            {n:"SPIKE", i:"https://media.brawltime.ninja/brawlers/spike/portrait.webp"},
-            {n:"CROW", i:"https://media.brawltime.ninja/brawlers/crow/portrait.webp"},
-            {n:"EDGAR", i:"https://media.brawltime.ninja/brawlers/edgar/portrait.webp"},
-            {n:"MORTIS", i:"https://media.brawltime.ninja/brawlers/mortis/portrait.webp"},
-            {n:"COLT", i:"https://media.brawltime.ninja/brawlers/colt/portrait.webp"},
-            {n:"SURGE", i:"https://media.brawltime.ninja/brawlers/surge/portrait.webp"},
-            {n:"EL PRIMO", i:"https://media.brawltime.ninja/brawlers/el_primo/portrait.webp"},
-            {n:"FANG", i:"https://media.brawltime.ninja/brawlers/fang/portrait.webp"},
-            {n:"PIPER", i:"https://media.brawltime.ninja/brawlers/piper/portrait.webp"},
-            {n:"BUZZ", i:"https://media.brawltime.ninja/brawlers/buzz/portrait.webp"},
-            {n:"STU", i:"https://media.brawltime.ninja/brawlers/stu/portrait.webp"},
-            {n:"AMBER", i:"https://media.brawltime.ninja/brawlers/amber/portrait.webp"},
-            {n:"CHESTER", i:"https://media.brawltime.ninja/brawlers/chester/portrait.webp"},
-            {n:"CORDELIUS", i:"https://media.brawltime.ninja/brawlers/cordelius/portrait.webp"},
-            {n:"MELODIE", i:"https://media.brawltime.ninja/brawlers/melodie/portrait.webp"},
-            {n:"ANGELO", i:"https://media.brawltime.ninja/brawlers/angelo/portrait.webp"},
-            {n:"LILY", i:"https://media.brawltime.ninja/brawlers/lily/portrait.webp"},
-            {n:"DRACO", i:"https://media.brawltime.ninja/brawlers/draco/portrait.webp"},
-            {n:"BULL", i:"https://media.brawltime.ninja/brawlers/bull/portrait.webp"},
-            {n:"BROCK", i:"https://media.brawltime.ninja/brawlers/brock/portrait.webp"},
-            {n:"DYNAMIKE", i:"https://media.brawltime.ninja/brawlers/dynamike/portrait.webp"},
-            {n:"BO", i:"https://media.brawltime.ninja/brawlers/bo/portrait.webp"},
-            {n:"TICK", i:"https://media.brawltime.ninja/brawlers/tick/portrait.webp"},
-            {n:"8-BIT", i:"https://media.brawltime.ninja/brawlers/8-bit/portrait.webp"},
-            {n:"EMZ", i:"https://media.brawltime.ninja/brawlers/emz/portrait.webp"},
-            {n:"NITA", i:"https://media.brawltime.ninja/brawlers/nita/portrait.webp"},
-            {n:"ROSA", i:"https://media.brawltime.ninja/brawlers/rosa/portrait.webp"}
-            // ... можно расширять до бесконечности
+        // --- БАЗА БРАВЛЕРОВ (50+ ШТУК) ---
+        const BRAWLERS_MEGA_DB = [
+            {n: "LEON", i: "https://media.brawltime.ninja/brawlers/leon/portrait.webp"},
+            {n: "SHELLY", i: "https://media.brawltime.ninja/brawlers/shelly/portrait.webp"},
+            {n: "SPIKE", i: "https://media.brawltime.ninja/brawlers/spike/portrait.webp"},
+            {n: "CROW", i: "https://media.brawltime.ninja/brawlers/crow/portrait.webp"},
+            {n: "MORTIS", i: "https://media.brawltime.ninja/brawlers/mortis/portrait.webp"},
+            {n: "EDGAR", i: "https://media.brawltime.ninja/brawlers/edgar/portrait.webp"},
+            {n: "SURGE", i: "https://media.brawltime.ninja/brawlers/surge/portrait.webp"},
+            {n: "FANG", i: "https://media.brawltime.ninja/brawlers/fang/portrait.webp"},
+            {n: "PIPER", i: "https://media.brawltime.ninja/brawlers/piper/portrait.webp"},
+            {n: "COLT", i: "https://media.brawltime.ninja/brawlers/colt/portrait.webp"},
+            {n: "EL PRIMO", i: "https://media.brawltime.ninja/brawlers/el_primo/portrait.webp"},
+            {n: "BUZZ", i: "https://media.brawltime.ninja/brawlers/buzz/portrait.webp"},
+            {n: "STU", i: "https://media.brawltime.ninja/brawlers/stu/portrait.webp"},
+            {n: "AMBER", i: "https://media.brawltime.ninja/brawlers/amber/portrait.webp"},
+            {n: "CHESTER", i: "https://media.brawltime.ninja/brawlers/chester/portrait.webp"},
+            {n: "CORDELIUS", i: "https://media.brawltime.ninja/brawlers/cordelius/portrait.webp"},
+            {n: "MELODIE", i: "https://media.brawltime.ninja/brawlers/melodie/portrait.webp"},
+            {n: "ANGELO", i: "https://media.brawltime.ninja/brawlers/angelo/portrait.webp"},
+            {n: "DRACO", i: "https://media.brawltime.ninja/brawlers/draco/portrait.webp"},
+            {n: "LILY", i: "https://media.brawltime.ninja/brawlers/lily/portrait.webp"},
+            {n: "BEA", i: "https://media.brawltime.ninja/brawlers/bea/portrait.webp"},
+            {n: "BIBI", i: "https://media.brawltime.ninja/brawlers/bibi/portrait.webp"},
+            {n: "TICK", i: "https://media.brawltime.ninja/brawlers/tick/portrait.webp"},
+            {n: "BO", i: "https://media.brawltime.ninja/brawlers/bo/portrait.webp"},
+            {n: "NITA", i: "https://media.brawltime.ninja/brawlers/nita/portrait.webp"},
+            {n: "BROCK", i: "https://media.brawltime.ninja/brawlers/brock/portrait.webp"},
+            {n: "DYNAMIKE", i: "https://media.brawltime.ninja/brawlers/dynamike/portrait.webp"},
+            {n: "BULL", i: "https://media.brawltime.ninja/brawlers/bull/portrait.webp"},
+            {n: "JESSIE", i: "https://media.brawltime.ninja/brawlers/jessie/portrait.webp"},
+            {n: "8-BIT", i: "https://media.brawltime.ninja/brawlers/8-bit/portrait.webp"},
+            {n: "RICO", i: "https://media.brawltime.ninja/brawlers/rico/portrait.webp"},
+            {n: "DARRYL", i: "https://media.brawltime.ninja/brawlers/darryl/portrait.webp"},
+            {n: "PENNY", i: "https://media.brawltime.ninja/brawlers/penny/portrait.webp"},
+            {n: "CARL", i: "https://media.brawltime.ninja/brawlers/carl/portrait.webp"},
+            {n: "JACKY", i: "https://media.brawltime.ninja/brawlers/jacky/portrait.webp"},
+            {n: "GALE", i: "https://media.brawltime.ninja/brawlers/gale/portrait.webp"},
+            {n: "COLETTE", i: "https://media.brawltime.ninja/brawlers/colette/portrait.webp"},
+            {n: "LOU", i: "https://media.brawltime.ninja/brawlers/lou/portrait.webp"},
+            {n: "RUFFS", i: "https://media.brawltime.ninja/brawlers/ruffs/portrait.webp"},
+            {n: "BELLE", i: "https://media.brawltime.ninja/brawlers/belle/portrait.webp"},
+            {n: "ASH", i: "https://media.brawltime.ninja/brawlers/ash/portrait.webp"},
+            {n: "LOLA", i: "https://media.brawltime.ninja/brawlers/lola/portrait.webp"},
+            {n: "EVE", i: "https://media.brawltime.ninja/brawlers/eve/portrait.webp"},
+            {n: "JANET", i: "https://media.brawltime.ninja/brawlers/janet/portrait.webp"},
+            {n: "OTIS", i: "https://media.brawltime.ninja/brawlers/otis/portrait.webp"},
+            {n: "BUSTER", i: "https://media.brawltime.ninja/brawlers/buster/portrait.webp"},
+            {n: "MANDY", i: "https://media.brawltime.ninja/brawlers/mandy/portrait.webp"},
+            {n: "MAISIE", i: "https://media.brawltime.ninja/brawlers/maisie/portrait.webp"},
+            {n: "PEARL", i: "https://media.brawltime.ninja/brawlers/pearl/portrait.webp"},
+            {n: "CHARLIE", i: "https://media.brawltime.ninja/brawlers/charlie/portrait.webp"}
         ];
 
-        // --- ЛОГИКА НАВИГАЦИИ ---
+        // --- ЛОГИКА ИНТЕРФЕЙСА ---
         function nav(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             tg.HapticFeedback.impactOccurred('medium');
         }
 
-        // --- СОЗДАНИЕ ЛОББИ ---
-        function initLobby() {
-            roomId = Math.floor(1000 + Math.random() * 8999);
-            document.getElementById('lobby-id-tag').innerText = "ROOM: #" + roomId;
-            renderPlayerSlots();
+        function openLobby() {
+            const rid = Math.floor(1000 + Math.random() * 8999);
+            document.getElementById('room-id').innerText = "ROOM #" + rid;
+            renderLobbyList();
             nav('scr-lobby');
         }
 
-        function changePlayers(v) {
-            players = Math.max(3, Math.min(15, players + v));
-            document.getElementById('p-label').innerText = players;
-            renderPlayerSlots();
+        function setPlayers(v) {
+            config.pCount = Math.max(3, Math.min(15, config.pCount + v));
+            document.getElementById('player-val').innerText = config.pCount;
+            renderLobbyList();
             tg.HapticFeedback.selectionChanged();
         }
 
-        function renderPlayerSlots() {
-            const list = document.getElementById('player-list-ui');
-            list.innerHTML = "";
-            const host = tg.initDataUnsafe?.user?.first_name || "ТЫ (HOST)";
+        function renderLobbyList() {
+            const box = document.getElementById('lobby-list-ui');
+            box.innerHTML = "";
+            const me = tg.initDataUnsafe?.user?.first_name || "ТЫ";
             
-            for(let i=0; i<players; i++) {
-                const row = document.createElement('div');
-                row.className = "player-row" + (i === 0 ? " is-host" : "");
-                row.innerHTML = `
-                    <span style="font-size:14px;">${i === 0 ? host.toUpperCase() : 'ИГРОК ' + (i+1)}</span>
-                    <span style="font-size:10px; color:#aaa;">${i === 0 ? 'READY' : 'WAITING...'}</span>
+            for(let i=0; i < config.pCount; i++) {
+                const item = document.createElement('div');
+                item.className = "player-card" + (i === 0 ? " host" : "");
+                item.innerHTML = `
+                    <span>${i === 0 ? me.toUpperCase() : 'ИГРОК ' + (i+1)}</span>
+                    <span class="status-ready">${i === 0 ? 'READY' : 'WAITING...'}</span>
                 `;
-                list.appendChild(row);
+                box.appendChild(item);
             }
         }
 
-        function inviteLink() {
-            tg.switchInlineQuery(`Заходи в мой рум #${roomId}!`);
-        }
-
-        // --- ИГРОВАЯ МЕХАНИКА ---
-        function startBattle() {
-            deck = [];
-            step = 0;
-            const roundHero = BRAWLERS[Math.floor(Math.random() * BRAWLERS.length)];
+        // --- ЛОГИКА ИГРЫ ---
+        function startGame() {
+            config.deck = [];
+            config.current = 0;
+            config.isFlipped = false;
             
-            for(let i=0; i<players; i++) {
-                deck.push({ isSpy: false, name: roundHero.n, img: roundHero.i });
+            // Выбор бравлера раунда
+            const hero = BRAWLERS_MEGA_DB[Math.floor(Math.random() * BRAWLERS_MEGA_DB.length)];
+            
+            // Наполнение колоды
+            for(let i=0; i < config.pCount; i++) {
+                config.deck.push({ isSpy: false, name: hero.n, img: hero.i });
             }
             
-            // Внедрение шпиона
-            const spyIdx = Math.floor(Math.random() * players);
-            deck[spyIdx] = { 
+            // Добавление шпиона
+            const spyIdx = Math.floor(Math.random() * config.pCount);
+            config.deck[spyIdx] = { 
                 isSpy: true, 
                 name: "ШПИОН", 
                 img: "https://cdn-icons-png.flaticon.com/512/1266/1266106.png" 
@@ -428,62 +440,80 @@
         }
 
         function resetCardUI() {
-            document.getElementById('game-status').innerText = "ИГРОК " + (step + 1);
-            const card = document.getElementById('card-content');
-            card.className = "brawl-card";
-            card.innerHTML = '<p style="margin-top: 180px; font-size: 14px; color: var(--accent);">НАЖМИ НА КАРТУ</p>';
-            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('status-header').innerText = "ИГРОК " + (config.current + 1);
+            const card = document.getElementById('main-card');
+            card.classList.remove('spy-theme');
+            document.getElementById('card-inner-view').innerHTML = `
+                <p style="color:var(--purp); font-size:14px; text-align:center">НАЖМИ НА КАРТУ,<br>ЧТОБЫ УЗНАТЬ РОЛЬ</p>
+            `;
+            document.getElementById('btn-next').style.display = 'none';
         }
 
-        function revealCard() {
-            if(document.getElementById('next-btn').style.display === 'flex') return;
+        function flipCard() {
+            if(config.isFlipped) return;
             
-            const data = deck[step];
-            const card = document.getElementById('card-content');
+            const data = config.deck[config.current];
+            const card = document.getElementById('main-card');
             
-            if(data.isSpy) card.classList.add('spy-mode');
+            if(data.isSpy) card.classList.add('spy-theme');
             
-            card.innerHTML = `
-                <div class="brawler-name-top">${data.name}</div>
-                <div class="photo-frame">
-                    <img src="${data.img}" class="brawler-photo">
+            // РЕНДЕР: ИМЯ НАД КАРТИНКОЙ
+            document.getElementById('card-inner-view').innerHTML = `
+                <div class="brawler-name-label">${data.name}</div>
+                <div class="brawler-img-box">
+                    <img src="${data.img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/1266/1266106.png'">
                 </div>
             `;
             
-            document.getElementById('next-btn').style.display = 'flex';
+            config.isFlipped = true;
+            document.getElementById('btn-next').style.display = 'flex';
             tg.HapticFeedback.notificationOccurred('success');
         }
 
-        function flowControl() {
-            step++;
-            if(step < players) {
+        function nextPlayer() {
+            config.current++;
+            config.isFlipped = false;
+            
+            if(config.current < config.pCount) {
                 resetCardUI();
+                tg.HapticFeedback.impactOccurred('light');
             } else {
-                startDiscussion();
+                showFinalStage();
             }
         }
 
-        function startDiscussion() {
-            document.getElementById('game-status').innerText = "КТО ШПИОН?";
-            document.getElementById('card-trigger').style.display = 'none';
-            document.getElementById('timer-display').style.display = 'block';
-            document.getElementById('next-btn').innerText = "НОВАЯ ИГРА";
-            document.getElementById('next-btn').onclick = () => location.reload();
+        function showFinalStage() {
+            document.getElementById('status-header').innerText = "ОБСУЖДЕНИЕ";
+            document.getElementById('main-card').style.display = 'none';
+            document.getElementById('timer-ui').style.display = 'block';
+            document.getElementById('btn-next').innerText = "НОВЫЙ МАТЧ";
+            document.getElementById('btn-next').onclick = () => location.reload();
             
-            let time = 300;
-            const interval = setInterval(() => {
-                let m = Math.floor(time / 60);
-                let s = time % 60;
-                document.getElementById('timer-display').innerText = `${m}:${s < 10 ? '0'+s : s}`;
-                if(time <= 0) {
+            startTimer(300); // 5 минут
+        }
+
+        function startTimer(duration) {
+            let timer = duration, minutes, seconds;
+            const display = document.getElementById('timer-ui');
+            
+            const interval = setInterval(function () {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.textContent = minutes + ":" + seconds;
+
+                if (--timer < 0) {
                     clearInterval(interval);
                     tg.HapticFeedback.notificationOccurred('error');
+                    display.innerText = "ВРЕМЯ!";
                 }
-                time--;
             }, 1000);
         }
 
-        // Принудительная инициализация
+        // Приветствие ТГ
         window.onload = () => {
             tg.ready();
         };
