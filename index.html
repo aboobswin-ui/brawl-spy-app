@@ -3,35 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>BRAWL SPY 2026 - ULTIMATE MONOLITH</title>
+    <title>BRAWL SPY 2026 - MEGA MONOLITH EDITION</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Luckiest+Guy&family=Exo+2:wght@900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rubik+Mono+One&display=swap" rel="stylesheet">
     
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <style>
-        /* --- ГЛОБАЛЬНЫЕ НАСТРОЙКИ --- */
+        /* --- ЦВЕТОВАЯ ПАЛИТРА --- */
         :root {
             --neon-red: #ff3131;
             --neon-blue: #00d2ff;
             --neon-gold: #ffd700;
             --white: #ffffff;
             --bg-black: #010103;
-            /* Шрифты */
-            --font-supercell: 'Luckiest Guy', cursive; /* Аналог KZ Supercell-Magic */
-            --font-ops: 'Black Ops One', cursive;
+            --font-main: 'Black Ops One', cursive;
+            --font-spy: 'Rubik Mono One', sans-serif;
         }
 
+        /* --- ГЛОБАЛЬНЫЕ СТИЛИ И ФИКСЫ БАГОВ --- */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
+            -webkit-user-select: none;
         }
 
         body {
@@ -43,12 +42,12 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            font-family: var(--font-main);
             position: relative;
-            font-family: var(--font-ops);
         }
 
-        /* ГЛАВНЫЙ КОНТЕЙНЕР (ЦЕНТРОВКА) */
-        .app-shell {
+        /* ГЛАВНЫЙ КОНТЕЙНЕР (ЖЕСТКАЯ ЦЕНТРОВКА) */
+        .app-container {
             width: 100%;
             max-width: 440px;
             height: 100%;
@@ -57,61 +56,63 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            padding: 20px;
+            padding: 30px;
             z-index: 10;
         }
 
-        /* --- EDITION 2026 (ТВОЙ ИДЕАЛ) --- */
-        .ed-2026-label {
-            position: absolute;
-            top: 30px;
-            right: 25px;
-            font-size: 16px;
-            color: var(--white);
-            text-shadow: 0 0 10px var(--white), 0 0 20px rgba(255,255,255,0.5);
-            z-index: 1000;
-        }
-
-        /* --- БЛОК ЛОГОТИПА (ШПИОН + BRAWL STARS) --- */
-        .logo-container {
+        /* --- ЛОГОТИП ПИРАМИДОЙ (ШПИОН -> BRAWL -> STARS -> ED 2026) --- */
+        .logo-stack {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-bottom: 50px;
             width: 100%;
+            margin-bottom: 60px;
+            animation: logoPulse 2s infinite ease-in-out;
         }
 
-        /* ШПИОН - КРАСНЫЙ НЕОН (SUPERCELL MAGIC) */
-        .title-spy {
-            font-family: var(--font-supercell);
-            font-size: 82px;
+        /* 1. ШПИОН (ВЕРХ - KZ SUPERCELL MAGIC STYLE) */
+        .spy-top {
+            font-family: var(--font-spy);
+            font-size: 66px;
             color: var(--neon-red);
             text-transform: uppercase;
-            line-height: 1;
-            text-shadow: 0 0 15px var(--neon-red), 0 0 30px rgba(255, 49, 49, 0.6);
-            margin-bottom: 5px;
+            letter-spacing: -6px; /* Сжатие как на фото */
+            line-height: 0.85;
+            transform: scaleY(1.2); /* Вытягивание как на фото */
+            text-shadow: 
+                0 0 15px var(--neon-red),
+                0 0 30px rgba(255, 49, 49, 0.5);
+            margin-bottom: 20px;
         }
 
-        /* ГРУППА BRAWL STARS */
-        .bs-group {
-            display: flex;
-            align-items: baseline;
-            gap: 10px;
-            font-family: var(--font-ops); /* Как у Edition 2026 */
-        }
-
-        .txt-brawl {
-            font-size: 24px;
+        /* 2. BRAWL (ПОД ШПИОНОМ) */
+        .brawl-mid {
+            font-size: 28px;
             color: var(--white);
             text-shadow: 0 0 10px var(--white);
             text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
         }
 
-        .txt-stars {
-            font-size: 48px;
+        /* 3. STARS (ПОД БРАВЛОМ - САМЫЙ БОЛЬШОЙ) */
+        .stars-low {
+            font-size: 62px;
             color: var(--neon-red);
-            text-shadow: 0 0 15px var(--neon-red);
+            text-shadow: 0 0 20px var(--neon-red);
             text-transform: uppercase;
+            line-height: 0.8;
+            margin-bottom: 15px;
+        }
+
+        /* 4. EDITION 2026 (ПОД СТАРСОМ) */
+        .ed-bottom {
+            font-size: 16px;
+            color: var(--white);
+            text-shadow: 0 0 10px var(--white);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            opacity: 0.9;
         }
 
         /* --- ЭКРАНЫ ПРИЛОЖЕНИЯ --- */
@@ -124,159 +125,179 @@
             justify-content: center;
             padding: 40px;
             background: var(--bg-black);
+            z-index: 20;
         }
 
         .screen.active {
             display: flex;
-            animation: screenFade 0.3s ease-out;
+            animation: screenIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        @keyframes screenFade {
-            from { opacity: 0; transform: scale(0.98); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        /* --- КНОПКИ --- */
-        .btn-stack {
+        /* --- СИСТЕМА КНОПОК --- */
+        .menu-stack {
             width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            gap: 20px;
         }
 
-        .main-btn {
+        .btn-base {
             width: 100%;
-            padding: 22px 0;
-            background: rgba(0,0,0,0.5);
-            border: 3px solid var(--neon-blue);
+            padding: 24px 0;
+            background: rgba(0,0,0,0.7);
+            border: 4px solid var(--neon-blue);
             box-shadow: 0 0 15px var(--neon-blue);
-            border-radius: 15px;
+            border-radius: 20px;
             color: var(--white);
-            font-size: 20px;
+            font-size: 22px;
             text-transform: uppercase;
             cursor: pointer;
-            transition: 0.2s;
+            transition: all 0.2s ease;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        .main-btn:active { transform: scale(0.96); box-shadow: 0 0 25px var(--neon-blue); }
-
-        /* КНОПКА №6: СОЗДАТЬ КОМНАТУ (БЕЛЫЙ ТЕКСТ + ЗОЛОТО) */
-        .btn-create-lobby {
-            border-color: var(--neon-gold);
-            box-shadow: 0 0 20px var(--neon-gold);
-            color: var(--white) !important;
+        .btn-base:active {
+            transform: scale(0.95);
+            box-shadow: 0 0 25px var(--neon-blue);
+            filter: brightness(1.2);
         }
 
-        .btn-back {
-            border-color: #333;
-            color: #555;
+        .btn-exit {
+            border-color: #333333;
+            color: #555555;
             box-shadow: none;
             margin-top: 10px;
         }
 
-        /* --- НАСТРОЙКИ --- */
-        .section-header {
-            font-size: 26px;
+        /* --- НАСТРОЙКА ЛОББИ --- */
+        .battle-settings-title {
+            font-size: 30px;
             color: var(--white);
-            text-shadow: 0 0 10px var(--white);
-            margin-bottom: 35px;
+            text-shadow: 0 0 15px var(--white);
+            margin-bottom: 40px;
             text-transform: uppercase;
-        }
-
-        .tabs-row {
-            display: flex;
-            width: 100%;
-            gap: 10px;
-            margin-bottom: 30px;
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 15px 0;
-            border: 2px solid;
-            border-radius: 10px;
-            font-size: 14px;
             text-align: center;
         }
 
-        .tab-blue { border-color: var(--neon-blue); color: var(--neon-blue); text-shadow: 0 0 5px var(--neon-blue); }
-        .tab-red { border-color: var(--neon-red); color: var(--neon-red); text-shadow: 0 0 5px var(--neon-red); }
-
-        /* ВХОД ПО ID (БЕЛЫЙ НЕОН) */
-        .id-input-wrap {
+        .neon-tabs-container {
             display: flex;
-            gap: 10px;
-            margin: 40px 0;
+            width: 100%;
+            gap: 12px;
+            margin-bottom: 35px;
         }
 
-        .id-slot {
-            font-size: 40px;
-            width: 30px;
-            border-bottom: 4px solid var(--white);
+        .tab-button {
+            flex: 1;
+            padding: 18px 0;
+            border: 3px solid;
+            border-radius: 15px;
+            font-size: 14px;
+            text-align: center;
+            text-transform: uppercase;
+            background: #000;
+        }
+
+        .tab-participants {
+            border-color: var(--neon-blue);
+            color: var(--neon-blue);
+            text-shadow: 0 0 10px var(--neon-blue);
+            box-shadow: inset 0 0 5px var(--neon-blue);
+        }
+
+        .tab-spy {
+            border-color: var(--neon-red);
+            color: var(--neon-red);
+            text-shadow: 0 0 10px var(--neon-red);
+            box-shadow: inset 0 0 5px var(--neon-red);
+        }
+
+        /* КНОПКА №6: СОЗДАТЬ КОМНАТУ (ЗОЛОТОЙ НЕОН, БЕЛЫЙ ТЕКСТ) */
+        .btn-create-lobby-gold {
+            border-color: var(--neon-gold);
+            box-shadow: 0 0 25px var(--neon-gold);
+            color: var(--white) !important; /* Текст белый */
+            margin-top: 25px;
+        }
+
+        /* --- ВВОД ID --- */
+        .id-input-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 45px 0;
+        }
+
+        .id-char-slot {
+            font-size: 44px;
+            width: 35px;
+            border-bottom: 5px solid var(--white);
             color: var(--white);
             text-shadow: 0 0 15px var(--white);
             text-align: center;
         }
 
-        /* ЛОББИ */
-        .tg-user-tag {
-            border: 2px solid var(--neon-blue);
-            box-shadow: 0 0 15px var(--neon-blue);
-            padding: 10px 30px;
-            border-radius: 50px;
-            color: var(--neon-blue);
-            margin-bottom: 40px;
+        /* --- АНИМАЦИИ --- */
+        @keyframes logoPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
         }
+
+        @keyframes screenIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
     </style>
 </head>
 <body>
 
-    <div class="ed-2026-label">EDITION 2026</div>
-
-    <div class="app-shell">
+    <div class="app-container">
         
         <div id="scr-menu" class="screen active">
-            <div class="logo-container">
-                <div class="title-spy">ШПИОН</div>
-                <div class="bs-group">
-                    <span class="txt-brawl">BRAWL</span>
-                    <span class="txt-stars">STARS</span>
-                </div>
+            <div class="logo-stack">
+                <div class="spy-top">ШПИОН</div>
+                <div class="brawl-mid">BRAWL</div>
+                <div class="stars-low">STARS</div>
+                <div class="ed-bottom">EDITION 2026</div>
             </div>
             
-            <div class="btn-stack">
-                <button class="main-btn" onclick="nav('scr-setup')">СОЗДАТЬ ЛОББИ</button>
-                <button class="main-btn" onclick="nav('scr-join')">ВХОД ПО ID</button>
-                <button class="main-btn btn-back" onclick="tg.close()">ВЫХОД</button>
+            <div class="menu-stack">
+                <button class="btn-base" onclick="App.nav('scr-setup')">СОЗДАТЬ ЛОББИ</button>
+                <button class="btn-base" onclick="App.nav('scr-join')">ВХОД ПО ID</button>
+                <button class="btn-base btn-exit" onclick="tg.close()">ВЫХОД</button>
             </div>
         </div>
 
         <div id="scr-setup" class="screen">
-            <h2 class="section-header">НАСТРОЙКА ЛОББИ</h2>
+            <h2 class="battle-settings-title">НАСТРОЙКИ БИТВЫ</h2>
             
-            <div class="tabs-row">
-                <div class="tab-btn tab-blue">УЧАСТНИКИ</div>
-                <div class="tab-btn tab-red">ШПИОН</div>
+            <div class="neon-tabs-container">
+                <div class="tab-button tab-participants">УЧАСТНИКИ</div>
+                <div class="tab-button tab-spy">ШПИОН</div>
             </div>
 
-            <div id="display-id" style="color:var(--neon-gold); font-size: 24px; margin-bottom: 30px;">ID: ....-....</div>
+            <div id="lobby-id-gen" style="color:var(--neon-gold); font-size: 26px; margin-bottom: 30px; letter-spacing: 2px;">ID: ....-....</div>
 
-            <div class="btn-stack">
-                <button class="main-btn btn-create-lobby" onclick="create()">СОЗДАТЬ КОМНАТУ</button>
-                <button class="main-btn btn-back" onclick="nav('scr-menu')">НАЗАД</button>
+            <div class="menu-stack">
+                <button class="btn-base btn-create-lobby-gold" onclick="App.createRoom()">СОЗДАТЬ КОМНАТУ</button>
+                <button class="btn-base btn-exit" onclick="App.nav('scr-menu')">МЕНЮ</button>
             </div>
         </div>
 
         <div id="scr-join" class="screen">
-            <h2 class="section-header">ID КОМНАТЫ</h2>
+            <h2 class="battle-settings-title" style="color: var(--white)">ID КОМНАТЫ</h2>
             
-            <div class="id-input-wrap">
-                <div class="id-slot">_</div><div class="id-slot">_</div><div class="id-slot">_</div><div class="id-slot">_</div>
-                <div style="font-size: 30px;">-</div>
-                <div class="id-slot">_</div><div class="id-slot">_</div><div class="id-slot">_</div><div class="id-slot">_</div>
+            <div class="id-input-section">
+                <div class="id-char-slot">_</div><div class="id-char-slot">_</div><div class="id-char-slot">_</div><div class="id-char-slot">_</div>
+                <div style="font-size: 35px; color: var(--white)">-</div>
+                <div class="id-char-slot">_</div><div class="id-char-slot">_</div><div class="id-char-slot">_</div><div class="id-char-slot">_</div>
             </div>
 
-            <button class="main-btn btn-back" onclick="nav('scr-menu')">ОТМЕНА</button>
+            <div class="menu-stack">
+                <button class="btn-base btn-exit" onclick="App.nav('scr-menu')">ОТМЕНА</button>
+            </div>
         </div>
 
     </div>
@@ -284,27 +305,38 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
+        tg.enableClosingConfirmation();
 
-        function nav(s) {
-            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
-            document.getElementById(s).classList.add('active');
-            
-            if(s === 'scr-setup') {
-                const id = Math.floor(1000+Math.random()*8999)+"-"+Math.floor(1000+Math.random()*8999);
-                document.getElementById('display-id').innerText = "ID: " + id;
+        const App = {
+            currentRoomId: "",
+
+            nav: function(screenId) {
+                // Плавное переключение экранов
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                document.getElementById(screenId).classList.add('active');
+                
+                // Генерация ID при входе в настройки
+                if(screenId === 'scr-setup') {
+                    this.currentRoomId = this.generateId();
+                    document.getElementById('lobby-id-gen').innerText = "ID: " + this.currentRoomId;
+                }
+                tg.HapticFeedback.impactOccurred('light');
+            },
+
+            generateId: function() {
+                const part1 = Math.floor(1000 + Math.random() * 8999);
+                const part2 = Math.floor(1000 + Math.random() * 8999);
+                return `${part1}-${part2}`;
+            },
+
+            createRoom: function() {
+                tg.HapticFeedback.notificationOccurred('success');
+                tg.showAlert(`КОМНАТА ${this.currentRoomId} СОЗДАНА!`);
             }
-        }
+        };
 
-        function create() {
-            tg.HapticFeedback.notificationOccurred('success');
-            tg.showAlert("КОМНАТА СОЗДАНА");
-        }
-
-        // Блокировка вылетов и багов центровки при скролле
-        window.addEventListener('scroll', (e) => {
-            e.preventDefault();
-            window.scrollTo(0,0);
-        }, {passive: false});
+        // Блокировка стандартного скролла для стабильности центровки
+        window.addEventListener('scroll', (e) => e.preventDefault(), {passive: false});
     </script>
 </body>
 </html>
