@@ -691,19 +691,20 @@
 
         .role-reveal {
             font-family: 'Exo 2';
-            font-size: 14px; /* УМЕНЬШЕН РАЗМЕР */
-            color: #ffffff; /* БЕЛЫЙ ЦВЕТ */
+            font-size: 16px;
+            color: #ffffff;
             margin-bottom: 25px;
             text-align: center;
-            text-shadow: 0 0 8px rgba(255, 255, 255, 0.7); /* НЕОНЧИК */
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
             font-weight: bold;
             opacity: 0.9;
+            min-height: 24px;
         }
 
-        /* БОЛЬШАЯ КАРТА БЕЗ ОБВОДКИ */
+        /* КАРТА - ВЫШЕ И МЕНЬШЕ */
         .card-container {
             width: 320px;
-            height: 420px;
+            height: 380px; /* Уменьшена высота */
             perspective: 1000px;
             margin: 0 auto 25px;
         }
@@ -738,8 +739,7 @@
         /* ПЕРЕДНЯЯ СТОРОНА КАРТЫ (ДО РАСКРЫТИЯ) */
         .card-front {
             background: linear-gradient(135deg, #0a0a1a, #1a1a2e);
-            border: none; /* УБИРАЕМ ОБВОДКУ */
-            /* АНИМИРОВАННОЕ СВЕЧЕНИЕ */
+            border: none;
             animation: cardGlow 2s infinite alternate;
         }
 
@@ -748,7 +748,6 @@
             background: linear-gradient(135deg, #0f0f1a, #1a1a2e);
             border: none;
             transform: rotateY(180deg);
-            /* СТАТИЧНЫЙ НЕОН */
             box-shadow: 
                 0 0 25px rgba(0, 210, 255, 0.4),
                 0 0 50px rgba(0, 210, 255, 0.2),
@@ -822,17 +821,17 @@
 
         .brawler-image {
             width: 200px;
-            height: 200px;
+            height: 180px; /* Уменьшена высота */
             object-fit: contain;
-            margin-bottom: 20px;
-            border-radius: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
+            margin-bottom: 10px; /* Уменьшен отступ */
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
         }
 
         .brawler-name {
             font-family: 'Exo 2';
-            font-size: 26px;
+            font-size: 28px; /* Увеличен размер */
             font-weight: 900;
             color: #ffffff;
             text-shadow: 0 0 15px #ffffff;
@@ -840,29 +839,7 @@
             text-align: center;
         }
 
-        .brawler-role {
-            font-family: 'Exo 2';
-            font-size: 20px;
-            font-weight: bold;
-            padding: 10px 30px;
-            border-radius: 15px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .role-spy {
-            color: var(--neon-red);
-            border: 3px solid var(--neon-red);
-            box-shadow: 0 0 20px var(--neon-red);
-            background: rgba(255, 0, 0, 0.1);
-        }
-
-        .role-brawler {
-            color: var(--neon-green);
-            border: 3px solid var(--neon-green);
-            box-shadow: 0 0 20px var(--neon-green);
-            background: rgba(0, 255, 0, 0.1);
-        }
+        /* УБРАН блок с ролью (зеленая надпись БРАВЛЕР) */
 
         /* ТОЛЬКО КНОПКА ПРОДОЛЖИТЬ */
         .game-controls-single {
@@ -874,10 +851,12 @@
             margin: 20px auto 0;
         }
 
+        /* БЕЛАЯ КНОПКА ПРОДОЛЖИТЬ */
         .btn-continue {
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.4),
-                        0 0 25px rgba(0, 210, 255, 0.2) inset;
-            color: var(--neon-blue);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.4),
+                        0 0 25px rgba(255, 255, 255, 0.2) inset;
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.8);
         }
 
         /* --- ЭКРАН 6: ГОЛОСОВАНИЕ --- */
@@ -893,6 +872,7 @@
             font-weight: 900;
         }
 
+        /* ТАЙМЕР БЕЗ ОБВОДКИ С НЕОНОМ */
         .voting-timer {
             font-family: 'Black Ops One';
             font-size: 32px;
@@ -900,7 +880,7 @@
             text-shadow: 0 0 25px var(--neon-red);
             margin-bottom: 25px;
             padding: 10px 20px;
-            border: 3px solid var(--neon-red);
+            border: none; /* Убрана обводка */
             border-radius: 15px;
             background: rgba(139, 0, 0, 0.2);
             box-shadow: 0 0 30px rgba(255, 49, 49, 0.4);
@@ -910,7 +890,7 @@
             font-family: 'Exo 2';
             font-size: 16px;
             color: #cccccc;
-            margin-bottom: 25px;
+            margin-bottom: 20px; /* Уменьшен отступ */
             text-align: center;
             line-height: 1.5;
         }
@@ -920,10 +900,10 @@
             max-width: 320px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin-bottom: 25px;
+            gap: 10px; /* Уменьшен промежуток */
+            margin-bottom: 20px; /* Уменьшен отступ */
             overflow-y: auto;
-            max-height: 250px;
+            max-height: 220px; /* Уменьшена высота */
             padding-right: 5px;
         }
 
@@ -932,7 +912,7 @@
             background: rgba(20, 20, 30, 0.7);
             border: 2px solid #333;
             border-radius: 16px;
-            padding: 15px;
+            padding: 12px; /* Уменьшен padding */
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -958,6 +938,43 @@
             min-width: 30px;
             text-align: center;
             text-shadow: 0 0 10px var(--neon-green);
+        }
+
+        /* КНОПКИ ГОЛОСОВАНИЯ - КОМПАКТНЫЕ */
+        .voting-controls {
+            width: 100%;
+            max-width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px; /* Уменьшен промежуток */
+            margin-top: 10px;
+        }
+
+        /* КНОПКА ВЫХОДА - КРАСНЫЙ НЕОН */
+        .btn-exit {
+            box-shadow: 0 0 12px rgba(255, 49, 49, 0.4),
+                        0 0 20px rgba(255, 49, 49, 0.1) inset;
+            color: var(--neon-red);
+            padding: 14px; /* Уменьшен padding */
+            font-size: 18px; /* Уменьшен размер шрифта */
+        }
+
+        /* КНОПКА НАЗАД */
+        .btn-back {
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.2),
+                        0 0 20px rgba(255, 255, 255, 0.1) inset;
+            color: #aaaaaa;
+            padding: 14px; /* Уменьшен padding */
+            font-size: 18px; /* Уменьшен размер шрифта */
+        }
+
+        /* КНОПКА ПОДТВЕРДИТЬ */
+        .btn-confirm-vote {
+            box-shadow: 0 0 12px rgba(0, 255, 0, 0.4),
+                        0 0 20px rgba(0, 255, 0, 0.1) inset;
+            color: var(--neon-green);
+            padding: 14px; /* Уменьшен padding */
+            font-size: 18px; /* Уменьшен размер шрифта */
         }
 
         /* СКРОЛЛБАР */
@@ -1105,7 +1122,7 @@
         <!-- ЭКРАН 5: ИГРА (КАРТЫ БРАВЛЕРОВ) -->
         <div id="scr-game" class="screen">
             <h2 class="game-title">ВАША РОЛЬ</h2>
-            <div class="role-reveal">Нажмите на карту, чтобы раскрыть свою роль</div>
+            <div class="role-reveal" id="role-reveal-text">Нажмите на карту, чтобы узнать свою роль</div>
 
             <div class="card-container">
                 <div class="card" id="role-card" onclick="Game.revealCard()">
@@ -1117,7 +1134,7 @@
                     <div class="card-back" id="card-back">
                         <img class="brawler-image" id="brawler-img" src="" alt="Бравлер">
                         <div class="brawler-name" id="brawler-name">Загрузка...</div>
-                        <div class="brawler-role" id="brawler-role">РОЛЬ</div>
+                        <!-- УБРАНА ЗЕЛЕНАЯ НАДПИСЬ БРАВЛЕР -->
                     </div>
                 </div>
             </div>
@@ -1129,16 +1146,19 @@
 
         <!-- ЭКРАН 6: ГОЛОСОВАНИЕ -->
         <div id="scr-voting" class="screen">
-            <h2 class="voting-title">ГОЛОСОВАНИЕ</h2>
-            <div class="voting-timer" id="voting-timer">01:00</div>
+            <h2 class="voting-title">ТАЙМЕР</h2> <!-- Изменено с ГОЛОСОВАНИЕ -->
+            <div class="voting-timer" id="voting-timer">10:00</div> <!-- 10 минут -->
             <div class="voting-instruction">Выберите игрока, которого считаете шпионом</div>
 
             <div class="voting-players" id="voting-players">
                 <!-- Список игроков для голосования -->
             </div>
 
-            <button class="btn-action" onclick="Game.submitVote()">ПОДТВЕРДИТЬ ВЫБОР</button>
-            <button class="btn-action btn-secondary" style="margin-top:10px" onclick="Game.cancelVoting()">ОТМЕНА</button>
+            <div class="voting-controls">
+                <button class="btn-action btn-confirm-vote" onclick="Game.submitVote()">ПОДТВЕРДИТЬ ВЫБОР</button>
+                <button class="btn-action btn-back" onclick="Game.cancelVoting()">НАЗАД</button> <!-- Изменено с ОТМЕНА -->
+                <button class="btn-action btn-exit" onclick="Game.showExitConfirm()">ВЫХОД</button> <!-- Новая кнопка -->
+            </div>
         </div>
 
     </div>
@@ -1149,28 +1169,28 @@
         tg.expand();
         tg.enableClosingConfirmation();
 
-        // БАЗА БРАВЛЕРОВ С ПРАВИЛЬНЫМИ ИЗОБРАЖЕНИЯМИ
+        // БАЗА БРАВЛЕРОВ С ПРАВИЛЬНЫМИ ИЗОБРАЖЕНИЯМИ (ОБНОВЛЕННЫЙ СПИСОК)
         const brawlersList = [
-            { id: 16000000, name: "ШЕЛЛИ", image: "https://cdn.brawlstats.com/character-arts/16000000.png" },
-            { id: 16000001, name: "КОЛЬТ", image: "https://cdn.brawlstats.com/character-arts/16000001.png" },
-            { id: 16000002, name: "НИТА", image: "https://cdn.brawlstats.com/character-arts/16000002.png" },
-            { id: 16000003, name: "БУЛЛ", image: "https://cdn.brawlstats.com/character-arts/16000003.png" },
-            { id: 16000004, name: "ДЖЕССИ", image: "https://cdn.brawlstats.com/character-arts/16000004.png" },
-            { id: 16000005, name: "БРОК", image: "https://cdn.brawlstats.com/character-arts/16000005.png" },
-            { id: 16000006, name: "ДИНАМАЙК", image: "https://cdn.brawlstats.com/character-arts/16000006.png" },
-            { id: 16000007, name: "БО", image: "https://cdn.brawlstats.com/character-arts/16000007.png" },
-            { id: 16000008, name: "ТИК", image: "https://cdn.brawlstats.com/character-arts/16000008.png" },
-            { id: 16000009, name: "8-БИТ", image: "https://cdn.brawlstats.com/character-arts/16000009.png" },
-            { id: 16000010, name: "ЭМЗ", image: "https://cdn.brawlstats.com/character-arts/16000010.png" },
-            { id: 16000011, name: "СТА", image: "https://cdn.brawlstats.com/character-arts/16000011.png" },
-            { id: 16000012, name: "ПАМ", image: "https://cdn.brawlstats.com/character-arts/16000012.png" },
-            { id: 16000013, name: "ПАЙПЕР", image: "https://cdn.brawlstats.com/character-arts/16000013.png" },
-            { id: 16000014, name: "ФРЕНК", image: "https://cdn.brawlstats.com/character-arts/16000014.png" },
-            { id: 16000015, name: "ПЕННИ", image: "https://cdn.brawlstats.com/character-arts/16000015.png" },
-            { id: 16000016, name: "КАРЛ", image: "https://cdn.brawlstats.com/character-arts/16000016.png" },
-            { id: 16000017, name: "ДЖЕКИ", image: "https://cdn.brawlstats.com/character-arts/16000017.png" },
-            { id: 16000018, name: "ГЕЙЛ", image: "https://cdn.brawlstats.com/character-arts/16000018.png" },
-            { id: 16000019, name: "СПРАУТ", image: "https://cdn.brawlstats.com/character-arts/16000019.png" }
+            { id: 16000000, name: "ШЕЛЛИ", image: "https://cdn-old.brawlify.com/brawler/Shelly.png" },
+            { id: 16000001, name: "КОЛЬТ", image: "https://cdn-old.brawlify.com/brawler/Colt.png" },
+            { id: 16000002, name: "НИТА", image: "https://cdn-old.brawlify.com/brawler/Nita.png" },
+            { id: 16000003, name: "БУЛЛ", image: "https://cdn-old.brawlify.com/brawler/Bull.png" },
+            { id: 16000004, name: "ДЖЕССИ", image: "https://cdn-old.brawlify.com/brawler/Jessie.png" },
+            { id: 16000005, name: "БРОК", image: "https://cdn-old.brawlify.com/brawler/Brock.png" },
+            { id: 16000006, name: "ДИНАМАЙК", image: "https://cdn-old.brawlify.com/brawler/Dynamike.png" },
+            { id: 16000007, name: "БО", image: "https://cdn-old.brawlify.com/brawler/Bo.png" },
+            { id: 16000008, name: "ТИК", image: "https://cdn-old.brawlify.com/brawler/Tick.png" },
+            { id: 16000009, name: "8-БИТ", image: "https://cdn-old.brawlify.com/brawler/8-Bit.png" },
+            { id: 16000010, name: "ЭМЗ", image: "https://cdn-old.brawlify.com/brawler/Emz.png" },
+            { id: 16000011, name: "СТА", image: "https://cdn-old.brawlify.com/brawler/Stu.png" },
+            { id: 16000012, name: "ПАМ", image: "https://cdn-old.brawlify.com/brawler/Pam.png" },
+            { id: 16000013, name: "ПАЙПЕР", image: "https://cdn-old.brawlify.com/brawler/Piper.png" },
+            { id: 16000014, name: "ФРЕНК", image: "https://cdn-old.brawlify.com/brawler/Frank.png" },
+            { id: 16000015, name: "ПЕННИ", image: "https://cdn-old.brawlify.com/brawler/Penny.png" },
+            { id: 16000016, name: "КАРЛ", image: "https://cdn-old.brawlify.com/brawler/Carl.png" },
+            { id: 16000017, name: "ДЖЕКИ", image: "https://cdn-old.brawlify.com/brawler/Jacky.png" },
+            { id: 16000018, name: "ГЕЙЛ", image: "https://cdn-old.brawlify.com/brawler/Gale.png" },
+            { id: 16000019, name: "СПРАУТ", image: "https://cdn-old.brawlify.com/brawler/Sprout.png" }
         ];
 
         // СИСТЕМА МОДАЛЬНЫХ ОКОН
@@ -1402,16 +1422,20 @@
             myBrawler: null,
             isCardRevealed: false,
             votingTimer: null,
-            timeLeft: 60,
+            timeLeft: 600, // 10 минут в секундах
             selectedPlayer: null,
             votes: {},
 
             // Инициализация игры
             initializeGame: () => {
                 Game.isCardRevealed = false;
-                Game.timeLeft = 60;
+                Game.timeLeft = 600; // 10 минут
                 Game.selectedPlayer = null;
                 Game.votes = {};
+
+                // Показываем текст "Нажмите на карту..."
+                document.getElementById('role-reveal-text').textContent = "Нажмите на карту, чтобы узнать свою роль";
+                document.getElementById('role-reveal-text').style.display = 'block';
 
                 // Скрываем кнопку ПРОДОЛЖИТЬ
                 document.getElementById('continue-btn').style.display = 'none';
@@ -1439,7 +1463,6 @@
                 // Сбрасываем изображение и имя
                 document.getElementById('brawler-img').src = '';
                 document.getElementById('brawler-name').textContent = 'Загрузка...';
-                document.getElementById('brawler-role').textContent = 'РОЛЬ';
             },
 
             // Раскрытие карты
@@ -1450,8 +1473,11 @@
                 const cardBack = document.getElementById('card-back');
                 const brawlerImg = document.getElementById('brawler-img');
                 const brawlerName = document.getElementById('brawler-name');
-                const brawlerRole = document.getElementById('brawler-role');
                 const continueBtn = document.getElementById('continue-btn');
+                const roleText = document.getElementById('role-reveal-text');
+
+                // Убираем текст "Нажмите на карту..."
+                roleText.style.display = 'none';
 
                 // Анимация переворота
                 card.classList.add('flipped');
@@ -1461,22 +1487,37 @@
                     // ШПИОН - красный сияющий неон
                     brawlerImg.src = "https://cdn-icons-png.flaticon.com/512/894/894438.png";
                     brawlerName.textContent = "ШПИОН";
-                    brawlerRole.textContent = "ШПИОН";
-                    brawlerRole.className = "brawler-role role-spy";
+                    brawlerName.style.color = "#ff3131";
+                    brawlerName.style.textShadow = "0 0 15px #ff3131";
                     // Добавляем стиль для карты шпиона
                     cardBack.classList.add('spy-card');
                 } else {
                     // БРАВЛЕР
                     brawlerImg.src = Game.myBrawler.image;
                     brawlerName.textContent = Game.myBrawler.name;
-                    brawlerRole.textContent = "БРАВЛЕР";
-                    brawlerRole.className = "brawler-role role-brawler";
+                    brawlerName.style.color = "#ffffff";
+                    brawlerName.style.textShadow = "0 0 15px #ffffff";
+                }
+
+                // Предзагрузка изображения для избежания проблем
+                if (Game.myRole !== 'SPY') {
+                    const img = new Image();
+                    img.src = Game.myBrawler.image;
+                    img.onload = () => {
+                        brawlerImg.src = Game.myBrawler.image;
+                    };
+                    img.onerror = () => {
+                        // Запасное изображение
+                        brawlerImg.src = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+                    };
                 }
 
                 Game.isCardRevealed = true;
                 
                 // Показываем кнопку ПРОДОЛЖИТЬ
-                continueBtn.style.display = 'block';
+                setTimeout(() => {
+                    continueBtn.style.display = 'block';
+                }, 500);
                 
                 tg.HapticFeedback.impactOccurred('heavy');
             },
@@ -1494,12 +1535,15 @@
 
             // Инициализация голосования
             initializeVoting: () => {
-                Game.timeLeft = 60;
+                Game.timeLeft = 600; // 10 минут
                 Game.selectedPlayer = null;
                 Game.votes = {};
 
                 // Обновляем таймер
-                document.getElementById('voting-timer').textContent = "01:00";
+                const minutes = Math.floor(Game.timeLeft / 60);
+                const seconds = Game.timeLeft % 60;
+                document.getElementById('voting-timer').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
                 // Создаем список игроков для голосования
                 const container = document.getElementById('voting-players');
@@ -1539,7 +1583,9 @@
 
                 // Выделяем выбранную карточку
                 const selectedCard = document.querySelector(`[data-player-id="${playerId}"]`);
-                selectedCard.classList.add('selected');
+                if (selectedCard) {
+                    selectedCard.classList.add('selected');
+                }
 
                 Game.selectedPlayer = playerId;
                 tg.HapticFeedback.selectionChanged();
@@ -1602,6 +1648,8 @@
 
             // Таймер голосования
             startVotingTimer: () => {
+                clearInterval(Game.votingTimer); // Очищаем предыдущий таймер
+                
                 Game.votingTimer = setInterval(() => {
                     Game.timeLeft--;
 
@@ -1617,10 +1665,26 @@
                 }, 1000);
             },
 
-            // Отмена голосования
+            // Отмена голосования (НАЗАД)
             cancelVoting: () => {
-                clearInterval(Game.votingTimer);
-                App.navigate('scr-game');
+                Modal.showConfirm(
+                    "Вернуться к просмотру роли?",
+                    () => {
+                        clearInterval(Game.votingTimer);
+                        App.navigate('scr-game');
+                    }
+                );
+            },
+
+            // Подтверждение выхода из голосования
+            showExitConfirm: () => {
+                Modal.showConfirm(
+                    "Вы уверены, что хотите выйти из голосования?",
+                    () => {
+                        clearInterval(Game.votingTimer);
+                        App.navigate('scr-menu');
+                    }
+                );
             }
         };
 
