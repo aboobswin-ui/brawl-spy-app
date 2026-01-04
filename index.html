@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>BRAWL SPY | ULTIMATE MONOLITH</title>
+    <title>BRAWL SPY | HARDCORE MONOLITH</title>
     
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rubik+One&family=Exo+2:wght@900&display=swap" rel="stylesheet">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
     <style>
         :root {
@@ -14,65 +14,111 @@
             --neon-red: #ff3131;
             --neon-gold: #ffd700;
             --bg-black: #020205;
-            --glow-white: rgba(255, 255, 255, 0.7);
+            --glow-white: rgba(255, 255, 255, 0.85);
+            --btn-dark: #0d0d14;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-user-select: none; }
-        html, body { width: 100%; height: 100%; background: var(--bg-black); color: #fff; font-family: 'Rubik One', sans-serif; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        /* Общие настройки и сброс */
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-user-select: none; outline: none; }
+        html, body { 
+            width: 100%; height: 100%; 
+            background: var(--bg-black); 
+            color: #fff; 
+            font-family: 'Rubik One', sans-serif; 
+            overflow: hidden; 
+            display: flex; align-items: center; justify-content: center; 
+        }
 
-        .app-shell { width: 100%; height: 100%; max-width: 430px; position: relative; display: flex; flex-direction: column; }
+        /* Оболочка приложения для адаптации под ПК и Телефон */
+        .app-shell { 
+            width: 100%; height: 100%; 
+            max-width: 450px; 
+            display: flex; flex-direction: column; 
+            position: relative;
+            background: var(--bg-black);
+        }
 
-        .screen { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 25px; background: var(--bg-black); z-index: 10; }
-        .screen.active { display: flex; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        /* Экраны */
+        .screen { 
+            position: absolute; inset: 0; 
+            display: none; flex-direction: column; 
+            align-items: center; padding: 40px 25px; 
+            z-index: 10; 
+        }
+        .screen.active { display: flex; animation: screenIn 0.25s ease-out; }
+        @keyframes screenIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- ГЛАВНОЕ МЕНЮ (ПО ФОТО) --- */
-        .logo-group { text-align: center; margin-bottom: 50px; }
-        .spy-main { font-size: 95px; color: var(--neon-red); text-shadow: 0 0 30px var(--neon-red); line-height: 0.8; }
-        .bs-sub { font-family: 'Black Ops One'; font-size: 32px; color: var(--neon-gold); margin-top: 10px; }
-        .ed-text { font-family: 'Exo 2'; font-size: 16px; color: #fff; opacity: 0.9; margin-top: 5px; font-weight: 400; text-transform: lowercase; }
+        /* --- ГЛАВНОЕ МЕНЮ (image_a24334.png) --- */
+        .logo-section { text-align: center; margin-bottom: 60px; margin-top: 20px; }
+        .spy-logo { font-size: 100px; color: var(--neon-red); text-shadow: 0 0 35px var(--neon-red); line-height: 0.8; }
+        .bs-text { font-family: 'Black Ops One'; font-size: 34px; color: var(--neon-gold); margin-top: 12px; letter-spacing: 1px; }
+        .edition-tag { font-family: 'Exo 2'; font-size: 18px; color: #fff; margin-top: 5px; font-weight: 400; text-transform: lowercase; opacity: 0.9; }
 
-        .btn-menu {
-            width: 100%; padding: 22px; background: #000; border: 4px solid var(--neon-blue);
-            box-shadow: 0 0 20px var(--neon-blue); border-radius: 28px; color: #fff;
+        .btn-main {
+            width: 100%; padding: 24px; background: #000; border: 4px solid var(--neon-blue);
+            box-shadow: 0 0 20px var(--neon-blue); border-radius: 30px; color: #fff;
             font-family: 'Exo 2'; font-weight: 900; font-size: 22px; text-transform: uppercase;
-            margin-bottom: 20px; transition: 0.1s; cursor: pointer; display: flex; align-items: center; justify-content: center;
-        }
-        .btn-menu:active { transform: scale(0.96); }
-        .btn-exit { border-color: #222; box-shadow: none; color: #555; background: #080808; border-radius: 35px; }
-
-        /* --- ВХОД ПО ID (ПО ФОТО + ТЗ) --- */
-        .title-id { font-family: 'Exo 2'; font-size: 34px; color: #fff; text-shadow: 0 0 15px var(--glow-white); margin-bottom: 30px; text-transform: uppercase; }
-        .id-display { 
-            font-family: 'Black Ops One'; font-size: 45px; color: #fff; 
-            text-shadow: 0 0 20px var(--glow-white); margin-bottom: 35px; letter-spacing: 5px; 
-        }
-        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 40px; }
-        .n-btn { 
-            width: 75px; height: 75px; background: #0d0d14; border: 2px solid #222; 
-            border-radius: 18px; font-size: 28px; color: #fff; font-family: 'Black Ops One'; 
-        }
-
-        /* --- ЛОББИ --- */
-        .lobby-row {
-            width: 100%; background: #0a0a10; border: 3px solid var(--neon-blue);
-            box-shadow: 0 0 15px var(--neon-blue); border-radius: 25px; padding: 18px 22px;
-            display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px;
-        }
-        .row-spy { border-color: var(--neon-red); box-shadow: 0 0 15px var(--neon-red); }
-        .s-btn {
-            width: 50px; height: 50px; background: #000; border: 2px solid var(--neon-blue);
-            border-radius: 14px; color: var(--neon-blue); font-size: 28px;
+            margin-bottom: 22px; transition: 0.15s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer;
             display: flex; align-items: center; justify-content: center;
         }
-        .row-spy .s-btn { border-color: var(--neon-red); color: var(--neon-red); }
+        .btn-main:active { transform: scale(0.95); box-shadow: 0 0 5px var(--neon-blue); }
+        .btn-exit { border-color: #222; box-shadow: none; color: #555; background: #080808; margin-top: 10px; }
 
-        /* ИГРОВОЙ ЭКРАН */
-        .card-box { width: 300px; height: 420px; perspective: 1000px; margin: 20px 0; }
-        .card-inner { width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; position: relative; }
-        .card-inner.flipped { transform: rotateY(180deg); }
-        .side { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 35px; border: 10px solid var(--neon-blue); background: #0d0d14; display: flex; align-items: center; justify-content: center; }
-        .side-back { transform: rotateY(180deg); background: #fff; color: #000; border-color: var(--neon-red); flex-direction: column; padding: 25px; text-align: center; }
+        /* --- ВХОД ПО ID (ИСПРАВЛЕННЫЙ МОНОЛИТ) --- */
+        .header-title { 
+            font-family: 'Exo 2'; font-size: 36px; color: #fff; 
+            text-shadow: 0 0 20px var(--glow-white); 
+            margin-bottom: 40px; text-transform: uppercase; text-align: center;
+        }
+
+        .id-input-area {
+            width: 100%; display: flex; justify-content: center; align-items: center;
+            margin-bottom: 45px; height: 60px;
+        }
+        .id-text-render { 
+            font-family: 'Black Ops One'; font-size: 48px; color: #fff; 
+            text-shadow: 0 0 25px var(--glow-white); 
+            letter-spacing: 6px; white-space: nowrap;
+        }
+
+        .numpad-grid { 
+            display: grid; grid-template-columns: repeat(3, 1fr); 
+            gap: 20px; margin-bottom: 40px; 
+        }
+        .num-key { 
+            width: 80px; height: 80px; background: var(--btn-dark); 
+            border: 2px solid #2a2a2a; border-radius: 20px; 
+            font-size: 30px; color: #fff; font-family: 'Black Ops One';
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.1s;
+        }
+        .num-key:active { background: #1a1a25; transform: scale(0.9); border-color: #555; }
+
+        .footer-nav { width: 100%; margin-top: auto; padding-bottom: 20px; }
+
+        /* --- ЛОББИ (image_a15a71.png) --- */
+        .lobby-card {
+            width: 100%; background: #0a0a12; border: 3px solid var(--neon-blue);
+            box-shadow: 0 0 15px var(--neon-blue); border-radius: 25px; 
+            padding: 22px; display: flex; justify-content: space-between; 
+            align-items: center; margin-bottom: 25px;
+        }
+        .card-spy { border-color: var(--neon-red); box-shadow: 0 0 15px var(--neon-red); }
+        .label-v { font-family: 'Exo 2'; font-size: 20px; font-weight: 900; }
+        .val-v { font-family: 'Black Ops One'; font-size: 34px; min-width: 45px; text-align: center; }
+        .adj-btn {
+            width: 55px; height: 55px; background: #000; border: 2px solid var(--neon-blue);
+            border-radius: 15px; color: var(--neon-blue); font-size: 30px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .card-spy .adj-btn { border-color: var(--neon-red); color: var(--neon-red); }
+
+        /* ЭКРАН ПЕРСОНАЖА */
+        .brawler-display { 
+            width: 300px; height: 400px; background: #fff; border-radius: 40px; 
+            border: 8px solid var(--neon-blue); display: flex; flex-direction: column;
+            align-items: center; justify-content: center; color: #000; padding: 20px;
+        }
     </style>
 </head>
 <body>
@@ -80,94 +126,110 @@
     <div class="app-shell">
         
         <div id="scr-menu" class="screen active">
-            <div class="logo-group">
-                <div class="spy-main">SPY</div>
-                <div class="bs-sub">BRAWL STARS</div>
-                <div class="ed-text">edition</div>
+            <div class="logo-section">
+                <div class="spy-logo">SPY</div>
+                <div class="bs-text">BRAWL STARS</div>
+                <div class="edition-tag">edition</div>
             </div>
-            <button class="btn-menu" onclick="App.createLobby()">Создать лобби</button>
-            <button class="btn-menu" onclick="App.nav('scr-join')">Вход по ID</button>
-            <button class="btn-menu btn-exit">Выход</button>
+            <button class="btn-main" onclick="App.createLobby()">Создать лобби</button>
+            <button class="btn-main" onclick="App.nav('scr-join')">Вход по ID</button>
+            <button class="btn-main btn-exit" onclick="tg.close()">Выход</button>
         </div>
 
         <div id="scr-join" class="screen">
-            <h2 class="title-id">ID ЛОББИ</h2>
-            <div id="id-display" class="id-display">____-____</div>
-            <div class="numpad">
-                <button class="n-btn" onclick="App.press('1')">1</button>
-                <button class="n-btn" onclick="App.press('2')">2</button>
-                <button class="n-btn" onclick="App.press('3')">3</button>
-                <button class="n-btn" onclick="App.press('4')">4</button>
-                <button class="n-btn" onclick="App.press('5')">5</button>
-                <button class="n-btn" onclick="App.press('6')">6</button>
-                <button class="n-btn" onclick="App.press('7')">7</button>
-                <button class="n-btn" onclick="App.press('8')">8</button>
-                <button class="n-btn" onclick="App.press('9')">9</button>
-                <button class="n-btn" style="color:var(--neon-red)" onclick="App.press('C')">C</button>
-                <button class="n-btn" onclick="App.press('0')">0</button>
-                <button class="n-btn" style="color:var(--neon-gold)" onclick="App.submitID()">OK</button>
+            <h2 class="header-title">ID ЛОББИ</h2>
+            <div class="id-input-area">
+                <div id="id-render" class="id-text-render">____-____</div>
             </div>
-            <button class="btn-menu btn-exit" onclick="App.nav('scr-menu')">НАЗАД</button>
+            
+            <div class="numpad-grid">
+                <button class="num-key" onclick="App.input('1')">1</button>
+                <button class="num-key" onclick="App.input('2')">2</button>
+                <button class="num-key" onclick="App.input('3')">3</button>
+                <button class="num-key" onclick="App.input('4')">4</button>
+                <button class="num-key" onclick="App.input('5')">5</button>
+                <button class="num-key" onclick="App.input('6')">6</button>
+                <button class="num-key" onclick="App.input('7')">7</button>
+                <button class="num-key" onclick="App.input('8')">8</button>
+                <button class="num-key" onclick="App.input('9')">9</button>
+                <button class="num-key" style="color:var(--neon-red)" onclick="App.input('C')">C</button>
+                <button class="num-key" onclick="App.input('0')">0</button>
+                <button class="num-key" style="color:var(--neon-gold)" onclick="App.confirmID()">OK</button>
+            </div>
+
+            <div class="footer-nav">
+                <button class="btn-main btn-exit" style="margin-bottom:0; color:#fff; border-color:#333;" onclick="App.nav('scr-menu')">НАЗАД</button>
+            </div>
         </div>
 
         <div id="scr-lobby" class="screen">
-            <h2 class="title-id">НАСТРОЙКИ ЛОББИ</h2>
-            <div class="lobby-row">
-                <span style="font-family:'Exo 2'; font-weight:900;">УЧАСТНИКИ:</span>
+            <h2 class="header-title">НАСТРОЙКА ЛОББИ</h2>
+            <div style="color:var(--neon-gold); font-family:'Black Ops One'; margin-bottom:20px;">ID: <span id="room-id-val">0000-0000</span></div>
+            
+            <div class="lobby-card">
+                <span class="label-v">УЧАСТНИКИ</span>
                 <div style="display:flex; align-items:center; gap:15px;">
-                    <button class="s-btn" onclick="App.adj('p', -1)">-</button>
-                    <span id="p-v" style="font-family:'Black Ops One'; font-size:32px;">3</span>
-                    <button class="s-btn" onclick="App.adj('p', 1)">+</button>
+                    <button class="adj-btn" onclick="App.adj('p', -1)">-</button>
+                    <span id="p-count" class="val-v">3</span>
+                    <button class="adj-btn" onclick="App.adj('p', 1)">+</button>
                 </div>
             </div>
-            <div class="lobby-row row-spy">
-                <span style="font-family:'Exo 2'; font-weight:900;">ШПИОН:</span>
+
+            <div class="lobby-card card-spy">
+                <span class="label-v">ШПИОН</span>
                 <div style="display:flex; align-items:center; gap:15px;">
-                    <button class="s-btn" onclick="App.adj('s', -1)">-</button>
-                    <span id="s-v" style="font-family:'Black Ops One'; font-size:32px;">1</span>
-                    <button class="s-btn" onclick="App.adj('s', 1)">+</button>
+                    <button class="adj-btn" onclick="App.adj('s', -1)">-</button>
+                    <span id="s-count" class="val-v">1</span>
+                    <button class="adj-btn" onclick="App.adj('s', 1)">+</button>
                 </div>
             </div>
-            <button class="btn-menu" style="border-color:var(--neon-gold); color:var(--neon-gold); box-shadow: 0 0 15px var(--neon-gold);">НАЧАТЬ ИГРУ</button>
-            <button class="btn-menu btn-exit" onclick="App.nav('scr-menu')">МЕНЮ</button>
+
+            <button class="btn-main" style="border-color:var(--neon-gold); color:var(--neon-gold); margin-top:10px;">НАЧАТЬ ИГРУ</button>
+            <button class="btn-main btn-exit" style="color:#fff;" onclick="App.nav('scr-menu')">МЕНЮ</button>
         </div>
 
     </div>
 
     <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
         const App = {
-            state: { id: "", p: 3, s: 1 },
-            db: [
-                {n:"LEON", i:"https://vignette.wikia.nocookie.net/brawlstars/images/3/3c/Leon_Portrait.png"},
-                {n:"CROW", i:"https://vignette.wikia.nocookie.net/brawlstars/images/6/62/Crow_Portrait.png"},
-                {n:"SPIKE", i:"https://vignette.wikia.nocookie.net/brawlstars/images/1/18/Spike_Portrait.png"},
-                {n:"MORTIS", i:"https://vignette.wikia.nocookie.net/brawlstars/images/e/eb/Mortis_Portrait.png"},
-                {n:"SHELLY", i:"https://vignette.wikia.nocookie.net/brawlstars/images/7/70/Shelly_Portrait.png"},
-                {n:"COLT", i:"https://vignette.wikia.nocookie.net/brawlstars/images/5/53/Colt_Portrait.png"},
-                {n:"EL PRIMO", i:"https://vignette.wikia.nocookie.net/brawlstars/images/0/0e/El_Primo_Portrait.png"},
-                {n:"EDGAR", i:"https://vignette.wikia.nocookie.net/brawlstars/images/d/dd/Edgar_Portrait.png"},
-                {n:"SURGE", i:"https://vignette.wikia.nocookie.net/brawlstars/images/1/15/Surge_Portrait.png"}
-            ],
-            nav: id => {
+            state: { id: "", players: 3, spies: 1 },
+            
+            nav: (id) => {
                 document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
                 document.getElementById(id).classList.add('active');
             },
-            press: v => {
-                if(v === 'C') App.state.id = "";
-                else if(App.state.id.length < 8) App.state.id += v;
-                let s = App.state.id.padEnd(8, "_");
-                document.getElementById('id-display').innerText = s.slice(0,4) + "-" + s.slice(4,8);
+
+            input: (val) => {
+                if(val === 'C') App.state.id = "";
+                else if(App.state.id.length < 8) App.state.id += val;
+                
+                let display = App.state.id.padEnd(8, "_");
+                document.getElementById('id-render').innerText = display.slice(0,4) + "-" + display.slice(4,8);
             },
-            submitID: () => {
-                if(App.state.id.length === 8) App.nav('scr-lobby');
+
+            confirmID: () => {
+                if(App.state.id.length === 8) {
+                    document.getElementById('room-id-val').innerText = App.state.id.slice(0,4) + "-" + App.state.id.slice(4,8);
+                    App.nav('scr-lobby');
+                }
             },
-            adj: (t, v) => {
-                if(t === 'p') App.state.p = Math.max(2, App.state.p + v);
-                else App.state.s = Math.max(1, App.state.s + v);
-                document.getElementById('p-v').innerText = App.state.p;
-                document.getElementById('s-v').innerText = App.state.s;
+
+            createLobby: () => {
+                const randomID = Math.floor(10000000 + Math.random() * 90000000).toString();
+                document.getElementById('room-id-val').innerText = randomID.slice(0,4) + "-" + randomID.slice(4,8);
+                App.nav('scr-lobby');
             },
-            createLobby: () => App.nav('scr-lobby')
+
+            adj: (type, delta) => {
+                if(type === 'p') App.state.players = Math.max(2, App.state.players + delta);
+                else App.state.spies = Math.max(1, App.state.spies + delta);
+                
+                document.getElementById('p-count').innerText = App.state.players;
+                document.getElementById('s-count').innerText = App.state.spies;
+            }
         };
     </script>
 </body>
