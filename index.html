@@ -56,6 +56,7 @@
             display: flex;
             flex-direction: column;
             box-shadow: 0 0 50px rgba(0,0,0,1);
+            overflow: hidden;
         }
 
         /* --- СИСТЕМА ЭКРАНОВ --- */
@@ -70,6 +71,8 @@
             opacity: 0;
             transform: scale(1.05);
             transition: opacity var(--transition-speed), transform var(--transition-speed);
+            overflow-y: auto;
+            overflow-x: hidden;
         }
 
         .screen.active {
@@ -83,6 +86,10 @@
             text-align: center;
             margin-top: 40px;
             margin-bottom: 60px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .main-logo-text {
@@ -91,6 +98,7 @@
             text-shadow: 0 0 40px var(--neon-red), 0 0 10px rgba(0,0,0,0.5);
             line-height: 0.8;
             letter-spacing: -2px;
+            margin-bottom: 5px;
         }
 
         .sub-logo-text {
@@ -115,6 +123,7 @@
         /* --- УНИВЕРСАЛЬНЫЕ КНОПКИ --- */
         .btn-action {
             width: 100%;
+            max-width: 350px;
             padding: 22px;
             background: #000000;
             border: 4px solid var(--neon-blue);
@@ -125,7 +134,7 @@
             font-weight: 900;
             font-size: 22px;
             text-transform: uppercase;
-            margin-bottom: 20px;
+            margin: 0 auto 20px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -143,8 +152,9 @@
             box-shadow: none;
             color: #888888;
             margin-top: auto;
-            font-size: 18px;
-            border-radius: 40px;
+            font-size: 22px;
+            border-radius: 25px;
+            max-width: 350px;
         }
 
         /* --- ЭКРАН 2: ВВОД ID --- */
@@ -155,6 +165,8 @@
             text-shadow: 0 0 20px var(--glow-white);
             margin-bottom: 40px;
             text-transform: uppercase;
+            text-align: center;
+            width: 100%;
         }
 
         .id-input-container {
@@ -163,6 +175,7 @@
             justify-content: center;
             gap: 8px;
             margin-bottom: 45px;
+            height: 80px;
         }
 
         .id-digit-box {
@@ -174,6 +187,10 @@
             text-align: center;
             border-bottom: 4px solid #ffffff;
             padding-bottom: 5px;
+            height: 60px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
         }
 
         .id-hyphen {
@@ -181,15 +198,25 @@
             font-size: 36px;
             color: #ffffff;
             text-shadow: 0 0 15px var(--glow-white);
-            margin: 0 8px 25px 8px; /* Приподнятый дефис */
+            margin: 0 8px;
+            display: flex;
+            align-items: center;
+            height: 100%;
         }
 
         /* ЦИФРОВАЯ КЛАВИАТУРА */
+        .numpad-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
         .numpad-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(3, 85px);
             gap: 15px;
-            margin-bottom: 30px;
+            justify-content: center;
         }
 
         .n-key {
@@ -204,7 +231,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: 0.1s;
+            cursor: pointer;
+            transition: all 0.1s;
         }
 
         .n-key:active {
@@ -220,6 +248,8 @@
             font-size: 20px;
             letter-spacing: 1px;
             margin-bottom: 25px;
+            text-align: center;
+            width: 100%;
         }
 
         .user-identity-card {
@@ -227,7 +257,9 @@
             align-items: center;
             justify-content: center;
             gap: 15px;
-            margin-bottom: 35px;
+            margin: 0 auto 35px;
+            width: 100%;
+            max-width: 350px;
         }
 
         .avatar-frame {
@@ -248,6 +280,7 @@
 
         .settings-row {
             width: 100%;
+            max-width: 350px;
             background: var(--card-bg);
             border: 3px solid var(--neon-blue);
             box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
@@ -256,7 +289,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 18px;
+            margin: 0 auto 18px;
         }
 
         .settings-row.red-theme {
@@ -282,6 +315,7 @@
             align-items: center;
             justify-content: center;
             font-family: 'Rubik One';
+            cursor: pointer;
         }
 
         .circle-btn.red-btn {
@@ -289,38 +323,56 @@
             color: var(--neon-red);
         }
 
+        .circle-btn:active {
+            transform: scale(0.9);
+        }
+
         .value-display {
             font-family: 'Black Ops One';
             font-size: 32px;
             min-width: 30px;
             text-align: center;
+            color: #ffffff;
         }
 
-        /* КНОПКА СОЗДАТЬ КОМНАТУ (БЕЛЫЙ ТЕКСТ + ЖЕЛТЫЙ НЕОН) */
+        /* КНОПКА СОЗДАТЬ КОМНАТУ */
         .btn-create-lobby {
             width: 100%;
-            padding: 20px;
+            max-width: 350px;
+            padding: 22px;
             background: #000;
             border: 5px solid var(--neon-gold);
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-            border-radius: 30px;
-            color: #ffffff; /* Строго белый по ТЗ */
+            border-radius: 25px;
+            color: #ffffff;
             font-family: 'Exo 2';
             font-weight: 900;
             font-size: 22px;
             text-transform: uppercase;
-            margin-top: 15px;
+            margin: 15px auto 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+
+        .btn-create-lobby:active {
+            transform: scale(0.94);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.7);
         }
 
         /* --- ЭКРАН 4: АКТИВНАЯ КОМНАТА --- */
         .players-scroll-area {
             width: 100%;
+            max-width: 350px;
             display: flex;
             flex-direction: column;
             gap: 14px;
-            margin-bottom: 25px;
+            margin: 0 auto 25px;
             overflow-y: auto;
             padding-right: 5px;
+            max-height: 250px;
         }
 
         .player-slot-card {
@@ -367,6 +419,7 @@
             font-weight: 900;
             text-transform: uppercase;
             border: 2px solid;
+            white-space: nowrap;
         }
 
         .status-ready {
@@ -389,9 +442,10 @@
         /* КНОПКИ УПРАВЛЕНИЯ В КОМНАТЕ */
         .room-controls-box {
             width: 100%;
+            max-width: 350px;
             display: flex;
             flex-direction: column;
-            margin-top: auto;
+            margin: 20px auto 0;
         }
 
         .btn-ready-toggle {
@@ -404,10 +458,27 @@
             box-shadow: 0 0 15px rgba(255, 49, 49, 0.3);
         }
 
+        #start-btn {
+            border-color: var(--neon-gold);
+            color: var(--neon-gold);
+            display: none;
+        }
+
         /* СКРОЛЛБАР */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        
+        /* ХОВЕР ЭФФЕКТЫ ДЛЯ ДЕСКТОПА */
+        @media (hover: hover) {
+            .btn-action:hover, .btn-create-lobby:hover {
+                transform: translateY(-2px);
+            }
+            .n-key:hover {
+                border-color: var(--neon-blue);
+                transform: scale(1.05);
+            }
+        }
     </style>
 </head>
 <body>
@@ -421,10 +492,10 @@
                 <div class="edition-label">edition 2026</div>
             </div>
             
-            <button class="btn-action" onclick="App.navigate('scr-lobby')">Создать лобби</button>
-            <button class="btn-action" onclick="App.navigate('scr-join')">Вход по ID</button>
+            <button class="btn-action" onclick="App.navigate('scr-lobby')">СОЗДАТЬ ЛОББИ</button>
+            <button class="btn-action" onclick="App.navigate('scr-join')">ВХОД ПО ID</button>
             
-            <button class="btn-action btn-secondary" onclick="tg.close()">ВЫХОД</button>
+            <button class="btn-action btn-secondary" onclick="App.exitGame()">ВЫХОД</button>
         </div>
 
         <div id="scr-join" class="screen">
@@ -442,19 +513,21 @@
                 <div class="id-digit-box" id="d8">_</div>
             </div>
 
-            <div class="numpad-grid">
-                <button class="n-key" onclick="App.pressKey('1')">1</button>
-                <button class="n-key" onclick="App.pressKey('2')">2</button>
-                <button class="n-key" onclick="App.pressKey('3')">3</button>
-                <button class="n-key" onclick="App.pressKey('4')">4</button>
-                <button class="n-key" onclick="App.pressKey('5')">5</button>
-                <button class="n-key" onclick="App.pressKey('6')">6</button>
-                <button class="n-key" onclick="App.pressKey('7')">7</button>
-                <button class="n-key" onclick="App.pressKey('8')">8</button>
-                <button class="n-key" onclick="App.pressKey('9')">9</button>
-                <button class="n-key" style="color:var(--neon-red)" onclick="App.pressKey('C')">C</button>
-                <button class="n-key" onclick="App.pressKey('0')">0</button>
-                <button class="n-key" style="color:var(--neon-gold)" onclick="App.joinByCode()">OK</button>
+            <div class="numpad-container">
+                <div class="numpad-grid">
+                    <button class="n-key" onclick="App.pressKey('1')">1</button>
+                    <button class="n-key" onclick="App.pressKey('2')">2</button>
+                    <button class="n-key" onclick="App.pressKey('3')">3</button>
+                    <button class="n-key" onclick="App.pressKey('4')">4</button>
+                    <button class="n-key" onclick="App.pressKey('5')">5</button>
+                    <button class="n-key" onclick="App.pressKey('6')">6</button>
+                    <button class="n-key" onclick="App.pressKey('7')">7</button>
+                    <button class="n-key" onclick="App.pressKey('8')">8</button>
+                    <button class="n-key" onclick="App.pressKey('9')">9</button>
+                    <button class="n-key" style="color:var(--neon-red)" onclick="App.pressKey('C')">C</button>
+                    <button class="n-key" onclick="App.pressKey('0')">0</button>
+                    <button class="n-key" style="color:var(--neon-gold)" onclick="App.joinByCode()">OK</button>
+                </div>
             </div>
 
             <button class="btn-action btn-secondary" onclick="App.navigate('scr-menu')">НАЗАД</button>
@@ -470,7 +543,7 @@
             </div>
 
             <div class="settings-row">
-                <span style="font-family:'Exo 2'; font-size:18px">УЧАСТНИКИ</span>
+                <span style="font-family:'Exo 2'; font-size:18px; color:#fff">УЧАСТНИКИ</span>
                 <div class="control-group">
                     <button class="circle-btn" onclick="App.updateSettings('p', -1)">-</button>
                     <span class="value-display" id="p-count">4</span>
@@ -479,7 +552,7 @@
             </div>
 
             <div class="settings-row red-theme">
-                <span style="font-family:'Exo 2'; font-size:18px">ШПИОН</span>
+                <span style="font-family:'Exo 2'; font-size:18px; color:#fff">ШПИОН</span>
                 <div class="control-group">
                     <button class="circle-btn red-btn" onclick="App.updateSettings('s', -1)">-</button>
                     <span class="value-display" id="s-count">1</span>
@@ -497,11 +570,12 @@
             <div class="id-display-white" id="room-id-val">ID: 0000-0000</div>
 
             <div class="players-scroll-area" id="room-slots">
-                </div>
+                <!-- Слоты игроков будут здесь -->
+            </div>
 
             <div class="room-controls-box">
                 <button class="btn-action btn-ready-toggle" id="ready-btn" onclick="App.toggleReady()">ГОТОВ</button>
-                <button class="btn-action" style="border-color:var(--neon-gold); color:var(--neon-gold); display:none;" id="start-btn" onclick="tg.showAlert('БИТВА НАЧИНАЕТСЯ!')">НАЧАТЬ ИГРУ</button>
+                <button class="btn-action" id="start-btn" onclick="App.startGame()">НАЧАТЬ ИГРУ</button>
                 <button class="btn-action btn-secondary" style="margin-top:10px" onclick="App.navigate('scr-menu')">ПОКИНУТЬ</button>
             </div>
         </div>
@@ -514,6 +588,17 @@
         tg.expand();
         tg.enableClosingConfirmation();
 
+        // ГЕНЕРАЦИЯ РАНДОМНОГО ID
+        function generateRandomId() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 8; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+                if (i === 3) result += '-';
+            }
+            return result;
+        }
+
         // ОСНОВНОЕ ПРИЛОЖЕНИЕ
         const App = {
             state: {
@@ -521,9 +606,10 @@
                 inputCode: '',
                 participants: 4,
                 spies: 1,
-                lobbyId: '9574-3718',
+                lobbyId: generateRandomId(),
                 isReady: false,
-                isAdmin: true
+                isAdmin: true,
+                players: []
             },
 
             // Навигация
@@ -539,32 +625,52 @@
                 if(screenId === 'scr-room') {
                     App.buildRoom();
                 }
+                
+                // Обновляем кнопку "Начать игру"
+                const startBtn = document.getElementById('start-btn');
+                if (screenId === 'scr-room') {
+                    startBtn.style.display = App.state.isAdmin ? 'block' : 'none';
+                } else {
+                    startBtn.style.display = 'none';
+                }
+                
                 tg.HapticFeedback.impactOccurred('light');
+            },
+
+            // Выход из игры
+            exitGame: () => {
+                if (confirm("Вы уверены, что хотите выйти?")) {
+                    tg.close();
+                }
             },
 
             // Ввод кода
             pressKey: (key) => {
                 if(key === 'C') {
                     App.state.inputCode = '';
-                } else if(App.state.inputCode.length < 8) {
+                } else if(App.state.inputCode.length < 8 && /^[0-9]$/.test(key)) {
                     App.state.inputCode += key;
                 }
                 
-                for(let i=1; i<=8; i++) {
+                for(let i = 1; i <= 8; i++) {
                     const char = App.state.inputCode[i-1] || "_";
                     const el = document.getElementById('d' + i);
                     el.innerText = char;
                     el.style.opacity = char === "_" ? "0.3" : "1";
+                    el.style.color = char === "_" ? "#666" : "#ffffff";
                 }
                 tg.HapticFeedback.selectionChanged();
             },
 
+            // Подключение по коду
             joinByCode: () => {
-                if(App.state.inputCode.length === 8) {
+                if(App.state.inputCode.length === 8 && /^\d+$/.test(App.state.inputCode)) {
                     App.state.lobbyId = App.state.inputCode.slice(0,4) + "-" + App.state.inputCode.slice(4,8);
                     App.state.isAdmin = false;
                     App.navigate('scr-room');
+                    tg.showAlert("Подключение к комнате...");
                 } else {
+                    tg.showAlert("Ошибка: введите 8 цифр");
                     tg.HapticFeedback.notificationOccurred('error');
                 }
             },
@@ -572,18 +678,40 @@
             // Настройки лобби
             updateSettings: (type, delta) => {
                 if(type === 'p') {
-                    App.state.participants = Math.max(2, Math.min(12, App.state.participants + delta));
-                    document.getElementById('p-count').innerText = App.state.participants;
+                    const newVal = App.state.participants + delta;
+                    if (newVal >= 2 && newVal <= 12) {
+                        App.state.participants = newVal;
+                        document.getElementById('p-count').innerText = App.state.participants;
+                        
+                        // Автоматически корректируем шпионов
+                        if (App.state.spies > App.state.participants - 1) {
+                            App.state.spies = Math.max(1, App.state.participants - 1);
+                            document.getElementById('s-count').innerText = App.state.spies;
+                        }
+                    }
                 } else {
-                    App.state.spies = Math.max(1, Math.min(5, App.state.spies + delta));
-                    document.getElementById('s-count').innerText = App.state.spies;
+                    const newVal = App.state.spies + delta;
+                    const maxSpies = App.state.participants - 1;
+                    if (newVal >= 1 && newVal <= maxSpies) {
+                        App.state.spies = newVal;
+                        document.getElementById('s-count').innerText = App.state.spies;
+                    }
                 }
                 tg.HapticFeedback.selectionChanged();
             },
 
+            // Создание финальной комнаты
             createFinalRoom: () => {
+                if (App.state.spies >= App.state.participants) {
+                    tg.showAlert("Ошибка: шпионов должно быть меньше чем участников");
+                    tg.HapticFeedback.notificationOccurred('error');
+                    return;
+                }
+                
                 App.state.isAdmin = true;
+                App.state.lobbyId = generateRandomId();
                 App.navigate('scr-room');
+                tg.showAlert("Комната создана! ID: " + App.state.lobbyId);
             },
 
             // Логика комнаты
@@ -592,7 +720,7 @@
                 const container = document.getElementById('room-slots');
                 container.innerHTML = '';
 
-                for(let i=0; i < App.state.participants; i++) {
+                for(let i = 0; i < App.state.participants; i++) {
                     const isMe = i === 0;
                     const card = document.createElement('div');
                     card.className = `player-slot-card ${isMe ? 'occupied' : ''}`;
@@ -608,12 +736,9 @@
                     `;
                     container.appendChild(card);
                 }
-
-                // Кнопки управления
-                const startBtn = document.getElementById('start-btn');
-                startBtn.style.display = (App.state.isAdmin && App.state.isReady) ? 'block' : 'none';
             },
 
+            // Переключение готовности
             toggleReady: () => {
                 App.state.isReady = !App.state.isReady;
                 const btn = document.getElementById('ready-btn');
@@ -622,6 +747,19 @@
                 
                 App.buildRoom();
                 tg.HapticFeedback.notificationOccurred('success');
+            },
+
+            // Начать игру
+            startGame: () => {
+                if (!App.state.isReady) {
+                    tg.showAlert("Вы должны быть готовы!");
+                    tg.HapticFeedback.notificationOccurred('error');
+                    return;
+                }
+                
+                tg.showAlert("Игра начинается! Шпионы: " + App.state.spies);
+                tg.HapticFeedback.notificationOccurred('success');
+                // Здесь будет переход на экран игры
             }
         };
 
@@ -633,6 +771,11 @@
                 document.getElementById('my-ava').style.backgroundImage = `url(${user.photo_url})`;
             }
         }
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', () => {
+            App.navigate('scr-menu');
+        });
     </script>
 </body>
 </html>
