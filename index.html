@@ -686,7 +686,7 @@
             font-size: 26px;
             color: #ffffff;
             text-shadow: 0 0 15px var(--neon-blue);
-            margin-bottom: 15px;
+            margin-bottom: 5px; /* Уменьшен отступ */
             text-transform: uppercase;
             text-align: center;
             width: 100%;
@@ -697,7 +697,7 @@
             font-family: 'Exo 2';
             font-size: 16px;
             color: #ffffff;
-            margin-bottom: 15px; /* Уменьшен отступ */
+            margin-bottom: 5px; /* Уменьшен отступ */
             text-align: center;
             text-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
             font-weight: bold;
@@ -705,12 +705,12 @@
             min-height: 24px;
         }
 
-        /* КАРТА - УВЕЛИЧЕНА И ОПУЩЕНА НИЖЕ */
+        /* КАРТА - ОПУЩЕНА НИЖЕ И РАСТЯНУТА */
         .card-container {
             width: 320px;
-            height: 420px; /* Увеличенная высота */
+            height: 440px; /* Увеличена высота */
             perspective: 1000px;
-            margin: 10px auto 20px; /* Уменьшен верхний отступ */
+            margin: 25px auto 20px; /* Увеличен верхний отступ (25px) */
         }
 
         .card {
@@ -735,20 +735,20 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center; /* Центрирование по вертикали */
+            justify-content: center;
             overflow: hidden;
             padding: 20px;
         }
 
-        /* ПЕРЕДНЯЯ СТОРОНА КАРТЫ (ДО РАСКРЫТИЯ) */
+        /* ПЕРЕДНЯЯ СТОРОНА КАРТЫ - БЕЛЫЙ ТЕКСТ */
         .card-front {
             background: linear-gradient(135deg, #0a0a1a, #1a1a2e);
             border: none;
             animation: cardGlow 2s infinite alternate;
-            padding-top: 60px; /* Сдвиг текста вниз */
+            padding-top: 80px; /* Сдвиг текста вниз */
         }
 
-        /* ЗАДНЯЯ СТОРОНА КАРТЫ (ПОСЛЕ РАСКРЫТИЯ) */
+        /* ЗАДНЯЯ СТОРОНА КАРТЫ */
         .card-back {
             background: linear-gradient(135deg, #0f0f1a, #1a1a2e);
             border: none;
@@ -757,37 +757,38 @@
                 0 0 25px rgba(0, 210, 255, 0.4),
                 0 0 50px rgba(0, 210, 255, 0.2),
                 inset 0 0 40px rgba(0, 210, 255, 0.1);
-            padding-top: 80px; /* Сдвиг текста вниз для бравлера */
+            padding-top: 100px; /* Сдвиг текста вниз для бравлера */
         }
 
         /* ОСОБЫЙ СТИЛЬ ДЛЯ КАРТЫ ШПИОНА */
         .card-back.spy-card {
             background: linear-gradient(135deg, #1a0000, #330000);
             animation: spyGlow 2s infinite alternate;
-            padding-top: 80px; /* Сдвиг текста вниз для шпиона */
+            padding-top: 100px; /* Сдвиг текста вниз для шпиона */
         }
 
-        /* КРУПНЫЙ ТЕКСТ НА КАРТЕ */
+        /* КРУПНЫЙ ТЕКСТ НА КАРТЕ - БЕЛЫЙ */
         .big-card-text {
             font-family: 'Exo 2';
-            font-size: 48px; /* Очень крупный текст */
+            font-size: 48px;
             font-weight: 900;
             text-transform: uppercase;
             text-align: center;
-            text-shadow: 0 0 25px currentColor;
+            text-shadow: 0 0 25px #ffffff; /* Белое свечение */
             letter-spacing: 3px;
             margin: 0;
+            color: #ffffff; /* Белый цвет */
         }
 
-        /* ТОЛЬКО КНОПКА ПРОДОЛЖИТЬ - В САМОМ НИЗУ */
+        /* УМЕНЬШЕННЫЕ КНОПКИ ПОД КАРТОЙ */
         .game-controls-single {
             width: 100%;
             max-width: 320px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            margin-top: auto; /* Прижимаем к низу */
-            margin-bottom: 20px;
+            gap: 10px; /* Уменьшен промежуток */
+            margin-top: auto;
+            margin-bottom: 15px; /* Уменьшен отступ снизу */
         }
 
         /* БЕЛАЯ КНОПКА ПРОДОЛЖИТЬ */
@@ -796,6 +797,8 @@
                         0 0 25px rgba(255, 255, 255, 0.2) inset;
             color: #ffffff;
             background: rgba(0, 0, 0, 0.8);
+            padding: 14px; /* Уменьшен padding */
+            font-size: 18px; /* Уменьшен шрифт */
         }
 
         /* --- ЭКРАН 6: ГОЛОСОВАНИЕ --- */
@@ -1067,7 +1070,7 @@
                 <div class="card" id="role-card" onclick="Game.revealCard()">
                     <div class="card-front">
                         <!-- УБРАНА ИКОНКА, ТОЛЬКО ТЕКСТ -->
-                        <div class="big-card-text" style="color: var(--neon-gold);">BRAWL SPY</div>
+                        <div class="big-card-text">BRAWL SPY</div>
                     </div>
                     <div class="card-back" id="card-back">
                         <!-- ТОЛЬКО КРУПНЫЙ ТЕКСТ БЕЗ ИКОНОК -->
