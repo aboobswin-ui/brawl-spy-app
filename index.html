@@ -3,152 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>BRAWL SPY 2026 REPLICA</title>
+    <title>BRAWL SPY - ULTIMATE INTERFACE</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rubik+Mono+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap" rel="stylesheet">
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <style>
         :root {
-            --bg-dark: #0d1117;
-            --spy-red: #e61e1e;
-            --brawl-white: #ffffff;
-            /* Тяжелые 3D тени */
-            --shadow-3d: 
-                0 1px 0 #000, 0 2px 0 #000, 0 3px 0 #000, 0 4px 0 #000, 
-                0 5px 0 #000, 0 6px 0 #000, 0 10px 20px rgba(0,0,0,0.8);
+            --clr-bg: #0d1117;
+            --clr-gold-main: #ffcc00;
+            --clr-gold-dark: #ff8c00;
+            --clr-neon-blue: #00d2ff;
+            --clr-neon-red: #ff3131;
+            --clr-white: #ffffff;
+            --f-main: 'Black Ops One', cursive;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        /* ГЛОБАЛЬНЫЕ СТИЛИ */
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            user-select: none; 
+        }
 
         body {
-            background-color: var(--bg-dark);
-            height: 100vh; width: 100vw;
-            display: flex; justify-content: center; align-items: center;
-            overflow: hidden; font-family: 'Black Ops One', cursive;
+            background-color: var(--clr-bg);
+            color: var(--clr-white);
+            height: 100vh; 
+            width: 100vw;
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: flex-start;
+            overflow: hidden; 
+            font-family: var(--f-main);
         }
 
-        /* Центрирующий контейнер с эффектом свечения сзади */
-        .main-container {
-            width: 100%; max-width: 440px; height: 100%;
-            position: relative; display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            background: radial-gradient(circle at 50% 45%, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0) 60%);
-        }
-
-        /* КОНСТРУКЦИЯ ЛОГОТИПА (КАК НА ФОТО) */
-        .logo-stack {
-            position: relative;
-            display: flex; flex-direction: column;
+        /* КОНТЕЙНЕР ПРИЛОЖЕНИЯ */
+        .app-wrapper {
+            width: 100%; 
+            max-width: 440px; 
+            height: 100%;
+            position: relative; 
+            display: flex; 
+            flex-direction: column;
             align-items: center;
-            z-index: 10;
-            margin-bottom: 80px;
-            transform: scale(1.1);
+            /* ФОНОВОЕ ОСВЕЩЕНИЕ КАК НА ФОТО */
+            background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0) 60%);
         }
 
-        .logo-brawl {
-            font-size: 64px;
-            color: var(--brawl-white);
-            line-height: 0.8;
-            text-shadow: var(--shadow-3d);
-            letter-spacing: -2px;
-            z-index: 1;
-        }
-
-        .logo-spy {
-            font-family: 'Rubik Mono One', sans-serif;
-            font-size: 58px;
-            color: var(--spy-red);
-            line-height: 0.8;
-            z-index: 5;
-            margin: -5px 0;
-            /* Белая обводка и глянец */
-            -webkit-text-stroke: 2px #fff;
-            text-shadow: 0 0 10px rgba(255,255,255,0.3), 4px 4px 0 #000;
-            background: linear-gradient(180deg, #ff4d4d 0%, #b30000 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-        }
-
-        .logo-stars {
-            font-size: 92px;
-            color: var(--spy-red);
-            line-height: 0.75;
-            text-shadow: var(--shadow-3d);
-            letter-spacing: -4px;
-            z-index: 1;
-        }
-
-        .logo-year {
-            font-size: 48px;
-            color: #fff;
-            margin-top: -10px;
-            text-shadow: var(--shadow-3d);
-        }
-
-        /* КНОПКИ (НИЖНЯЯ ПАНЕЛЬ) */
-        .ui-panel {
+        /* БЛОК ДЛЯ ТВОЕГО ФОТО (НАВЕРХУ) */
+        .top-logo-area {
             width: 100%;
-            position: absolute;
-            bottom: 40px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            padding: 0 20px;
-            z-index: 20;
+            padding: 40px 20px 20px 20px;
+            display: flex;
+            justify-content: center;
+            z-index: 10;
         }
 
-        .btn-base {
-            padding: 18px 0;
-            font-size: 20px;
-            font-weight: bold;
-            border-radius: 6px;
-            border: none;
-            cursor: pointer;
-            text-transform: uppercase;
-            box-shadow: 0 4px 0 rgba(0,0,0,0.5);
-            transition: 0.1s;
-            background: linear-gradient(180deg, #ffffff 0%, #cccccc 100%);
-            color: #000;
+        .top-logo-area img {
+            width: 85%;
+            height: auto;
+            filter: drop-shadow(0 0 25px rgba(255,255,255,0.2));
         }
 
-        .btn-base:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 0 rgba(0,0,0,0.5);
+        /* ЭКРАНЫ */
+        .screen-layer { 
+            position: absolute; 
+            inset: 0; 
+            display: none; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            padding-top: 180px; /* Чтобы не перекрывать логотип сверху */
+        }
+        
+        .screen-layer.active { display: flex; animation: fadeIn 0.4s ease-out; }
+
+        /* КНОПКИ */
+        .button-container { 
+            width: 100%; 
+            padding: 0 40px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 18px; 
+            z-index: 100; 
         }
 
-        /* Кнопка создания (по твоей инструкции: Белый текст на золоте) */
-        .btn-create {
-            grid-column: span 2;
-            background: linear-gradient(180deg, #ffcc00 0%, #ff9900 100%);
-            color: #ffffff;
-            margin-bottom: 10px;
+        .btn-action {
+            width: 100%; 
+            padding: 22px 0;
+            font-family: var(--f-main); 
             font-size: 24px;
+            text-transform: uppercase; 
+            border-radius: 14px;
+            border: none; 
+            cursor: pointer; 
+            transition: transform 0.1s, box-shadow 0.1s;
+            box-shadow: 0 8px 0 rgba(0,0,0,0.5);
+            position: relative;
+            overflow: hidden;
         }
 
-        .btn-id { grid-column: 1; }
-        .btn-exit { grid-column: 2; }
+        .btn-action::before {
+            content: ''; 
+            position: absolute; 
+            top: 0; left: 0; 
+            width: 100%; height: 40%; 
+            background: linear-gradient(rgba(255,255,255,0.1), transparent);
+        }
+
+        .btn-action:active { 
+            transform: translateY(4px); 
+            box-shadow: 0 4px 0 rgba(0,0,0,0.5); 
+        }
+
+        /* КНОПКА №6: СОЗДАТЬ КОМНАТУ (ЗОЛОТАЯ + БЕЛЫЙ ТЕКСТ) */
+        .btn-create-lobby {
+            background: linear-gradient(180deg, var(--clr-gold-main), var(--clr-gold-dark));
+            color: #ffffff !important; 
+        }
+
+        .btn-join-blue { 
+            background: linear-gradient(180deg, #00a2ff, #004dff); 
+            color: #fff; 
+        }
+
+        .btn-back-menu { 
+            background: #2a2a2a; 
+            color: #ccc; 
+            font-size: 16px; 
+            padding: 16px 0; 
+            margin-top: 10px;
+        }
+
+        /* НАСТРОЙКА ЛОББИ - СТИЛИ */
+        .lobby-title { 
+            font-size: 32px; 
+            color: var(--clr-white); 
+            text-shadow: 0 0 15px rgba(255,255,255,0.7); 
+            margin-bottom: 40px; 
+            text-transform: uppercase;
+        }
+
+        .settings-tabs { 
+            display: flex; 
+            width: 100%; 
+            gap: 15px; 
+            padding: 0 40px; 
+            margin-bottom: 35px; 
+        }
+
+        .tab-box { 
+            flex: 1; 
+            padding: 20px 0; 
+            border: 3.5px solid; 
+            border-radius: 12px; 
+            text-align: center; 
+            font-size: 14px; 
+            font-weight: bold;
+        }
+        
+        .tab-neon-blue { 
+            border-color: var(--clr-neon-blue); 
+            color: var(--clr-neon-blue); 
+            box-shadow: inset 0 0 10px var(--clr-neon-blue), 0 0 10px var(--clr-neon-blue); 
+        }
+
+        .tab-neon-red { 
+            border-color: var(--clr-neon-red); 
+            color: var(--clr-neon-red); 
+            box-shadow: inset 0 0 10px var(--clr-neon-red), 0 0 10px var(--clr-neon-red); 
+        }
+
+        .id-caption { font-size: 20px; color: var(--clr-white); margin-bottom: 8px; }
+        .id-number { color: var(--clr-gold-main); font-size: 38px; margin-bottom: 40px; letter-spacing: 4px; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
     </style>
 </head>
 <body>
 
-    <div class="main-container">
+    <div class="app-wrapper">
         
-        <div class="logo-stack">
-            <div class="logo-brawl">BRAWL</div>
-            <div class="logo-spy">ШПИОН</div>
-            <div class="logo-stars">STARS</div>
-            <div class="logo-year">-2026</div>
+        <div class="top-logo-area">
+            <img src="logo.png" alt="LOGO">
         </div>
 
-        <div class="ui-panel">
-            <button class="btn-base btn-create" onclick="tg.showAlert('Создание лобби...')">СОЗДАТЬ КОМНАТУ</button>
-            <button class="btn-base btn-id">ВХОД ПО ID</button>
-            <button class="btn-base btn-exit" onclick="tg.close()">ВЫХОД</button>
+        <div id="view-menu" class="screen-layer active">
+            <div class="button-container">
+                <button class="btn-action btn-create-lobby" onclick="navigateTo('view-setup')">СОЗДАТЬ КОМНАТУ</button>
+                <button class="btn-action btn-join-blue" onclick="navigateTo('view-join')">ВХОД ПО ID</button>
+                <button class="btn-action btn-back-menu" onclick="tg.close()">ВЫХОД</button>
+            </div>
+        </div>
+
+        <div id="view-setup" class="screen-layer">
+            <h2 class="lobby-title">НАСТРОЙКА ЛОББИ</h2>
+            
+            <div class="settings-tabs">
+                <div class="tab-box tab-neon-blue">УЧАСТНИКИ</div>
+                <div class="tab-box tab-neon-red">ШПИОН</div>
+            </div>
+
+            <div class="id-caption">ID КОМНАТЫ</div>
+            <div id="display-room-id" class="id-number">777-999</div>
+
+            <div class="button-container">
+                <button class="btn-action btn-create-lobby" onclick="tg.showAlert('БИТВА ГОТОВА!')">НАЧАТЬ ИГРУ</button>
+                <button class="btn-action btn-back-menu" onclick="navigateTo('view-menu')">МЕНЮ</button>
+            </div>
+        </div>
+
+        <div id="view-join" class="screen-layer">
+            <h2 class="id-caption" style="font-size: 28px;">ID КОМНАТЫ</h2>
+            <div style="margin: 40px 0; font-size: 44px; border-bottom: 5px solid #fff; width: 220px; text-align: center; letter-spacing: 12px;">____</div>
+            <div class="button-container">
+                <button class="btn-action btn-back-menu" onclick="navigateTo('view-menu')">ОТМЕНА</button>
+            </div>
         </div>
 
     </div>
@@ -156,7 +234,26 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.ready();
+
+        function navigateTo(screenId) {
+            // Переключение экранов
+            document.querySelectorAll('.screen-layer').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            
+            // Генерация ID при создании комнаты
+            if(screenId === 'view-setup') {
+                const randomId = Math.floor(100+Math.random()*899) + "-" + Math.floor(100+Math.random()*899);
+                document.getElementById('display-room-id').innerText = randomId;
+            }
+            
+            // Вибрация для отклика
+            tg.HapticFeedback.impactOccurred('medium');
+        }
+
+        window.onload = () => {
+            tg.ready();
+            console.log("Interface initialized");
+        };
     </script>
 </body>
 </html>
