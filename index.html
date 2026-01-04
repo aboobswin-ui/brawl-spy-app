@@ -3,37 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>BRAWL SPY ULTIMATE ENGINE 2026</title>
+    <title>BRAWL SPY PREMIER - CORE ENGINE 2026</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rubik:wght@700;900&family=Orbitron:wght@400;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rubik:wght@700;900&family=Orbitron:wght@500;700;900&family=Exo+2:wght@300;800&display=swap" rel="stylesheet">
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <style>
         /* =========================================
-           1. ГЛОБАЛЬНАЯ ДИЗАЙН-СИСТЕМА (VARIABLES)
+           МОДУЛЬ 1: ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ И ЦВЕТА
            =========================================
         */
         :root {
-            --bg-ultra-dark: #020406;
-            --accent-white: #ffffff;
-            --gold-gradient: linear-gradient(180deg, #ffcc00 0%, #ff8c00 100%);
-            --blue-gradient: linear-gradient(180deg, #00a2ff 0%, #004dff 100%);
+            --primary-black: #020305;
+            --deep-space: #05080a;
+            --white-pure: #ffffff;
+            --gold-top: #ffde59;
+            --gold-bottom: #ff914d;
             --neon-blue: #00d2ff;
             --neon-red: #ff3131;
             --neon-yellow: #ffff00;
-            --neon-green: #00ff00;
-            --glass-panel: rgba(255, 255, 255, 0.04);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --font-main: 'Black Ops One', cursive;
-            --font-ui: 'Rubik', sans-serif;
-            --font-id: 'Orbitron', sans-serif;
+            --text-shadow-glow: 0 0 15px rgba(255, 255, 255, 0.4);
+            --font-army: 'Black Ops One', cursive;
+            --font-main: 'Rubik', sans-serif;
+            --font-tech: 'Orbitron', sans-serif;
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* =========================================
-           2. БАЗОВЫЕ НАСТРОЙКИ И ОБНУЛЕНИЕ (RESET)
+           МОДУЛЬ 2: СБРОС И БАЗОВЫЕ КОНТЕЙНЕРЫ
            =========================================
         */
         * {
@@ -41,448 +41,513 @@
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: manipulation;
+            outline: none;
         }
 
         body {
-            background-color: var(--bg-ultra-dark);
-            color: var(--accent-white);
+            background-color: var(--primary-black);
+            color: var(--white-pure);
             height: 100vh;
             width: 100vw;
-            font-family: var(--font-ui);
+            font-family: var(--font-main);
+            overflow: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
-            overflow: hidden;
             position: relative;
-            /* Радиальный градиент для создания глубины и эффекта Halo */
-            background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.12) 0%, rgba(0,0,0,0) 65%), var(--bg-ultra-dark);
+            /* Фон с эффектом виньетки и свечения */
+            background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0) 75%), var(--primary-black);
         }
 
-        /* Эффект мерцающих звезд на фоне */
-        body::after {
+        /* Анимированная подложка (Звездная пыль) */
+        body::before {
             content: "";
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0; left: 0; width: 200%; height: 200%;
             background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
-            opacity: 0.15;
-            z-index: 1;
+            opacity: 0.1;
+            animation: backgroundMove 60s linear infinite;
             pointer-events: none;
         }
 
-        /* =========================================
-           3. ВЕРХНЯЯ ИНФОРМАЦИОННАЯ ПАНЕЛЬ
-           =========================================
-        */
-        .system-header {
-            width: 100%;
-            padding: 25px 30px 10px;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            z-index: 1000;
+        @keyframes backgroundMove {
+            from { transform: translate(0, 0); }
+            to { transform: translate(-50%, -50%); }
         }
 
-        .online-chip {
+        /* =========================================
+           МОДУЛЬ 3: ВЕРХНИЙ СТАТУС (HEADER)
+           =========================================
+        */
+        .header-interface {
+            width: 100%;
+            padding: 25px 35px 5px;
+            display: flex;
+            justify-content: flex-end;
+            z-index: 999;
+        }
+
+        .online-indicator {
+            background: rgba(0, 255, 0, 0.05);
+            border: 1px solid rgba(0, 255, 0, 0.2);
+            padding: 6px 14px;
+            border-radius: 100px;
             display: flex;
             align-items: center;
             gap: 10px;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 8px 16px;
-            border-radius: 30px;
-            border: 1px solid rgba(0, 255, 0, 0.2);
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.1);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
         }
 
-        .status-dot {
+        .pulse-circle {
             width: 8px;
             height: 8px;
-            background-color: var(--neon-green);
+            background: #00ff00;
             border-radius: 50%;
-            box-shadow: 0 0 12px var(--neon-green);
-            animation: pulse-dot 2s infinite ease-in-out;
+            box-shadow: 0 0 10px #00ff00;
+            animation: circleGlow 2s infinite;
         }
 
-        @keyframes pulse-dot {
+        @keyframes circleGlow {
             0% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.4); opacity: 0.4; }
             100% { transform: scale(1); opacity: 1; }
         }
 
-        .online-count {
-            color: var(--neon-green);
-            font-size: 13px;
+        .online-label {
+            color: #00ff00;
+            font-size: 11px;
             font-weight: 900;
-            letter-spacing: 1.2px;
+            letter-spacing: 2px;
             text-transform: uppercase;
         }
 
         /* =========================================
-           4. СЕКЦИЯ ЛОГОТИПА (УВЕЛИЧЕННЫЙ И ПРОЗРАЧНЫЙ)
+           МОДУЛЬ 4: ЛОГОТИП (ПРЕМИУМ PNG)
            =========================================
         */
-        .brand-zone {
+        .branding-container {
             width: 100%;
-            padding: 10px 20px;
+            padding: 10px 15px;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 15px;
             z-index: 500;
+            margin-bottom: 10px;
         }
 
-        .brand-zone img {
-            width: 120%; /* ОГРОМНЫЙ РАЗМЕР */
-            max-width: 550px;
-            filter: drop-shadow(0 0 45px rgba(255, 255, 255, 0.25));
-            animation: giant-float 5s infinite ease-in-out;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        .branding-container img {
+            width: 125%;
+            max-width: 580px;
+            filter: drop-shadow(0 0 35px rgba(255, 255, 255, 0.25));
+            animation: brandingFloat 6s infinite ease-in-out;
+            transition: var(--transition-smooth);
         }
 
-        @keyframes giant-float {
-            0% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-20px) scale(1.05); }
-            100% { transform: translateY(0) scale(1); }
+        @keyframes brandingFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+            50% { transform: translateY(-15px) rotate(1deg) scale(1.05); }
         }
 
         /* =========================================
-           5. АРХИТЕКТУРА ИГРОВЫХ ЭКРАНОВ
+           МОДУЛЬ 5: СИСТЕМА ЭКРАНОВ И ПЕРЕХОДОВ
            =========================================
         */
-        .ui-master-container {
+        .view-port {
             width: 100%;
             max-width: 440px;
             flex-grow: 1;
+            padding: 0 40px;
             position: relative;
             z-index: 800;
-            padding: 0 40px;
         }
 
-        .app-screen {
+        .scene {
             display: none;
             width: 100%;
             flex-direction: column;
-            align-items: center;
-            position: absolute;
-            top: 0; left: 0; padding: 0 40px;
+            animation: sceneEnter 0.5s cubic-bezier(0.19, 1, 0.22, 1) forwards;
         }
 
-        .app-screen.is-visible {
+        .scene.active-scene {
             display: flex;
-            animation: screen-reveal 0.5s cubic-bezier(0.23, 1, 0.32, 1) forwards;
         }
 
-        @keyframes screen-reveal {
-            from { opacity: 0; transform: translateY(40px) scale(0.9); filter: blur(10px); }
+        @keyframes sceneEnter {
+            from { opacity: 0; transform: translateY(50px) scale(0.9); filter: blur(10px); }
             to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
         }
 
         /* =========================================
-           6. УНИВЕРСАЛЬНАЯ СИСТЕМА КНОПОК
+           МОДУЛЬ 6: КОМПОНЕНТЫ КНОПОК
            =========================================
         */
-        .btn-vertical-group {
-            width: 100%;
+        .ui-stack {
             display: flex;
             flex-direction: column;
-            gap: 22px;
+            gap: 20px;
+            width: 100%;
         }
 
-        .main-btn {
+        .base-btn {
             width: 100%;
             padding: 24px 0;
-            font-family: var(--font-main);
+            font-family: var(--font-army);
             font-size: 26px;
             text-transform: uppercase;
             border-radius: 22px;
             border: none;
             cursor: pointer;
             position: relative;
-            box-shadow: 0 10px 0 rgba(0,0,0,0.7);
-            transition: all 0.1s;
-            overflow: hidden;
+            box-shadow: 0 8px 0 rgba(0,0,0,0.6);
+            transition: all 0.1s ease;
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: hidden;
         }
 
-        .main-btn:active {
+        .base-btn:active {
             transform: translateY(4px);
-            box-shadow: 0 6px 0 rgba(0,0,0,0.7);
+            box-shadow: 0 4px 0 rgba(0,0,0,0.6);
         }
 
-        /* ГЛЯНЦЕВЫЙ БЛИК КНОПОК */
-        .main-btn::before {
+        /* Эффект глянца */
+        .base-btn::after {
             content: "";
             position: absolute;
             top: 0; left: -100%; width: 50%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
             transform: skewX(-30deg);
         }
 
-        .main-btn:hover::before {
+        .base-btn:hover::after {
             left: 150%;
-            transition: 0.7s;
+            transition: 0.6s;
         }
 
-        /* СПЕЦИФИЧЕСКИЕ СТИЛИ КНОПОК */
-        .btn-gold-action {
-            background: var(--gold-gradient);
-            color: #ffffff !important; /* БЕЛЫЙ ТЕКСТ ПО ТЗ */
+        /* ЦВЕТА КНОПОК */
+        .btn-gold-main {
+            background: linear-gradient(180deg, var(--gold-top) 0%, var(--gold-bottom) 100%);
+            color: var(--white-pure) !important; /* Текст белый по ТЗ */
             border: 2px solid rgba(255, 255, 255, 0.4);
-            text-shadow: 0 2px 5px rgba(0,0,0,0.4);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        .btn-blue-action {
-            background: var(--blue-gradient);
-            color: #ffffff;
-            border: 2px solid rgba(255, 255, 255, 0.2);
+        .btn-blue-alt {
+            background: linear-gradient(180deg, #00a2ff 0%, #004dff 100%);
+            color: var(--white-pure);
         }
 
-        .btn-dark-utility {
-            background: #1c1f24;
-            color: #7a828e;
+        .btn-utility {
+            background: #1a1c20;
+            color: #5d646d;
             font-size: 18px;
-            margin-top: 15px;
-            box-shadow: 0 8px 0 rgba(0,0,0,0.8);
+            margin-top: 10px;
         }
 
         /* =========================================
-           7. КОНФИГУРАЦИЯ ЛОББИ (PREMIUM LOOK)
+           МОДУЛЬ 7: ЛОББИ И НАСТРОЙКИ (CORE UI)
            =========================================
         */
-        .lobby-main-title {
-            font-family: var(--font-main);
-            font-size: 32px;
-            color: var(--accent-white);
-            text-shadow: 0 0 20px var(--accent-white);
+        .lobby-title {
+            font-family: var(--font-army);
+            font-size: 30px;
             text-align: center;
-            margin-bottom: 35px;
+            margin-bottom: 25px;
             text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: var(--text-shadow-glow);
         }
 
-        .settings-container {
-            width: 100%;
-            background: var(--glass-panel);
+        .premium-card {
+            background: rgba(255, 255, 255, 0.03);
             border: 1px solid var(--glass-border);
-            border-radius: 30px;
+            border-radius: 32px;
             padding: 25px;
             backdrop-filter: blur(20px);
-            margin-bottom: 35px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            margin-bottom: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
 
-        .tab-selector {
+        /* ТАБЫ */
+        .tab-controller {
             display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
+            gap: 12px;
+            margin-bottom: 25px;
         }
 
-        .neon-tab {
+        .tab-trigger {
             flex: 1;
-            padding: 20px 0;
-            border-radius: 20px;
+            padding: 18px 0;
+            border-radius: 18px;
             border: 4px solid;
             text-align: center;
             font-weight: 900;
-            font-size: 14px;
+            font-size: 12px;
             text-transform: uppercase;
-            transition: 0.3s;
+            transition: var(--transition-smooth);
         }
 
-        .tab-blue-neon {
+        .trigger-players {
             border-color: var(--neon-blue);
             color: var(--neon-blue);
-            box-shadow: 0 0 15px var(--neon-blue), inset 0 0 10px rgba(0, 210, 255, 0.2);
+        }
+        .trigger-players.is-active {
+            background: rgba(0, 210, 255, 0.15);
+            box-shadow: 0 0 20px var(--neon-blue);
         }
 
-        .tab-red-neon {
+        .trigger-spy {
             border-color: var(--neon-red);
             color: var(--neon-red);
-            box-shadow: 0 0 15px var(--neon-red), inset 0 0 10px rgba(255, 49, 49, 0.2);
+        }
+        .trigger-spy.is-active {
+            background: rgba(255, 49, 49, 0.15);
+            box-shadow: 0 0 20px var(--neon-red);
         }
 
-        .id-label-text {
-            color: #ffffff;
-            font-size: 18px;
-            text-align: center;
-            margin-bottom: 5px;
-            letter-spacing: 2px;
-            opacity: 0.8;
+        /* КОНТРОЛЛЕР ВЫБОРА (DIGITAL SELECTOR) */
+        .digital-selector {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            padding: 10px;
         }
 
-        .id-code-value {
-            font-family: var(--font-id);
-            font-size: 52px;
-            color: #ffcc00;
-            text-align: center;
-            letter-spacing: 6px;
-            text-shadow: 0 0 15px rgba(255, 204, 0, 0.5);
+        .control-node {
+            width: 55px;
+            height: 55px;
+            border-radius: 15px;
+            border: 2px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            font-size: 28px;
             font-weight: 900;
+            cursor: pointer;
+        }
+
+        .value-node {
+            font-family: var(--font-tech);
+            font-size: 52px;
+            font-weight: 900;
+            color: var(--white-pure);
+            text-shadow: 0 0 15px rgba(255,255,255,0.3);
+        }
+
+        /* ID БЛОК */
+        .room-meta {
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding-top: 20px;
+        }
+
+        .meta-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+        }
+
+        .meta-id {
+            font-family: var(--font-tech);
+            font-size: 36px;
+            color: var(--neon-yellow);
+            letter-spacing: 6px;
         }
 
         .btn-start-neon {
-            background-color: var(--neon-yellow);
-            color: #000000;
-            box-shadow: 0 0 30px var(--neon-yellow), 0 10px 0 #b3b300;
+            background: var(--neon-yellow);
+            color: #000;
             font-weight: 900;
-        }
-
-        /* =========================================
-           8. ЭКРАН ВХОДА ПО ID
-           =========================================
-        */
-        .input-box-premium {
-            width: 100%;
-            background: var(--glass-panel);
-            border: 1px solid var(--glass-border);
-            border-radius: 30px;
-            padding: 50px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 25px;
-        }
-
-        .id-input-placeholder {
-            font-family: var(--font-id);
-            font-size: 55px;
-            border-bottom: 6px solid #ffffff;
-            width: 80%;
-            text-align: center;
-            letter-spacing: 15px;
-            color: #ffffff;
-            padding-bottom: 15px;
-            text-shadow: 0 0 10px #fff;
+            box-shadow: 0 0 35px var(--neon-yellow), 0 8px 0 #b1b100;
         }
 
     </style>
 </head>
 <body>
 
-    <div class="system-header">
-        <div class="online-chip">
-            <div class="status-dot"></div>
-            <span class="online-count">В СЕТИ: 32,841</span>
+    <div class="header-interface">
+        <div class="online-indicator">
+            <div class="pulse-circle"></div>
+            <span class="online-label">NETWORK: ACTIVE</span>
         </div>
     </div>
 
-    <div class="brand-zone">
+    <div class="branding-container">
         <img src="https://i.postimg.cc/1X6p4hZ8/Gemini-Generated-Image-sdde75sdde75sdde.png" alt="BRAWL SPY LOGO">
     </div>
 
-    <div class="ui-master-container">
+    <div class="view-port">
         
-        <div id="view-home" class="app-screen is-visible">
-            <div class="btn-vertical-group">
-                <button class="main-btn btn-gold-action" onclick="appNavigate('view-lobby')">СОЗДАТЬ КОМНАТУ</button>
-                <button class="main-btn btn-blue-action" onclick="appNavigate('view-join')">ВХОД ПО ID</button>
-                <button class="main-btn btn-dark-utility" onclick="tg.close()">ВЫЙТИ ИЗ ИГРЫ</button>
+        <div id="scene-main" class="scene active-scene">
+            <div class="ui-stack">
+                <button class="base-btn btn-gold-main" onclick="BrawlSpyApp.navigate('scene-lobby')">СОЗДАТЬ КОМНАТУ</button>
+                <button class="base-btn btn-blue-alt" onclick="BrawlSpyApp.navigate('scene-join')">ВХОД ПО ID</button>
+                <button class="base-btn btn-utility" onclick="BrawlSpyApp.close()">ВЫХОД</button>
             </div>
         </div>
 
-        <div id="view-lobby" class="app-screen">
-            <h2 class="lobby-main-title">НАСТРОЙКА ЛОББИ</h2>
+        <div id="scene-lobby" class="scene">
+            <h2 class="lobby-title">НАСТРОЙКА ЛОББИ</h2>
             
-            <div class="settings-container">
-                <div class="tab-selector">
-                    <div class="neon-tab tab-blue-neon">Участники</div>
-                    <div class="neon-tab tab-red-neon">Шпион</div>
+            <div class="premium-card">
+                <div class="tab-controller">
+                    <div id="tab-p" class="tab-trigger trigger-players is-active" onclick="BrawlSpyApp.setTab('players')">Участники</div>
+                    <div id="tab-s" class="tab-trigger trigger-spy" onclick="BrawlSpyApp.setTab('spies')">Шпион</div>
                 </div>
 
-                <div class="room-id-display">
-                    <p class="id-label-text">ID КОМНАТЫ</p>
-                    <h3 id="generated-id-label" class="id-code-value">777-777</h3>
+                <div class="digital-selector">
+                    <button class="control-node" onclick="BrawlSpyApp.adjustValue(-1)">-</button>
+                    <div id="display-value" class="value-node">8</div>
+                    <button class="control-node" onclick="BrawlSpyApp.adjustValue(1)">+</button>
+                </div>
+
+                <div class="room-meta">
+                    <p class="meta-label">ID КОМНАТЫ</p>
+                    <h3 id="room-id-label" class="meta-id">000-000</h3>
                 </div>
             </div>
 
-            <div class="btn-vertical-group">
-                <button class="main-btn btn-start-neon" onclick="tg.showAlert('БИТВА НАЧИНАЕТСЯ! ПРИГОТОВЬТЕСЬ!')">НАЧАТЬ ИГРУ</button>
-                <button class="main-btn btn-dark-utility" onclick="appNavigate('view-home')">ВЕРНУТЬСЯ В МЕНЮ</button>
+            <div class="ui-stack">
+                <button class="base-btn btn-start-neon" onclick="tg.showAlert('БИТВА НАЧИНАЕТСЯ!')">НАЧАТЬ ИГРУ</button>
+                <button class="base-btn btn-utility" onclick="BrawlSpyApp.navigate('scene-main')">В МЕНЮ</button>
             </div>
         </div>
 
-        <div id="view-join" class="app-screen">
-            <h2 class="lobby-main-title">ВХОД ПО ID</h2>
-            <div class="input-box-premium">
-                <p class="id-label-text">ВВЕДИТЕ ID КОМНАТЫ</p>
-                <div class="id-input-placeholder">____</div>
+        <div id="scene-join" class="scene">
+            <h2 class="lobby-title">ПОДКЛЮЧЕНИЕ</h2>
+            <div class="premium-card" style="padding: 60px 20px; text-align: center;">
+                <p class="meta-label">ВВЕДИТЕ КОД ДОСТУПА</p>
+                <div style="font-family: 'Orbitron'; font-size: 45px; border-bottom: 4px solid #fff; width: 220px; margin: 20px auto; letter-spacing: 12px; color: #fff; text-shadow: 0 0 15px #fff;">____</div>
             </div>
-            <div class="btn-vertical-group" style="margin-top: 30px;">
-                <button class="main-btn btn-dark-utility" onclick="appNavigate('view-home')">ОТМЕНА</button>
-            </div>
+            <button class="base-btn btn-utility" onclick="BrawlSpyApp.navigate('scene-main')">ОТМЕНА</button>
         </div>
 
     </div>
 
     <script>
-        // Инициализация Telegram Web App API
         const tg = window.Telegram.WebApp;
-        
-        // Настройка параметров WebApp
-        tg.expand();
-        tg.enableClosingConfirmation();
-        tg.headerColor = "#020406";
-        tg.backgroundColor = "#020406";
 
         /**
-         * Управляет навигацией между экранами приложения
-         * @param {string} screenId - ID экрана для отображения
+         * ГЛАВНЫЙ ОБЪЕКТ ПРИЛОЖЕНИЯ
+         * Управляет всей логикой, состояниями и навигацией
          */
-        function appNavigate(screenId) {
-            console.log("Navigating to:", screenId);
+        const BrawlSpyApp = {
+            state: {
+                activeTab: 'players',
+                players: 8,
+                spies: 1,
+                isInitialized: false
+            },
 
-            // 1. Деактивация всех активных экранов
-            const activeScreens = document.querySelectorAll('.app-screen');
-            activeScreens.forEach(screen => {
-                screen.classList.remove('is-visible');
-            });
+            /**
+             * Инициализация базовых параметров
+             */
+            init() {
+                tg.expand();
+                tg.ready();
+                tg.enableClosingConfirmation();
+                tg.headerColor = "#020305";
+                
+                this.updateUI();
+                console.log("Brawl Spy Core Engine Loaded.");
+                this.state.isInitialized = true;
+            },
 
-            // 2. Активация выбранного экрана с задержкой для плавности
-            const target = document.getElementById(screenId);
-            if (target) {
-                target.classList.add('is-visible');
+            /**
+             * Навигация между сценами
+             */
+            navigate(sceneId) {
+                const scenes = document.querySelectorAll('.scene');
+                scenes.forEach(s => s.classList.remove('active-scene'));
+                
+                const target = document.getElementById(sceneId);
+                if (target) {
+                    target.classList.add('active-scene');
+                }
+
+                if (sceneId === 'scene-lobby') {
+                    this.generateRoomID();
+                }
+
+                this.haptic('medium');
+            },
+
+            /**
+             * Переключение вкладок (Участники/Шпионы)
+             */
+            setTab(tabType) {
+                this.state.activeTab = tabType;
+                
+                // Визуальное обновление табов
+                document.getElementById('tab-p').classList.toggle('is-active', tabType === 'players');
+                document.getElementById('tab-s').classList.toggle('is-active', tabType === 'spies');
+                
+                this.updateUI();
+                this.haptic('light');
+            },
+
+            /**
+             * Изменение значений счетчика
+             */
+            adjustValue(delta) {
+                if (this.state.activeTab === 'players') {
+                    this.state.players = Math.max(3, this.state.players + delta);
+                } else {
+                    this.state.spies = Math.max(1, this.state.spies + delta);
+                }
+                
+                this.updateUI();
+                this.haptic('selection');
+            },
+
+            /**
+             * Обновление текстовых значений в интерфейсе
+             */
+            updateUI() {
+                const display = document.getElementById('display-value');
+                const isPlayers = this.state.activeTab === 'players';
+                
+                display.innerText = isPlayers ? this.state.players : this.state.spies;
+                display.style.color = isPlayers ? 'var(--neon-blue)' : 'var(--neon-red)';
+                display.style.textShadow = isPlayers ? '0 0 20px var(--neon-blue)' : '0 0 20px var(--neon-red)';
+            },
+
+            /**
+             * Генерация случайного ID комнаты
+             */
+            generateRoomID() {
+                const part1 = Math.floor(100 + Math.random() * 899);
+                const part2 = Math.floor(100 + Math.random() * 899);
+                document.getElementById('room-id-label').innerText = `${part1}-${part2}`;
+            },
+
+            /**
+             * Виброотклик через Telegram SDK
+             */
+            haptic(style) {
+                if (!tg.HapticFeedback) return;
+                
+                switch(style) {
+                    case 'light': tg.HapticFeedback.impactOccurred('light'); break;
+                    case 'medium': tg.HapticFeedback.impactOccurred('medium'); break;
+                    case 'selection': tg.HapticFeedback.selectionChanged(); break;
+                }
+            },
+
+            close() {
+                tg.close();
             }
-
-            // 3. Специфическая логика генерации ID для лобби
-            if (screenId === 'view-lobby') {
-                updateRoomCode();
-            }
-
-            // 4. Использование Haptic Feedback (Виброотклик)
-            if (tg.HapticFeedback) {
-                tg.HapticFeedback.impactOccurred('heavy');
-            }
-        }
-
-        /**
-         * Генерирует и обновляет код комнаты
-         */
-        function updateRoomCode() {
-            const partA = Math.floor(100 + Math.random() * 899);
-            const partB = Math.floor(100 + Math.random() * 899);
-            const finalCode = `${partA}-${partB}`;
-            
-            const display = document.getElementById('generated-id-label');
-            if (display) {
-                display.innerText = finalCode;
-            }
-        }
-
-        // Выполнение действий при полной загрузке страницы
-        window.addEventListener('DOMContentLoaded', () => {
-            tg.ready();
-            console.log("Brawl Spy Engine Initialized. Ready for Battle.");
-        });
-
-        // Запрет контекстного меню для сохранения игрового опыта
-        window.oncontextmenu = function(event) {
-            event.preventDefault();
-            event.stopPropagation();
-            return false;
         };
+
+        // Запуск при загрузке
+        window.addEventListener('DOMContentLoaded', () => BrawlSpyApp.init());
+        
+        // Блокировка стандартного меню браузера
+        window.oncontextmenu = (e) => { e.preventDefault(); e.stopPropagation(); return false; };
     </script>
 </body>
 </html>
