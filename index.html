@@ -693,7 +693,7 @@
             font-family: 'Exo 2';
             font-size: 16px;
             color: #ffffff;
-            margin-bottom: 25px;
+            margin-bottom: 15px; /* Уменьшен отступ */
             text-align: center;
             text-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
             font-weight: bold;
@@ -701,12 +701,12 @@
             min-height: 24px;
         }
 
-        /* КАРТА - ВЫШЕ И МЕНЬШЕ */
+        /* КАРТА - УВЕЛИЧЕНА И ОПУЩЕНА НИЖЕ */
         .card-container {
             width: 320px;
-            height: 380px; /* Уменьшена высота */
+            height: 420px; /* Увеличенная высота */
             perspective: 1000px;
-            margin: 0 auto 25px;
+            margin: 10px auto 20px; /* Уменьшен верхний отступ */
         }
 
         .card {
@@ -731,7 +731,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: center; /* Центрирование по вертикали */
             overflow: hidden;
             padding: 20px;
         }
@@ -741,6 +741,7 @@
             background: linear-gradient(135deg, #0a0a1a, #1a1a2e);
             border: none;
             animation: cardGlow 2s infinite alternate;
+            padding-top: 60px; /* Сдвиг текста вниз */
         }
 
         /* ЗАДНЯЯ СТОРОНА КАРТЫ (ПОСЛЕ РАСКРЫТИЯ) */
@@ -752,103 +753,37 @@
                 0 0 25px rgba(0, 210, 255, 0.4),
                 0 0 50px rgba(0, 210, 255, 0.2),
                 inset 0 0 40px rgba(0, 210, 255, 0.1);
+            padding-top: 80px; /* Сдвиг текста вниз для бравлера */
         }
 
         /* ОСОБЫЙ СТИЛЬ ДЛЯ КАРТЫ ШПИОНА */
         .card-back.spy-card {
             background: linear-gradient(135deg, #1a0000, #330000);
             animation: spyGlow 2s infinite alternate;
+            padding-top: 80px; /* Сдвиг текста вниз для шпиона */
         }
 
-        .card-icon-brawl {
-            font-size: 140px;
-            margin-bottom: 20px;
-            text-shadow: 0 0 25px rgba(255, 215, 0, 0.8);
-            color: var(--neon-gold);
-            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
-        }
-
-        .card-icon-spy {
-            font-size: 140px;
-            margin-bottom: 20px;
-            text-shadow: 0 0 25px rgba(255, 0, 0, 0.9);
-            color: var(--neon-red);
-            filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.7));
-        }
-
-        .card-title {
+        /* КРУПНЫЙ ТЕКСТ НА КАРТЕ */
+        .big-card-text {
             font-family: 'Exo 2';
-            font-size: 32px;
+            font-size: 48px; /* Очень крупный текст */
             font-weight: 900;
             text-transform: uppercase;
             text-align: center;
-            margin-bottom: 10px;
-            text-shadow: 0 0 15px currentColor;
-            letter-spacing: 2px;
+            text-shadow: 0 0 25px currentColor;
+            letter-spacing: 3px;
+            margin: 0;
         }
 
-        .card-subtitle {
-            font-family: 'Exo 2';
-            font-size: 16px;
-            color: #cccccc;
-            text-align: center;
-            margin-bottom: 25px;
-            opacity: 0.8;
-        }
-
-        /* ИКОНКА ИЗ BRAWL STARS */
-        .brawl-icon {
-            width: 120px;
-            height: 120px;
-            background: linear-gradient(135deg, var(--neon-gold), #ffa500);
-            border-radius: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 25px;
-            box-shadow: 
-                0 0 30px rgba(255, 215, 0, 0.6),
-                inset 0 0 20px rgba(255, 255, 255, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .brawl-icon::before {
-            content: '🎮';
-            font-size: 60px;
-            filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
-        }
-
-        .brawler-image {
-            width: 200px;
-            height: 180px; /* Уменьшена высота */
-            object-fit: contain;
-            margin-bottom: 10px; /* Уменьшен отступ */
-            border-radius: 15px;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 10px;
-        }
-
-        .brawler-name {
-            font-family: 'Exo 2';
-            font-size: 28px; /* Увеличен размер */
-            font-weight: 900;
-            color: #ffffff;
-            text-shadow: 0 0 15px #ffffff;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        /* УБРАН блок с ролью (зеленая надпись БРАВЛЕР) */
-
-        /* ТОЛЬКО КНОПКА ПРОДОЛЖИТЬ */
+        /* ТОЛЬКО КНОПКА ПРОДОЛЖИТЬ - В САМОМ НИЗУ */
         .game-controls-single {
             width: 100%;
             max-width: 320px;
             display: flex;
             flex-direction: column;
             gap: 15px;
-            margin: 20px auto 0;
+            margin-top: auto; /* Прижимаем к низу */
+            margin-bottom: 20px;
         }
 
         /* БЕЛАЯ КНОПКА ПРОДОЛЖИТЬ */
@@ -968,11 +903,11 @@
             font-size: 18px; /* Уменьшен размер шрифта */
         }
 
-        /* КНОПКА ПОДТВЕРДИТЬ */
+        /* КНОПКА ПОДТВЕРДИТЬ - БЕЛАЯ */
         .btn-confirm-vote {
-            box-shadow: 0 0 12px rgba(0, 255, 0, 0.4),
-                        0 0 20px rgba(0, 255, 0, 0.1) inset;
-            color: var(--neon-green);
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.4),
+                        0 0 20px rgba(255, 255, 255, 0.1) inset;
+            color: #ffffff; /* Белый цвет */
             padding: 14px; /* Уменьшен padding */
             font-size: 18px; /* Уменьшен размер шрифта */
         }
@@ -1127,14 +1062,12 @@
             <div class="card-container">
                 <div class="card" id="role-card" onclick="Game.revealCard()">
                     <div class="card-front">
-                        <div class="brawl-icon"></div>
-                        <div class="card-title">BRAWL SPY</div>
-                        <div class="card-subtitle">Откройте карту, чтобы узнать роль</div>
+                        <!-- УБРАНА ИКОНКА, ТОЛЬКО ТЕКСТ -->
+                        <div class="big-card-text" style="color: var(--neon-gold);">BRAWL SPY</div>
                     </div>
                     <div class="card-back" id="card-back">
-                        <img class="brawler-image" id="brawler-img" src="" alt="Бравлер">
-                        <div class="brawler-name" id="brawler-name">Загрузка...</div>
-                        <!-- УБРАНА ЗЕЛЕНАЯ НАДПИСЬ БРАВЛЕР -->
+                        <!-- ТОЛЬКО КРУПНЫЙ ТЕКСТ БЕЗ ИКОНОК -->
+                        <div class="big-card-text" id="role-text">Загрузка...</div>
                     </div>
                 </div>
             </div>
@@ -1169,29 +1102,101 @@
         tg.expand();
         tg.enableClosingConfirmation();
 
-        // БАЗА БРАВЛЕРОВ С ПРАВИЛЬНЫМИ ИЗОБРАЖЕНИЯМИ (ОБНОВЛЕННЫЙ СПИСОК)
+        // БАЗА БРАВЛЕРОВ С РАБОЧИМИ ССЫЛКАМИ С brawlstats.com
         const brawlersList = [
-            { id: 16000000, name: "ШЕЛЛИ", image: "https://cdn-old.brawlify.com/brawler/Shelly.png" },
-            { id: 16000001, name: "КОЛЬТ", image: "https://cdn-old.brawlify.com/brawler/Colt.png" },
-            { id: 16000002, name: "НИТА", image: "https://cdn-old.brawlify.com/brawler/Nita.png" },
-            { id: 16000003, name: "БУЛЛ", image: "https://cdn-old.brawlify.com/brawler/Bull.png" },
-            { id: 16000004, name: "ДЖЕССИ", image: "https://cdn-old.brawlify.com/brawler/Jessie.png" },
-            { id: 16000005, name: "БРОК", image: "https://cdn-old.brawlify.com/brawler/Brock.png" },
-            { id: 16000006, name: "ДИНАМАЙК", image: "https://cdn-old.brawlify.com/brawler/Dynamike.png" },
-            { id: 16000007, name: "БО", image: "https://cdn-old.brawlify.com/brawler/Bo.png" },
-            { id: 16000008, name: "ТИК", image: "https://cdn-old.brawlify.com/brawler/Tick.png" },
-            { id: 16000009, name: "8-БИТ", image: "https://cdn-old.brawlify.com/brawler/8-Bit.png" },
-            { id: 16000010, name: "ЭМЗ", image: "https://cdn-old.brawlify.com/brawler/Emz.png" },
-            { id: 16000011, name: "СТА", image: "https://cdn-old.brawlify.com/brawler/Stu.png" },
-            { id: 16000012, name: "ПАМ", image: "https://cdn-old.brawlify.com/brawler/Pam.png" },
-            { id: 16000013, name: "ПАЙПЕР", image: "https://cdn-old.brawlify.com/brawler/Piper.png" },
-            { id: 16000014, name: "ФРЕНК", image: "https://cdn-old.brawlify.com/brawler/Frank.png" },
-            { id: 16000015, name: "ПЕННИ", image: "https://cdn-old.brawlify.com/brawler/Penny.png" },
-            { id: 16000016, name: "КАРЛ", image: "https://cdn-old.brawlify.com/brawler/Carl.png" },
-            { id: 16000017, name: "ДЖЕКИ", image: "https://cdn-old.brawlify.com/brawler/Jacky.png" },
-            { id: 16000018, name: "ГЕЙЛ", image: "https://cdn-old.brawlify.com/brawler/Gale.png" },
-            { id: 16000019, name: "СПРАУТ", image: "https://cdn-old.brawlify.com/brawler/Sprout.png" }
+            { name: "ШЕЛЛИ", image: "https://brawlstats.com/characters/shelly.png" },
+            { name: "КОЛЬТ", image: "https://brawlstats.com/characters/colt.png" },
+            { name: "НИТА", image: "https://brawlstats.com/characters/nita.png" },
+            { name: "БУЛЛ", image: "https://brawlstats.com/characters/bull.png" },
+            { name: "ДЖЕССИ", image: "https://brawlstats.com/characters/jessie.png" },
+            { name: "БРОК", image: "https://brawlstats.com/characters/brock.png" },
+            { name: "ДИНАМАЙК", image: "https://brawlstats.com/characters/dynamike.png" },
+            { name: "БО", image: "https://brawlstats.com/characters/bo.png" },
+            { name: "ТИК", image: "https://brawlstats.com/characters/tick.png" },
+            { name: "8-БИТ", image: "https://brawlstats.com/characters/8-bit.png" },
+            { name: "ЭМЗ", image: "https://brawlstats.com/characters/emz.png" },
+            { name: "СТА", image: "https://brawlstats.com/characters/stu.png" },
+            { name: "ПАМ", image: "https://brawlstats.com/characters/pam.png" },
+            { name: "ПАЙПЕР", image: "https://brawlstats.com/characters/piper.png" },
+            { name: "ФРЕНК", image: "https://brawlstats.com/characters/frank.png" },
+            { name: "ПЕННИ", image: "https://brawlstats.com/characters/penny.png" },
+            { name: "КАРЛ", image: "https://brawlstats.com/characters/carl.png" },
+            { name: "ДЖЕКИ", image: "https://brawlstats.com/characters/jacky.png" },
+            { name: "ГЕЙЛ", image: "https://brawlstats.com/characters/gale.png" },
+            { name: "СПРАУТ", image: "https://brawlstats.com/characters/sprout.png" },
+            { name: "БАЙРОН", image: "https://brawlstats.com/characters/byron.png" },
+            { name: "ЭДГАР", image: "https://brawlstats.com/characters/edgar.png" },
+            { name: "ГРИФФ", image: "https://brawlstats.com/characters/griff.png" },
+            { name: "ГРОМ", image: "https://brawlstats.com/characters/grom.png" }
         ];
+
+        // СИСТЕМА ХРАНЕНИЯ КОМНАТ (localStorage для симуляции сервера)
+        const RoomStorage = {
+            key: 'brawl_spy_rooms',
+            
+            getAllRooms: () => {
+                const rooms = localStorage.getItem(RoomStorage.key);
+                return rooms ? JSON.parse(rooms) : {};
+            },
+            
+            saveRoom: (roomId, roomData) => {
+                const rooms = RoomStorage.getAllRooms();
+                rooms[roomId] = roomData;
+                localStorage.setItem(RoomStorage.key, JSON.stringify(rooms));
+            },
+            
+            getRoom: (roomId) => {
+                const rooms = RoomStorage.getAllRooms();
+                return rooms[roomId] || null;
+            },
+            
+            deleteRoom: (roomId) => {
+                const rooms = RoomStorage.getAllRooms();
+                delete rooms[roomId];
+                localStorage.setItem(RoomStorage.key, JSON.stringify(rooms));
+            },
+            
+            addPlayerToRoom: (roomId, playerData) => {
+                const room = RoomStorage.getRoom(roomId);
+                if (!room) return false;
+                
+                if (room.players.length >= room.maxPlayers) {
+                    return false; // Комната заполнена
+                }
+                
+                // Проверяем, нет ли уже такого игрока
+                const existingPlayer = room.players.find(p => p.id === playerData.id);
+                if (!existingPlayer) {
+                    room.players.push(playerData);
+                    RoomStorage.saveRoom(roomId, room);
+                }
+                return true;
+            },
+            
+            removePlayerFromRoom: (roomId, playerId) => {
+                const room = RoomStorage.getRoom(roomId);
+                if (!room) return;
+                
+                room.players = room.players.filter(p => p.id !== playerId);
+                RoomStorage.saveRoom(roomId, room);
+                
+                // Если комната пустая, удаляем ее
+                if (room.players.length === 0) {
+                    RoomStorage.deleteRoom(roomId);
+                }
+            },
+            
+            updatePlayerReady: (roomId, playerId, isReady) => {
+                const room = RoomStorage.getRoom(roomId);
+                if (!room) return;
+                
+                const player = room.players.find(p => p.id === playerId);
+                if (player) {
+                    player.isReady = isReady;
+                    RoomStorage.saveRoom(roomId, room);
+                }
+            }
+        };
 
         // СИСТЕМА МОДАЛЬНЫХ ОКОН
         const Modal = {
@@ -1244,6 +1249,11 @@
             return result;
         }
 
+        // ГЕНЕРАЦИЯ УНИКАЛЬНОГО ID ИГРОКА
+        function generatePlayerId() {
+            return 'player_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
         // ОСНОВНОЕ ПРИЛОЖЕНИЕ
         const App = {
             state: {
@@ -1254,8 +1264,8 @@
                 lobbyId: generateRandomId(),
                 isReady: false,
                 isAdmin: true,
-                players: [],
-                allPlayersReady: false
+                playerId: generatePlayerId(),
+                currentRoomId: null
             },
 
             // Навигация
@@ -1285,6 +1295,10 @@
                 Modal.showConfirm(
                     "Вы уверены, что хотите выйти из игры?",
                     () => {
+                        // Выходим из комнаты если находимся в ней
+                        if (App.state.currentRoomId) {
+                            RoomStorage.removePlayerFromRoom(App.state.currentRoomId, App.state.playerId);
+                        }
                         tg.close();
                     }
                 );
@@ -1295,6 +1309,11 @@
                 Modal.showConfirm(
                     "Вы уверены, что хотите покинуть комнату?",
                     () => {
+                        // Выходим из комнаты
+                        if (App.state.currentRoomId) {
+                            RoomStorage.removePlayerFromRoom(App.state.currentRoomId, App.state.playerId);
+                            App.state.currentRoomId = null;
+                        }
                         App.navigate('scr-menu');
                     }
                 );
@@ -1321,22 +1340,61 @@
             // Подключение по коду
             joinByCode: () => {
                 if(App.state.inputCode.length === 8 && /^\d+$/.test(App.state.inputCode)) {
-                    App.state.lobbyId = App.state.inputCode.slice(0,4) + "-" + App.state.inputCode.slice(4,8);
+                    const roomId = App.state.inputCode.slice(0,4) + "-" + App.state.inputCode.slice(4,8);
+                    
+                    // Проверяем существование комнаты
+                    const room = RoomStorage.getRoom(roomId);
+                    
+                    if (!room) {
+                        Modal.showAlert("ОШИБКА", "Комната не найдена");
+                        tg.HapticFeedback.notificationOccurred('error');
+                        return;
+                    }
+                    
+                    // Проверяем заполненность комнаты
+                    if (room.players.length >= room.maxPlayers) {
+                        Modal.showAlert("ОШИБКА", "Извините, комната заполнена");
+                        tg.HapticFeedback.notificationOccurred('error');
+                        return;
+                    }
+                    
+                    // Присоединяемся к комнате
+                    App.state.lobbyId = roomId;
+                    App.state.currentRoomId = roomId;
                     App.state.isAdmin = false;
+                    App.state.participants = room.maxPlayers;
+                    App.state.spies = room.spies;
+                    
+                    // Добавляем игрока в комнату
+                    const playerData = {
+                        id: App.state.playerId,
+                        username: tg.initDataUnsafe.user?.username || 'Игрок',
+                        photo_url: tg.initDataUnsafe.user?.photo_url || '',
+                        isReady: false,
+                        isAdmin: false
+                    };
+                    
+                    const success = RoomStorage.addPlayerToRoom(roomId, playerData);
+                    if (!success) {
+                        Modal.showAlert("ОШИБКА", "Не удалось присоединиться к комнате");
+                        return;
+                    }
+                    
                     App.navigate('scr-room');
+                    Modal.showAlert("УСПЕХ", "Вы присоединились к комнате!");
                 } else {
                     Modal.showAlert("ОШИБКА", "Введите 8 цифр");
                     tg.HapticFeedback.notificationOccurred('error');
                 }
             },
 
-            // Настройки лобби (БЕЗ ОГРАНИЧЕНИЙ)
+            // Настройки лобби
             updateSettings: (type, delta) => {
                 if(type === 'p') {
-                    App.state.participants = Math.max(1, App.state.participants + delta);
+                    App.state.participants = Math.max(2, Math.min(8, App.state.participants + delta));
                     document.getElementById('p-count').innerText = App.state.participants;
                 } else {
-                    App.state.spies = Math.max(0, App.state.spies + delta);
+                    App.state.spies = Math.max(1, Math.min(3, App.state.spies + delta));
                     document.getElementById('s-count').innerText = App.state.spies;
                 }
                 tg.HapticFeedback.selectionChanged();
@@ -1346,71 +1404,148 @@
             createFinalRoom: () => {
                 App.state.isAdmin = true;
                 App.state.lobbyId = generateRandomId();
+                App.state.currentRoomId = App.state.lobbyId;
+                
+                // Создаем комнату в хранилище
+                const roomData = {
+                    maxPlayers: App.state.participants,
+                    spies: App.state.spies,
+                    players: [{
+                        id: App.state.playerId,
+                        username: tg.initDataUnsafe.user?.username || 'Хост',
+                        photo_url: tg.initDataUnsafe.user?.photo_url || '',
+                        isReady: false,
+                        isAdmin: true
+                    }],
+                    gameStarted: false
+                };
+                
+                RoomStorage.saveRoom(App.state.lobbyId, roomData);
+                
                 App.navigate('scr-room');
                 Modal.showAlert("УСПЕХ", "Комната создана!", true, "ID: " + App.state.lobbyId);
             },
 
             // Логика комнаты
             buildRoom: () => {
-                document.getElementById('room-id-val').innerText = "ID: " + App.state.lobbyId;
+                if (!App.state.currentRoomId) return;
+                
+                const room = RoomStorage.getRoom(App.state.currentRoomId);
+                if (!room) {
+                    // Если комнаты нет, возвращаем в меню
+                    App.navigate('scr-menu');
+                    return;
+                }
+                
+                document.getElementById('room-id-val').innerText = "ID: " + App.state.currentRoomId;
                 const container = document.getElementById('room-slots');
                 container.innerHTML = '';
 
-                // Проверяем готовность всех игроков
-                let allReady = true;
+                // Обновляем настройки из комнаты
+                App.state.participants = room.maxPlayers;
+                App.state.spies = room.spies;
 
-                for(let i = 0; i < App.state.participants; i++) {
-                    const isMe = i === 0;
-                    const isReady = isMe ? App.state.isReady : false; // Для других игроков - не готовы
+                // Проверяем готовность всех игроков
+                let allReady = room.players.length > 0;
+                let myReadyStatus = false;
+
+                // Отображаем всех игроков в комнате
+                room.players.forEach((player, index) => {
+                    const isMe = player.id === App.state.playerId;
                     
-                    if (!isReady && isMe) allReady = false;
+                    if (isMe) {
+                        myReadyStatus = player.isReady || false;
+                        App.state.isReady = myReadyStatus;
+                    }
+                    
+                    if (!player.isReady) {
+                        allReady = false;
+                    }
 
                     const card = document.createElement('div');
-                    card.className = `player-slot-card ${isMe ? 'occupied' : ''}`;
+                    card.className = `player-slot-card occupied`;
                     
                     card.innerHTML = `
                         <div class="slot-info">
-                            <div class="slot-ava" style="${isMe && tg.initDataUnsafe.user?.photo_url ? 'background-image:url('+tg.initDataUnsafe.user.photo_url+')' : ''}"></div>
-                            <div class="slot-name">${isMe ? '@' + (tg.initDataUnsafe.user?.username || 'Вы') : 'Игрок ' + (i+1)}</div>
+                            <div class="slot-ava" style="${player.photo_url ? 'background-image:url('+player.photo_url+')' : ''}"></div>
+                            <div class="slot-name">${player.username || 'Игрок ' + (index+1)} ${player.isAdmin ? '👑' : ''}</div>
                         </div>
-                        <div class="status-indicator ${isMe ? (App.state.isReady ? 'status-ready' : 'status-not-ready') : 'status-not-ready'}">
-                            ${isMe ? (App.state.isReady ? 'ГОТОВ' : 'НЕ ГОТОВ') : 'НЕ ГОТОВ'}
+                        <div class="status-indicator ${player.isReady ? 'status-ready' : 'status-not-ready'}">
+                            ${player.isReady ? 'ГОТОВ' : 'НЕ ГОТОВ'}
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+
+                // Добавляем пустые слоты если нужно
+                for(let i = room.players.length; i < room.maxPlayers; i++) {
+                    const card = document.createElement('div');
+                    card.className = `player-slot-card`;
+                    
+                    card.innerHTML = `
+                        <div class="slot-info">
+                            <div class="slot-ava"></div>
+                            <div class="slot-name">Свободно</div>
+                        </div>
+                        <div class="status-indicator status-empty">
+                            НЕТ
                         </div>
                     `;
                     container.appendChild(card);
                 }
 
-                App.state.allPlayersReady = allReady;
+                // Обновляем кнопку готовности
+                const btn = document.getElementById('ready-btn');
+                btn.innerText = myReadyStatus ? 'НЕ ГОТОВ' : 'ГОТОВ';
+                btn.classList.toggle('active-ready', myReadyStatus);
+
+                // Показываем кнопку "Начать игру" только если все готовы и я админ
+                const startBtn = document.getElementById('start-btn');
+                startBtn.style.display = (allReady && App.state.isAdmin) ? 'block' : 'none';
             },
 
             // Переключение готовности
             toggleReady: () => {
+                if (!App.state.currentRoomId) return;
+                
                 App.state.isReady = !App.state.isReady;
                 const btn = document.getElementById('ready-btn');
                 btn.innerText = App.state.isReady ? 'НЕ ГОТОВ' : 'ГОТОВ';
                 btn.classList.toggle('active-ready', App.state.isReady);
                 
-                App.buildRoom();
+                // Обновляем в хранилище
+                RoomStorage.updatePlayerReady(App.state.currentRoomId, App.state.playerId, App.state.isReady);
+                
+                // Обновляем отображение комнаты
+                setTimeout(() => App.buildRoom(), 100);
+                
                 tg.HapticFeedback.notificationOccurred('success');
             },
 
             // Начать игру (проверка всех игроков)
             startGame: () => {
-                if (!App.state.isReady) {
-                    Modal.showAlert("ОШИБКА", "Вы должны быть готовы!");
-                    tg.HapticFeedback.notificationOccurred('error');
-                    return;
-                }
+                if (!App.state.currentRoomId) return;
+                
+                const room = RoomStorage.getRoom(App.state.currentRoomId);
+                if (!room) return;
 
-                // Проверяем, все ли игроки готовы (в реальной игре здесь проверка сервера)
-                if (!App.state.allPlayersReady) {
+                // Проверяем, все ли игроки готовы
+                const allReady = room.players.every(p => p.isReady);
+                if (!allReady) {
                     Modal.showAlert("ОЖИДАНИЕ", "Не все игроки готовы!");
                     tg.HapticFeedback.notificationOccurred('warning');
                     return;
                 }
 
-                // Переходим сразу к игре, без окна "СТАРТ"
-                Game.initializeGame();
+                // Проверяем минимальное количество игроков
+                if (room.players.length < 2) {
+                    Modal.showAlert("ОШИБКА", "Нужно минимум 2 игрока!");
+                    tg.HapticFeedback.notificationOccurred('error');
+                    return;
+                }
+
+                // Переходим к игре
+                Game.initializeGame(room.players, room.spies);
                 App.navigate('scr-game');
                 tg.HapticFeedback.notificationOccurred('success');
             }
@@ -1422,14 +1557,18 @@
             myBrawler: null,
             isCardRevealed: false,
             votingTimer: null,
-            timeLeft: 600, // 10 минут в секундах
+            timeLeft: 600,
             selectedPlayer: null,
             votes: {},
+            allPlayers: [],
+            spiesCount: 1,
 
             // Инициализация игры
-            initializeGame: () => {
+            initializeGame: (players, spiesCount) => {
+                Game.allPlayers = players;
+                Game.spiesCount = spiesCount;
                 Game.isCardRevealed = false;
-                Game.timeLeft = 600; // 10 минут
+                Game.timeLeft = 600;
                 Game.selectedPlayer = null;
                 Game.votes = {};
 
@@ -1440,8 +1579,11 @@
                 // Скрываем кнопку ПРОДОЛЖИТЬ
                 document.getElementById('continue-btn').style.display = 'none';
 
-                // Случайно определяем роль (шпион или бравлер)
-                const isSpy = Math.random() < (App.state.spies / App.state.participants);
+                // Определяем роль (шпион или бравлер)
+                // В реальной игре здесь должна быть логика распределения ролей между всеми игроками
+                // Для симуляции: текущий игрок с шансом стать шпионом
+                const playerIndex = Game.allPlayers.findIndex(p => p.id === App.state.playerId);
+                const isSpy = Math.random() < (Game.spiesCount / Game.allPlayers.length);
                 Game.myRole = isSpy ? 'SPY' : 'BRAWLER';
 
                 // Если бравлер - выбираем случайного из списка
@@ -1460,9 +1602,8 @@
                 const cardBack = document.getElementById('card-back');
                 cardBack.classList.remove('spy-card');
                 
-                // Сбрасываем изображение и имя
-                document.getElementById('brawler-img').src = '';
-                document.getElementById('brawler-name').textContent = 'Загрузка...';
+                // Сбрасываем текст
+                document.getElementById('role-text').textContent = 'Загрузка...';
             },
 
             // Раскрытие карты
@@ -1471,13 +1612,12 @@
 
                 const card = document.getElementById('role-card');
                 const cardBack = document.getElementById('card-back');
-                const brawlerImg = document.getElementById('brawler-img');
-                const brawlerName = document.getElementById('brawler-name');
+                const roleText = document.getElementById('role-text');
                 const continueBtn = document.getElementById('continue-btn');
-                const roleText = document.getElementById('role-reveal-text');
+                const instructionText = document.getElementById('role-reveal-text');
 
                 // Убираем текст "Нажмите на карту..."
-                roleText.style.display = 'none';
+                instructionText.style.display = 'none';
 
                 // Анимация переворота
                 card.classList.add('flipped');
@@ -1485,31 +1625,16 @@
                 // Устанавливаем данные в зависимости от роли
                 if (Game.myRole === 'SPY') {
                     // ШПИОН - красный сияющий неон
-                    brawlerImg.src = "https://cdn-icons-png.flaticon.com/512/894/894438.png";
-                    brawlerName.textContent = "ШПИОН";
-                    brawlerName.style.color = "#ff3131";
-                    brawlerName.style.textShadow = "0 0 15px #ff3131";
+                    roleText.textContent = "ШПИОН";
+                    roleText.style.color = "#ff3131";
+                    roleText.style.textShadow = "0 0 25px #ff3131";
                     // Добавляем стиль для карты шпиона
                     cardBack.classList.add('spy-card');
                 } else {
                     // БРАВЛЕР
-                    brawlerImg.src = Game.myBrawler.image;
-                    brawlerName.textContent = Game.myBrawler.name;
-                    brawlerName.style.color = "#ffffff";
-                    brawlerName.style.textShadow = "0 0 15px #ffffff";
-                }
-
-                // Предзагрузка изображения для избежания проблем
-                if (Game.myRole !== 'SPY') {
-                    const img = new Image();
-                    img.src = Game.myBrawler.image;
-                    img.onload = () => {
-                        brawlerImg.src = Game.myBrawler.image;
-                    };
-                    img.onerror = () => {
-                        // Запасное изображение
-                        brawlerImg.src = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-                    };
+                    roleText.textContent = Game.myBrawler.name;
+                    roleText.style.color = "#ffffff";
+                    roleText.style.textShadow = "0 0 25px #ffffff";
                 }
 
                 Game.isCardRevealed = true;
@@ -1549,26 +1674,26 @@
                 const container = document.getElementById('voting-players');
                 container.innerHTML = '';
 
-                for(let i = 0; i < App.state.participants; i++) {
-                    const isMe = i === 0;
-                    const playerName = isMe ? 'Вы' : `Игрок ${i+1}`;
+                Game.allPlayers.forEach((player, index) => {
+                    const isMe = player.id === App.state.playerId;
+                    const playerName = isMe ? 'Вы' : (player.username || `Игрок ${index+1}`);
                     
                     const playerCard = document.createElement('div');
                     playerCard.className = 'voting-player-card';
-                    playerCard.dataset.playerId = i;
-                    playerCard.onclick = () => Game.selectPlayer(i);
+                    playerCard.dataset.playerId = player.id;
+                    playerCard.onclick = () => Game.selectPlayer(player.id);
 
                     playerCard.innerHTML = `
                         <div class="slot-info">
-                            <div class="slot-ava" style="${isMe && tg.initDataUnsafe.user?.photo_url ? 'background-image:url('+tg.initDataUnsafe.user.photo_url+')' : ''}"></div>
+                            <div class="slot-ava" style="${player.photo_url ? 'background-image:url('+player.photo_url+')' : ''}"></div>
                             <div class="slot-name">${playerName}</div>
                         </div>
-                        <div class="vote-count" id="vote-count-${i}">0</div>
+                        <div class="vote-count" id="vote-count-${player.id}">0</div>
                     `;
 
                     container.appendChild(playerCard);
-                    Game.votes[i] = 0;
-                }
+                    Game.votes[player.id] = 0;
+                });
 
                 // Запускаем таймер
                 Game.startVotingTimer();
@@ -1602,8 +1727,10 @@
                 Game.votes[Game.selectedPlayer]++;
 
                 // Обновляем счетчик голосов
-                document.getElementById(`vote-count-${Game.selectedPlayer}`).textContent = 
-                    Game.votes[Game.selectedPlayer];
+                const voteCountElement = document.getElementById(`vote-count-${Game.selectedPlayer}`);
+                if (voteCountElement) {
+                    voteCountElement.textContent = Game.votes[Game.selectedPlayer];
+                }
 
                 Modal.showAlert("ГОЛОС", "Ваш голос учтен!");
                 
@@ -1622,23 +1749,28 @@
                 for (const [playerId, votes] of Object.entries(Game.votes)) {
                     if (votes > maxVotes) {
                         maxVotes = votes;
-                        spyPlayerId = parseInt(playerId);
+                        spyPlayerId = playerId;
                     }
                 }
 
                 // Показываем результат
-                const spyName = spyPlayerId === 0 ? 'Вы' : `Игрок ${spyPlayerId + 1}`;
+                const spyPlayer = Game.allPlayers.find(p => p.id === spyPlayerId);
+                const spyName = spyPlayer ? (spyPlayer.id === App.state.playerId ? 'Вы' : spyPlayer.username) : 'Неизвестно';
                 Modal.showAlert("РЕЗУЛЬТАТ", `Большинство голосов против: ${spyName}`);
 
                 // Через 3 секунды возвращаем в комнату
                 setTimeout(() => {
                     App.navigate('scr-room');
                     // Сбрасываем готовность всех игроков
+                    if (App.state.currentRoomId) {
+                        const room = RoomStorage.getRoom(App.state.currentRoomId);
+                        if (room) {
+                            room.players.forEach(player => {
+                                RoomStorage.updatePlayerReady(App.state.currentRoomId, player.id, false);
+                            });
+                        }
+                    }
                     App.state.isReady = false;
-                    App.state.allPlayersReady = false;
-                    const btn = document.getElementById('ready-btn');
-                    btn.innerText = 'ГОТОВ';
-                    btn.classList.remove('active-ready');
                     App.buildRoom();
                 }, 3000);
 
@@ -1682,6 +1814,11 @@
                     "Вы уверены, что хотите выйти из голосования?",
                     () => {
                         clearInterval(Game.votingTimer);
+                        // Выходим из комнаты
+                        if (App.state.currentRoomId) {
+                            RoomStorage.removePlayerFromRoom(App.state.currentRoomId, App.state.playerId);
+                            App.state.currentRoomId = null;
+                        }
                         App.navigate('scr-menu');
                     }
                 );
@@ -1700,6 +1837,9 @@
         // Инициализация при загрузке
         document.addEventListener('DOMContentLoaded', () => {
             App.navigate('scr-menu');
+            
+            // Очищаем старые комнаты при загрузке (для тестирования)
+            // localStorage.removeItem('brawl_spy_rooms');
         });
     </script>
 </body>
