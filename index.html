@@ -66,7 +66,7 @@
             display: none;
             flex-direction: column;
             align-items: center;
-            padding: 30px 25px;
+            padding: 25px 20px;
             z-index: 10;
             opacity: 0;
             transform: scale(1.05);
@@ -81,11 +81,118 @@
             transform: scale(1);
         }
 
+        /* --- МОДАЛЬНЫЕ ОКНА (ИГРОВЫЕ) --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-container {
+            background: var(--card-bg);
+            border: 4px solid var(--neon-blue);
+            border-radius: 25px;
+            padding: 30px;
+            width: 90%;
+            max-width: 380px;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(0, 210, 255, 0.5);
+            animation: modalAppear 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-container.red-border {
+            border-color: var(--neon-red);
+            box-shadow: 0 0 40px rgba(255, 49, 49, 0.5);
+        }
+
+        .modal-container.gold-border {
+            border-color: var(--neon-gold);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
+        }
+
+        .modal-title {
+            font-family: 'Exo 2';
+            font-size: 28px;
+            color: #ffffff;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            text-shadow: 0 0 15px var(--glow-white);
+        }
+
+        .modal-message {
+            font-family: 'Exo 2';
+            font-size: 18px;
+            color: #cccccc;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 18px;
+            font-family: 'Exo 2';
+            font-weight: 900;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        .modal-btn:active {
+            transform: scale(0.95);
+        }
+
+        .modal-btn-confirm {
+            background: #000;
+            border: 3px solid var(--neon-green);
+            color: var(--neon-green);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+
+        .modal-btn-cancel {
+            background: #000;
+            border: 3px solid var(--neon-red);
+            color: var(--neon-red);
+            box-shadow: 0 0 15px rgba(255, 49, 49, 0.3);
+        }
+
+        /* АНИМАЦИИ */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes modalAppear {
+            from { transform: scale(0.8) rotate(-5deg); opacity: 0; }
+            to { transform: scale(1) rotate(0); opacity: 1; }
+        }
+
         /* --- ЭКРАН 1: ГЛАВНОЕ МЕНЮ --- */
         .main-menu-header {
             text-align: center;
             margin-top: 40px;
-            margin-bottom: 60px;
+            margin-bottom: 50px;
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -120,50 +227,54 @@
             text-transform: uppercase;
         }
 
-        /* --- УНИВЕРСАЛЬНЫЕ КНОПКИ --- */
+        /* --- УНИВЕРСАЛЬНЫЕ КНОПКИ (БЕЗ ОБВОДКИ, С СВЕЧЕНИЕМ) --- */
         .btn-action {
             width: 100%;
-            max-width: 350px;
-            padding: 22px;
-            background: #000000;
-            border: 4px solid var(--neon-blue);
-            box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
-            border-radius: 25px;
+            max-width: 320px;
+            padding: 18px;
+            background: rgba(0, 0, 0, 0.8);
+            border: none; /* УБИРАЕМ ОБВОДКУ */
+            border-radius: 20px;
             color: #ffffff;
             font-family: 'Exo 2';
             font-weight: 900;
-            font-size: 22px;
+            font-size: 20px;
             text-transform: uppercase;
-            margin: 0 auto 20px;
+            margin: 0 auto 15px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.15s ease;
+            /* ЛЕГКОЕ СВЕЧЕНИЕ БЕЗ ОБВОДКИ */
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.3),
+                        0 0 30px rgba(0, 210, 255, 0.1) inset;
         }
 
         .btn-action:active {
-            transform: scale(0.94);
-            box-shadow: 0 0 30px rgba(0, 210, 255, 0.7);
+            transform: scale(0.96);
+            box-shadow: 0 0 25px rgba(0, 210, 255, 0.5),
+                        0 0 40px rgba(0, 210, 255, 0.2) inset;
         }
 
         .btn-secondary {
-            border-color: #252525;
-            box-shadow: none;
-            color: #888888;
+            background: rgba(30, 30, 30, 0.8);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1),
+                        0 0 20px rgba(255, 255, 255, 0.05) inset;
+            color: #aaaaaa;
             margin-top: auto;
-            font-size: 22px;
-            border-radius: 25px;
-            max-width: 350px;
+            font-size: 18px;
+            border-radius: 20px;
+            max-width: 320px;
         }
 
         /* --- ЭКРАН 2: ВВОД ID --- */
         .title-neon-white {
             font-family: 'Exo 2';
-            font-size: 32px;
+            font-size: 28px;
             color: #ffffff;
             text-shadow: 0 0 20px var(--glow-white);
-            margin-bottom: 40px;
+            margin-bottom: 30px;
             text-transform: uppercase;
             text-align: center;
             width: 100%;
@@ -173,21 +284,21 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            margin-bottom: 45px;
-            height: 80px;
+            gap: 6px;
+            margin-bottom: 35px;
+            height: 60px;
         }
 
         .id-digit-box {
             font-family: 'Black Ops One';
-            font-size: 42px;
+            font-size: 32px;
             color: #ffffff;
-            text-shadow: 0 0 15px var(--glow-white);
-            width: 35px;
+            text-shadow: 0 0 10px var(--glow-white);
+            width: 30px;
             text-align: center;
-            border-bottom: 4px solid #ffffff;
-            padding-bottom: 5px;
-            height: 60px;
+            border-bottom: 3px solid #ffffff;
+            padding-bottom: 3px;
+            height: 50px;
             display: flex;
             align-items: flex-end;
             justify-content: center;
@@ -195,10 +306,10 @@
 
         .id-hyphen {
             font-family: 'Black Ops One';
-            font-size: 36px;
+            font-size: 28px;
             color: #ffffff;
-            text-shadow: 0 0 15px var(--glow-white);
-            margin: 0 8px;
+            text-shadow: 0 0 10px var(--glow-white);
+            margin: 0 6px;
             display: flex;
             align-items: center;
             height: 100%;
@@ -209,23 +320,23 @@
             width: 100%;
             display: flex;
             justify-content: center;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .numpad-grid {
             display: grid;
-            grid-template-columns: repeat(3, 85px);
-            gap: 15px;
+            grid-template-columns: repeat(3, 70px);
+            gap: 12px;
             justify-content: center;
         }
 
         .n-key {
-            width: 85px;
-            height: 85px;
-            background: #0d0d14;
-            border: 2px solid #252525;
-            border-radius: 20px;
-            font-size: 32px;
+            width: 70px;
+            height: 70px;
+            background: rgba(20, 20, 30, 0.8);
+            border: none;
+            border-radius: 16px;
+            font-size: 28px;
             color: #ffffff;
             font-family: 'Black Ops One';
             display: flex;
@@ -233,121 +344,141 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.1s;
+            box-shadow: 0 0 10px rgba(0, 210, 255, 0.1),
+                        0 0 15px rgba(0, 210, 255, 0.05) inset;
         }
 
         .n-key:active {
-            background: #1a1a25;
+            background: rgba(40, 40, 60, 0.8);
             transform: scale(0.9);
-            border-color: var(--neon-blue);
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.2),
+                        0 0 25px rgba(0, 210, 255, 0.1) inset;
         }
 
         /* --- ЭКРАН 3: НАСТРОЙКА ЛОББИ --- */
         .id-display-white {
             color: #ffffff;
             font-family: 'Black Ops One';
-            font-size: 20px;
+            font-size: 18px;
             letter-spacing: 1px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             text-align: center;
             width: 100%;
+            opacity: 0.8;
         }
 
         .user-identity-card {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 15px;
-            margin: 0 auto 35px;
+            gap: 12px;
+            margin: 0 auto 25px;
             width: 100%;
-            max-width: 350px;
+            max-width: 320px;
         }
 
         .avatar-frame {
-            width: 55px;
-            height: 55px;
+            width: 48px;
+            height: 48px;
             border-radius: 50%;
             border: 2px solid #ffffff;
-            box-shadow: 0 0 15px var(--glow-white);
+            box-shadow: 0 0 10px var(--glow-white);
             background: #222 center/cover;
         }
 
         .username-label {
             font-family: 'Exo 2';
-            font-size: 18px;
+            font-size: 16px;
             color: #ffffff;
             text-shadow: 0 0 8px #ffffff;
         }
 
+        /* НОВЫЙ СТИЛЬ НАСТРОЕК (БЕЗ ОБВОДКИ, КОМПАКТНЫЙ) */
         .settings-row {
             width: 100%;
-            max-width: 350px;
-            background: var(--card-bg);
-            border: 3px solid var(--neon-blue);
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
-            border-radius: 22px;
-            padding: 15px 25px;
+            max-width: 320px;
+            background: rgba(15, 15, 25, 0.6);
+            border: none; /* УБИРАЕМ ОБВОДКУ */
+            border-radius: 18px;
+            padding: 12px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin: 0 auto 18px;
+            margin: 0 auto 12px;
+            /* ЛЕГКОЕ СВЕЧЕНИЕ */
+            box-shadow: 0 0 12px rgba(0, 210, 255, 0.15),
+                        0 0 20px rgba(0, 210, 255, 0.05) inset;
         }
 
         .settings-row.red-theme {
-            border-color: var(--neon-red);
-            box-shadow: 0 0 15px rgba(255, 49, 49, 0.3);
+            box-shadow: 0 0 12px rgba(255, 49, 49, 0.15),
+                        0 0 20px rgba(255, 49, 49, 0.05) inset;
         }
 
         .control-group {
             display: flex;
             align-items: center;
-            gap: 18px;
+            gap: 15px;
         }
 
         .circle-btn {
-            width: 45px;
-            height: 45px;
-            background: #000;
-            border: 2px solid var(--neon-blue);
-            border-radius: 12px;
+            width: 38px;
+            height: 38px;
+            background: rgba(0, 0, 0, 0.7);
+            border: none; /* УБИРАЕМ ОБВОДКУ */
+            border-radius: 10px;
             color: var(--neon-blue);
-            font-size: 30px;
+            font-size: 26px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: 'Rubik One';
             cursor: pointer;
+            /* СВЕЧЕНИЕ */
+            box-shadow: 0 0 8px rgba(0, 210, 255, 0.2),
+                        0 0 12px rgba(0, 210, 255, 0.1) inset;
         }
 
         .circle-btn.red-btn {
-            border-color: var(--neon-red);
             color: var(--neon-red);
+            box-shadow: 0 0 8px rgba(255, 49, 49, 0.2),
+                        0 0 12px rgba(255, 49, 49, 0.1) inset;
         }
 
         .circle-btn:active {
             transform: scale(0.9);
+            box-shadow: 0 0 12px rgba(0, 210, 255, 0.3),
+                        0 0 18px rgba(0, 210, 255, 0.15) inset;
+        }
+
+        .circle-btn.red-btn:active {
+            box-shadow: 0 0 12px rgba(255, 49, 49, 0.3),
+                        0 0 18px rgba(255, 49, 49, 0.15) inset;
         }
 
         .value-display {
             font-family: 'Black Ops One';
-            font-size: 32px;
-            min-width: 30px;
+            font-size: 26px;
+            min-width: 26px;
             text-align: center;
             color: #ffffff;
+            text-shadow: 0 0 10px var(--glow-white);
         }
 
         /* КНОПКА СОЗДАТЬ КОМНАТУ */
         .btn-create-lobby {
             width: 100%;
-            max-width: 350px;
-            padding: 22px;
-            background: #000;
-            border: 5px solid var(--neon-gold);
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-            border-radius: 25px;
+            max-width: 320px;
+            padding: 18px;
+            background: rgba(0, 0, 0, 0.8);
+            border: none; /* УБИРАЕМ ОБВОДКУ */
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3),
+                        0 0 30px rgba(255, 215, 0, 0.1) inset;
+            border-radius: 20px;
             color: #ffffff;
             font-family: 'Exo 2';
             font-weight: 900;
-            font-size: 22px;
+            font-size: 20px;
             text-transform: uppercase;
             margin: 15px auto 0;
             cursor: pointer;
@@ -358,29 +489,30 @@
         }
 
         .btn-create-lobby:active {
-            transform: scale(0.94);
-            box-shadow: 0 0 30px rgba(255, 215, 0, 0.7);
+            transform: scale(0.96);
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.5),
+                        0 0 40px rgba(255, 215, 0, 0.2) inset;
         }
 
         /* --- ЭКРАН 4: АКТИВНАЯ КОМНАТА --- */
         .players-scroll-area {
             width: 100%;
-            max-width: 350px;
+            max-width: 320px;
             display: flex;
             flex-direction: column;
-            gap: 14px;
-            margin: 0 auto 25px;
+            gap: 10px;
+            margin: 0 auto 20px;
             overflow-y: auto;
             padding-right: 5px;
-            max-height: 250px;
+            max-height: 220px;
         }
 
         .player-slot-card {
             width: 100%;
             background: rgba(10, 10, 16, 0.8);
             border: 2px solid #222;
-            border-radius: 20px;
-            padding: 14px 18px;
+            border-radius: 16px;
+            padding: 12px 16px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -394,12 +526,12 @@
         .slot-info {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .slot-ava {
-            width: 42px;
-            height: 42px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             border: 1px solid rgba(255,255,255,0.3);
             background: #111 center/cover;
@@ -407,15 +539,15 @@
 
         .slot-name {
             font-family: 'Exo 2';
-            font-size: 16px;
+            font-size: 14px;
             color: #ffffff;
         }
 
         .status-indicator {
-            padding: 6px 14px;
-            border-radius: 12px;
+            padding: 5px 12px;
+            border-radius: 10px;
             font-family: 'Exo 2';
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 900;
             text-transform: uppercase;
             border: 2px solid;
@@ -425,13 +557,13 @@
         .status-ready {
             border-color: var(--neon-green);
             color: var(--neon-green);
-            box-shadow: 0 0 10px var(--neon-green);
+            box-shadow: 0 0 8px var(--neon-green);
         }
 
         .status-not-ready {
             border-color: var(--neon-red);
             color: var(--neon-red);
-            box-shadow: 0 0 10px var(--neon-red);
+            box-shadow: 0 0 8px var(--neon-red);
         }
 
         .status-empty {
@@ -442,24 +574,25 @@
         /* КНОПКИ УПРАВЛЕНИЯ В КОМНАТЕ */
         .room-controls-box {
             width: 100%;
-            max-width: 350px;
+            max-width: 320px;
             display: flex;
             flex-direction: column;
-            margin: 20px auto 0;
+            margin: 15px auto 0;
         }
 
         .btn-ready-toggle {
-            border-color: var(--neon-green);
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+            box-shadow: 0 0 12px rgba(0, 255, 0, 0.2),
+                        0 0 20px rgba(0, 255, 0, 0.1) inset;
         }
 
         .btn-ready-toggle.active-ready {
-            border-color: var(--neon-red);
-            box-shadow: 0 0 15px rgba(255, 49, 49, 0.3);
+            box-shadow: 0 0 12px rgba(255, 49, 49, 0.2),
+                        0 0 20px rgba(255, 49, 49, 0.1) inset;
         }
 
         #start-btn {
-            border-color: var(--neon-gold);
+            box-shadow: 0 0 12px rgba(255, 215, 0, 0.2),
+                        0 0 20px rgba(255, 215, 0, 0.1) inset;
             color: var(--neon-gold);
             display: none;
         }
@@ -475,14 +608,37 @@
                 transform: translateY(-2px);
             }
             .n-key:hover {
-                border-color: var(--neon-blue);
-                transform: scale(1.05);
+                box-shadow: 0 0 15px rgba(0, 210, 255, 0.2),
+                            0 0 25px rgba(0, 210, 255, 0.1) inset;
             }
         }
     </style>
 </head>
 <body>
 
+    <!-- МОДАЛЬНЫЕ ОКНА (ИГРОВЫЕ) -->
+    <div class="modal-overlay" id="confirm-modal">
+        <div class="modal-container red-border">
+            <div class="modal-title">ПОДТВЕРЖДЕНИЕ</div>
+            <div class="modal-message" id="confirm-message">Вы уверены?</div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" onclick="Modal.hide()">ОТМЕНА</button>
+                <button class="modal-btn modal-btn-confirm" onclick="Modal.confirmAction()">ДА</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="alert-modal">
+        <div class="modal-container gold-border">
+            <div class="modal-title" id="alert-title">УВЕДОМЛЕНИЕ</div>
+            <div class="modal-message" id="alert-message">Сообщение</div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-confirm" onclick="Modal.hide()">ОК</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
     <div class="app-shell">
         
         <div id="scr-menu" class="screen active">
@@ -495,11 +651,11 @@
             <button class="btn-action" onclick="App.navigate('scr-lobby')">СОЗДАТЬ ЛОББИ</button>
             <button class="btn-action" onclick="App.navigate('scr-join')">ВХОД ПО ID</button>
             
-            <button class="btn-action btn-secondary" onclick="App.exitGame()">ВЫХОД</button>
+            <button class="btn-action btn-secondary" onclick="App.showExitConfirm()">ВЫХОД</button>
         </div>
 
         <div id="scr-join" class="screen">
-            <h2 class="title-neon-white">ВВЕДИТЕ КОД</h2>
+            <h2 class="title-neon-white">ВВЕДИТЕ ID</h2> <!-- ИЗМЕНИЛ НАЗВАНИЕ -->
             
             <div class="id-input-container">
                 <div class="id-digit-box" id="d1">_</div>
@@ -534,7 +690,7 @@
         </div>
 
         <div id="scr-lobby" class="screen">
-            <h2 class="title-neon-white" style="margin-bottom:5px">НАСТРОЙКА ЛОББИ</h2>
+            <h2 class="title-neon-white" style="margin-bottom:0">НАСТРОЙКА ЛОББИ</h2> <!-- ПОДНЯЛ ВЫШЕ -->
             <div class="id-display-white" id="lobby-id-val">ID: 0000-0000</div>
 
             <div class="user-identity-card">
@@ -543,7 +699,7 @@
             </div>
 
             <div class="settings-row">
-                <span style="font-family:'Exo 2'; font-size:18px; color:#fff">УЧАСТНИКИ</span>
+                <span style="font-family:'Exo 2'; font-size:16px; color:#fff">УЧАСТНИКИ</span>
                 <div class="control-group">
                     <button class="circle-btn" onclick="App.updateSettings('p', -1)">-</button>
                     <span class="value-display" id="p-count">4</span>
@@ -552,7 +708,7 @@
             </div>
 
             <div class="settings-row red-theme">
-                <span style="font-family:'Exo 2'; font-size:18px; color:#fff">ШПИОН</span>
+                <span style="font-family:'Exo 2'; font-size:16px; color:#fff">ШПИОН</span>
                 <div class="control-group">
                     <button class="circle-btn red-btn" onclick="App.updateSettings('s', -1)">-</button>
                     <span class="value-display" id="s-count">1</span>
@@ -566,7 +722,7 @@
         </div>
 
         <div id="scr-room" class="screen">
-            <h2 class="title-neon-white" style="margin-bottom:5px">КОМНАТА ИГРЫ</h2>
+            <h2 class="title-neon-white" style="margin-bottom:0">КОМНАТА ИГРЫ</h2>
             <div class="id-display-white" id="room-id-val">ID: 0000-0000</div>
 
             <div class="players-scroll-area" id="room-slots">
@@ -576,17 +732,50 @@
             <div class="room-controls-box">
                 <button class="btn-action btn-ready-toggle" id="ready-btn" onclick="App.toggleReady()">ГОТОВ</button>
                 <button class="btn-action" id="start-btn" onclick="App.startGame()">НАЧАТЬ ИГРУ</button>
-                <button class="btn-action btn-secondary" style="margin-top:10px" onclick="App.navigate('scr-menu')">ПОКИНУТЬ</button>
+                <button class="btn-action btn-secondary" style="margin-top:10px" onclick="App.showLeaveConfirm()">ПОКИНУТЬ</button>
             </div>
         </div>
 
     </div>
 
     <script>
-        // ИНИЦИАЛИЗАЦИЯ TELEGRAM
+        // ИНИЦИАЛИЗАЦИЯ TELEGRAM (только для вибрации и данных)
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.enableClosingConfirmation();
+
+        // СИСТЕМА МОДАЛЬНЫХ ОКОН
+        const Modal = {
+            currentAction: null,
+            
+            showConfirm: (message, callback) => {
+                document.getElementById('confirm-message').innerText = message;
+                Modal.currentAction = callback;
+                document.getElementById('confirm-modal').classList.add('active');
+                tg.HapticFeedback.impactOccurred('medium');
+            },
+            
+            showAlert: (title, message) => {
+                document.getElementById('alert-title').innerText = title;
+                document.getElementById('alert-message').innerText = message;
+                document.getElementById('alert-modal').classList.add('active');
+                tg.HapticFeedback.impactOccurred('light');
+            },
+            
+            hide: () => {
+                document.getElementById('confirm-modal').classList.remove('active');
+                document.getElementById('alert-modal').classList.remove('active');
+                Modal.currentAction = null;
+                tg.HapticFeedback.selectionChanged();
+            },
+            
+            confirmAction: () => {
+                if (Modal.currentAction) {
+                    Modal.currentAction();
+                }
+                Modal.hide();
+            }
+        };
 
         // ГЕНЕРАЦИЯ РАНДОМНОГО ID
         function generateRandomId() {
@@ -637,11 +826,25 @@
                 tg.HapticFeedback.impactOccurred('light');
             },
 
-            // Выход из игры
-            exitGame: () => {
-                if (confirm("Вы уверены, что хотите выйти?")) {
-                    tg.close();
-                }
+            // Подтверждение выхода
+            showExitConfirm: () => {
+                Modal.showConfirm(
+                    "Вы уверены, что хотите выйти из игры?",
+                    () => {
+                        tg.close();
+                    }
+                );
+            },
+
+            // Подтверждение выхода из комнаты
+            showLeaveConfirm: () => {
+                Modal.showConfirm(
+                    "Вы уверены, что хотите покинуть комнату?",
+                    () => {
+                        App.navigate('scr-menu');
+                        Modal.showAlert("ВЫХОД", "Вы покинули комнату");
+                    }
+                );
             },
 
             // Ввод кода
@@ -668,9 +871,9 @@
                     App.state.lobbyId = App.state.inputCode.slice(0,4) + "-" + App.state.inputCode.slice(4,8);
                     App.state.isAdmin = false;
                     App.navigate('scr-room');
-                    tg.showAlert("Подключение к комнате...");
+                    Modal.showAlert("ПОДКЛЮЧЕНИЕ", "Подключение к комнате...");
                 } else {
-                    tg.showAlert("Ошибка: введите 8 цифр");
+                    Modal.showAlert("ОШИБКА", "Введите 8 цифр");
                     tg.HapticFeedback.notificationOccurred('error');
                 }
             },
@@ -703,7 +906,7 @@
             // Создание финальной комнаты
             createFinalRoom: () => {
                 if (App.state.spies >= App.state.participants) {
-                    tg.showAlert("Ошибка: шпионов должно быть меньше чем участников");
+                    Modal.showAlert("ОШИБКА", "Шпионов должно быть меньше чем участников");
                     tg.HapticFeedback.notificationOccurred('error');
                     return;
                 }
@@ -711,7 +914,7 @@
                 App.state.isAdmin = true;
                 App.state.lobbyId = generateRandomId();
                 App.navigate('scr-room');
-                tg.showAlert("Комната создана! ID: " + App.state.lobbyId);
+                Modal.showAlert("УСПЕХ", "Комната создана! ID: " + App.state.lobbyId);
             },
 
             // Логика комнаты
@@ -747,17 +950,18 @@
                 
                 App.buildRoom();
                 tg.HapticFeedback.notificationOccurred('success');
+                Modal.showAlert("СТАТУС", App.state.isReady ? "Вы готовы к игре!" : "Вы не готовы");
             },
 
             // Начать игру
             startGame: () => {
                 if (!App.state.isReady) {
-                    tg.showAlert("Вы должны быть готовы!");
+                    Modal.showAlert("ОШИБКА", "Вы должны быть готовы!");
                     tg.HapticFeedback.notificationOccurred('error');
                     return;
                 }
                 
-                tg.showAlert("Игра начинается! Шпионы: " + App.state.spies);
+                Modal.showAlert("СТАРТ", "Игра начинается! Шпионов: " + App.state.spies);
                 tg.HapticFeedback.notificationOccurred('success');
                 // Здесь будет переход на экран игры
             }
