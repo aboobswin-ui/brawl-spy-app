@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rubik+One&family=Exo+2:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
@@ -206,6 +207,54 @@
         @keyframes modalAppear {
             from { transform: scale(0.8); opacity: 0; }
             to { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes cardGlow {
+            0% { 
+                box-shadow: 
+                    0 0 30px rgba(0, 210, 255, 0.4),
+                    0 0 60px rgba(0, 210, 255, 0.2),
+                    0 0 90px rgba(0, 210, 255, 0.1),
+                    inset 0 0 50px rgba(0, 210, 255, 0.15);
+            }
+            50% { 
+                box-shadow: 
+                    0 0 40px rgba(0, 210, 255, 0.6),
+                    0 0 80px rgba(0, 210, 255, 0.3),
+                    0 0 120px rgba(0, 210, 255, 0.15),
+                    inset 0 0 70px rgba(0, 210, 255, 0.25);
+            }
+            100% { 
+                box-shadow: 
+                    0 0 30px rgba(0, 210, 255, 0.4),
+                    0 0 60px rgba(0, 210, 255, 0.2),
+                    0 0 90px rgba(0, 210, 255, 0.1),
+                    inset 0 0 50px rgba(0, 210, 255, 0.15);
+            }
+        }
+
+        @keyframes spyGlow {
+            0% { 
+                box-shadow: 
+                    0 0 40px rgba(255, 0, 0, 0.7),
+                    0 0 80px rgba(255, 0, 0, 0.4),
+                    0 0 120px rgba(255, 0, 0, 0.2),
+                    inset 0 0 60px rgba(255, 0, 0, 0.3);
+            }
+            50% { 
+                box-shadow: 
+                    0 0 50px rgba(255, 0, 0, 0.8),
+                    0 0 100px rgba(255, 0, 0, 0.5),
+                    0 0 150px rgba(255, 0, 0, 0.3),
+                    inset 0 0 80px rgba(255, 0, 0, 0.4);
+            }
+            100% { 
+                box-shadow: 
+                    0 0 40px rgba(255, 0, 0, 0.7),
+                    0 0 80px rgba(255, 0, 0, 0.4),
+                    0 0 120px rgba(255, 0, 0, 0.2),
+                    inset 0 0 60px rgba(255, 0, 0, 0.3);
+            }
         }
 
         /* --- ЭКРАН 1: ГЛАВНОЕ МЕНЮ --- */
@@ -621,9 +670,9 @@
         }
 
         #start-btn {
-            box-shadow: 0 0 12px rgba(255, 255, 255, 0.3), /* БЕЛЫЙ НЕОН */
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.3),
                         0 0 20px rgba(255, 255, 255, 0.1) inset;
-            color: #ffffff; /* БЕЛЫЙ ТЕКСТ */
+            color: #ffffff;
             display: none;
         }
 
@@ -633,7 +682,7 @@
             font-size: 26px;
             color: #ffffff;
             text-shadow: 0 0 15px var(--neon-blue);
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-transform: uppercase;
             text-align: center;
             width: 100%;
@@ -642,19 +691,21 @@
 
         .role-reveal {
             font-family: 'Exo 2';
-            font-size: 18px;
-            color: var(--neon-gold);
+            font-size: 14px; /* УМЕНЬШЕН РАЗМЕР */
+            color: #ffffff; /* БЕЛЫЙ ЦВЕТ */
             margin-bottom: 25px;
             text-align: center;
-            text-shadow: 0 0 10px var(--neon-gold);
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.7); /* НЕОНЧИК */
             font-weight: bold;
+            opacity: 0.9;
         }
 
+        /* БОЛЬШАЯ КАРТА БЕЗ ОБВОДКИ */
         .card-container {
-            width: 280px;
-            height: 380px;
+            width: 320px;
+            height: 420px;
             perspective: 1000px;
-            margin: 0 auto 30px;
+            margin: 0 auto 25px;
         }
 
         .card {
@@ -675,52 +726,66 @@
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
-            border-radius: 20px;
+            border-radius: 25px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-        }
-
-        .card-front {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            border: 3px solid var(--neon-blue);
-            box-shadow: 0 0 30px rgba(0, 210, 255, 0.5),
-                        inset 0 0 40px rgba(0, 210, 255, 0.1);
-        }
-
-        .card-back {
-            background: linear-gradient(135deg, #0f0f1a, #1a1a2e);
-            border: 3px solid var(--neon-red);
-            box-shadow: 0 0 30px rgba(255, 49, 49, 0.5),
-                        inset 0 0 40px rgba(255, 49, 49, 0.1);
-            transform: rotateY(180deg);
             padding: 20px;
         }
 
-        .card-icon {
-            font-size: 80px;
+        /* ПЕРЕДНЯЯ СТОРОНА КАРТЫ (ДО РАСКРЫТИЯ) */
+        .card-front {
+            background: linear-gradient(135deg, #0a0a1a, #1a1a2e);
+            border: none; /* УБИРАЕМ ОБВОДКУ */
+            /* АНИМИРОВАННОЕ СВЕЧЕНИЕ */
+            animation: cardGlow 2s infinite alternate;
+        }
+
+        /* ЗАДНЯЯ СТОРОНА КАРТЫ (ПОСЛЕ РАСКРЫТИЯ) */
+        .card-back {
+            background: linear-gradient(135deg, #0f0f1a, #1a1a2e);
+            border: none;
+            transform: rotateY(180deg);
+            /* СТАТИЧНЫЙ НЕОН */
+            box-shadow: 
+                0 0 25px rgba(0, 210, 255, 0.4),
+                0 0 50px rgba(0, 210, 255, 0.2),
+                inset 0 0 40px rgba(0, 210, 255, 0.1);
+        }
+
+        /* ОСОБЫЙ СТИЛЬ ДЛЯ КАРТЫ ШПИОНА */
+        .card-back.spy-card {
+            background: linear-gradient(135deg, #1a0000, #330000);
+            animation: spyGlow 2s infinite alternate;
+        }
+
+        .card-icon-brawl {
+            font-size: 140px;
             margin-bottom: 20px;
-            text-shadow: 0 0 20px var(--neon-blue);
+            text-shadow: 0 0 25px rgba(255, 215, 0, 0.8);
+            color: var(--neon-gold);
+            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
+        }
+
+        .card-icon-spy {
+            font-size: 140px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 25px rgba(255, 0, 0, 0.9);
+            color: var(--neon-red);
+            filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.7));
         }
 
         .card-title {
             font-family: 'Exo 2';
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 900;
             text-transform: uppercase;
             text-align: center;
             margin-bottom: 10px;
             text-shadow: 0 0 15px currentColor;
-        }
-
-        .card-title.spy {
-            color: var(--neon-red);
-        }
-
-        .card-title.brawler {
-            color: var(--neon-green);
+            letter-spacing: 2px;
         }
 
         .card-subtitle {
@@ -729,50 +794,78 @@
             color: #cccccc;
             text-align: center;
             margin-bottom: 25px;
+            opacity: 0.8;
+        }
+
+        /* ИКОНКА ИЗ BRAWL STARS */
+        .brawl-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, var(--neon-gold), #ffa500);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+            box-shadow: 
+                0 0 30px rgba(255, 215, 0, 0.6),
+                inset 0 0 20px rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .brawl-icon::before {
+            content: '🎮';
+            font-size: 60px;
+            filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
         }
 
         .brawler-image {
-            width: 180px;
-            height: 180px;
+            width: 200px;
+            height: 200px;
             object-fit: contain;
             margin-bottom: 20px;
-            border-radius: 15px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
         }
 
         .brawler-name {
             font-family: 'Exo 2';
-            font-size: 22px;
+            font-size: 26px;
             font-weight: 900;
             color: #ffffff;
-            text-shadow: 0 0 10px #ffffff;
-            margin-bottom: 10px;
+            text-shadow: 0 0 15px #ffffff;
+            margin-bottom: 15px;
             text-align: center;
         }
 
         .brawler-role {
             font-family: 'Exo 2';
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
-            padding: 8px 20px;
-            border-radius: 12px;
+            padding: 10px 30px;
+            border-radius: 15px;
             text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         .role-spy {
             color: var(--neon-red);
-            border: 2px solid var(--neon-red);
-            box-shadow: 0 0 15px var(--neon-red);
+            border: 3px solid var(--neon-red);
+            box-shadow: 0 0 20px var(--neon-red);
+            background: rgba(255, 0, 0, 0.1);
         }
 
         .role-brawler {
             color: var(--neon-green);
-            border: 2px solid var(--neon-green);
-            box-shadow: 0 0 15px var(--neon-green);
+            border: 3px solid var(--neon-green);
+            box-shadow: 0 0 20px var(--neon-green);
+            background: rgba(0, 255, 0, 0.1);
         }
 
-        .game-controls {
+        /* ТОЛЬКО КНОПКА ПРОДОЛЖИТЬ */
+        .game-controls-single {
             width: 100%;
             max-width: 320px;
             display: flex;
@@ -781,17 +874,10 @@
             margin: 20px auto 0;
         }
 
-        .btn-vote {
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3),
-                        0 0 25px rgba(255, 215, 0, 0.1) inset;
-            color: var(--neon-gold);
-        }
-
-        .btn-restart {
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.3),
-                        0 0 25px rgba(0, 210, 255, 0.1) inset;
+        .btn-continue {
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.4),
+                        0 0 25px rgba(0, 210, 255, 0.2) inset;
             color: var(--neon-blue);
-            display: none;
         }
 
         /* --- ЭКРАН 6: ГОЛОСОВАНИЕ --- */
@@ -1024,11 +1110,11 @@
             <div class="card-container">
                 <div class="card" id="role-card" onclick="Game.revealCard()">
                     <div class="card-front">
-                        <div class="card-icon">🃏</div>
+                        <div class="brawl-icon"></div>
                         <div class="card-title">BRAWL SPY</div>
-                        <div class="card-subtitle">Нажмите, чтобы открыть</div>
+                        <div class="card-subtitle">Откройте карту, чтобы узнать роль</div>
                     </div>
-                    <div class="card-back">
+                    <div class="card-back" id="card-back">
                         <img class="brawler-image" id="brawler-img" src="" alt="Бравлер">
                         <div class="brawler-name" id="brawler-name">Загрузка...</div>
                         <div class="brawler-role" id="brawler-role">РОЛЬ</div>
@@ -1036,10 +1122,8 @@
                 </div>
             </div>
 
-            <div class="game-controls">
-                <button class="btn-action btn-vote" id="vote-btn" onclick="Game.startVoting()">НАЧАТЬ ГОЛОСОВАНИЕ</button>
-                <button class="btn-action btn-restart" id="restart-btn" onclick="Game.restartGame()">НАЧАТЬ ЗАНОВО</button>
-                <button class="btn-action btn-secondary" onclick="Game.returnToRoom()">ВЕРНУТЬСЯ В КОМНАТУ</button>
+            <div class="game-controls-single">
+                <button class="btn-action btn-continue" id="continue-btn" onclick="Game.continueToVoting()" style="display: none;">ПРОДОЛЖИТЬ</button>
             </div>
         </div>
 
@@ -1065,8 +1149,7 @@
         tg.expand();
         tg.enableClosingConfirmation();
 
-        // БАЗА БРАВЛЕРОВ (99 штук - для масштабирования)
-        // Сейчас тестовый набор из 10 бравлеров
+        // БАЗА БРАВЛЕРОВ С ПРАВИЛЬНЫМИ ИЗОБРАЖЕНИЯМИ
         const brawlersList = [
             { id: 16000000, name: "ШЕЛЛИ", image: "https://cdn.brawlstats.com/character-arts/16000000.png" },
             { id: 16000001, name: "КОЛЬТ", image: "https://cdn.brawlstats.com/character-arts/16000001.png" },
@@ -1078,7 +1161,16 @@
             { id: 16000007, name: "БО", image: "https://cdn.brawlstats.com/character-arts/16000007.png" },
             { id: 16000008, name: "ТИК", image: "https://cdn.brawlstats.com/character-arts/16000008.png" },
             { id: 16000009, name: "8-БИТ", image: "https://cdn.brawlstats.com/character-arts/16000009.png" },
-            // ... можно добавить остальные 89 бравлеров
+            { id: 16000010, name: "ЭМЗ", image: "https://cdn.brawlstats.com/character-arts/16000010.png" },
+            { id: 16000011, name: "СТА", image: "https://cdn.brawlstats.com/character-arts/16000011.png" },
+            { id: 16000012, name: "ПАМ", image: "https://cdn.brawlstats.com/character-arts/16000012.png" },
+            { id: 16000013, name: "ПАЙПЕР", image: "https://cdn.brawlstats.com/character-arts/16000013.png" },
+            { id: 16000014, name: "ФРЕНК", image: "https://cdn.brawlstats.com/character-arts/16000014.png" },
+            { id: 16000015, name: "ПЕННИ", image: "https://cdn.brawlstats.com/character-arts/16000015.png" },
+            { id: 16000016, name: "КАРЛ", image: "https://cdn.brawlstats.com/character-arts/16000016.png" },
+            { id: 16000017, name: "ДЖЕКИ", image: "https://cdn.brawlstats.com/character-arts/16000017.png" },
+            { id: 16000018, name: "ГЕЙЛ", image: "https://cdn.brawlstats.com/character-arts/16000018.png" },
+            { id: 16000019, name: "СПРАУТ", image: "https://cdn.brawlstats.com/character-arts/16000019.png" }
         ];
 
         // СИСТЕМА МОДАЛЬНЫХ ОКОН
@@ -1321,6 +1413,9 @@
                 Game.selectedPlayer = null;
                 Game.votes = {};
 
+                // Скрываем кнопку ПРОДОЛЖИТЬ
+                document.getElementById('continue-btn').style.display = 'none';
+
                 // Случайно определяем роль (шпион или бравлер)
                 const isSpy = Math.random() < (App.state.spies / App.state.participants);
                 Game.myRole = isSpy ? 'SPY' : 'BRAWLER';
@@ -1333,13 +1428,13 @@
                     Game.myBrawler = null;
                 }
 
-                // Обновляем кнопку "Начать заново" (только для админа)
-                const restartBtn = document.getElementById('restart-btn');
-                restartBtn.style.display = App.state.isAdmin ? 'block' : 'none';
-
                 // Сбрасываем карту
                 const card = document.getElementById('role-card');
                 card.classList.remove('flipped');
+                
+                // Сбрасываем заднюю сторону карты
+                const cardBack = document.getElementById('card-back');
+                cardBack.classList.remove('spy-card');
                 
                 // Сбрасываем изображение и имя
                 document.getElementById('brawler-img').src = '';
@@ -1352,20 +1447,26 @@
                 if (Game.isCardRevealed) return;
 
                 const card = document.getElementById('role-card');
+                const cardBack = document.getElementById('card-back');
                 const brawlerImg = document.getElementById('brawler-img');
                 const brawlerName = document.getElementById('brawler-name');
                 const brawlerRole = document.getElementById('brawler-role');
+                const continueBtn = document.getElementById('continue-btn');
 
                 // Анимация переворота
                 card.classList.add('flipped');
 
                 // Устанавливаем данные в зависимости от роли
                 if (Game.myRole === 'SPY') {
-                    brawlerImg.src = "https://cdn-icons-png.flaticon.com/512/894/894438.png"; // Иконка шпиона
+                    // ШПИОН - красный сияющий неон
+                    brawlerImg.src = "https://cdn-icons-png.flaticon.com/512/894/894438.png";
                     brawlerName.textContent = "ШПИОН";
                     brawlerRole.textContent = "ШПИОН";
                     brawlerRole.className = "brawler-role role-spy";
+                    // Добавляем стиль для карты шпиона
+                    cardBack.classList.add('spy-card');
                 } else {
+                    // БРАВЛЕР
                     brawlerImg.src = Game.myBrawler.image;
                     brawlerName.textContent = Game.myBrawler.name;
                     brawlerRole.textContent = "БРАВЛЕР";
@@ -1373,11 +1474,20 @@
                 }
 
                 Game.isCardRevealed = true;
+                
+                // Показываем кнопку ПРОДОЛЖИТЬ
+                continueBtn.style.display = 'block';
+                
                 tg.HapticFeedback.impactOccurred('heavy');
             },
 
-            // Начать голосование
-            startVoting: () => {
+            // Продолжить к голосованию
+            continueToVoting: () => {
+                if (!Game.isCardRevealed) {
+                    Modal.showAlert("ВНИМАНИЕ", "Сначала откройте свою карту!");
+                    return;
+                }
+                
                 Game.initializeVoting();
                 App.navigate('scr-voting');
             },
@@ -1511,24 +1621,6 @@
             cancelVoting: () => {
                 clearInterval(Game.votingTimer);
                 App.navigate('scr-game');
-            },
-
-            // Начать игру заново (только для админа)
-            restartGame: () => {
-                if (!App.state.isAdmin) return;
-
-                Modal.showConfirm(
-                    "Начать игру заново? Все игроки вернутся в комнату.",
-                    () => {
-                        Game.initializeGame();
-                        Modal.showAlert("ИГРА", "Игра перезапущена!");
-                    }
-                );
-            },
-
-            // Вернуться в комнату
-            returnToRoom: () => {
-                App.navigate('scr-room');
             }
         };
 
