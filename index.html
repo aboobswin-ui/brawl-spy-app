@@ -3,399 +3,265 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>BRAWL SPY 2026 - ULTIMATE ALIGNMENT MONOLITH</title>
+    <title>BRAWL SPY ULTIMATE</title>
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rubik+Mono+One&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rubik+One&family=Exo+2:wght@900&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <style>
-        /* ========================================
-           1. СИСТЕМНЫЕ ПЕРЕМЕННЫЕ (VARIABLES)
-           ========================================
-        */
         :root {
-            --clr-red-neon: #ff3131;
-            --clr-blue-neon: #00d2ff;
-            --clr-gold-neon: #ffd700;
-            --clr-white: #ffffff;
-            --clr-bg-pure: #010103;
-            
-            /* Шрифты */
-            --font-spy: 'Rubik Mono One', sans-serif;
-            --font-ops: 'Black Ops One', cursive;
-
-            /* Физика 3D объема для ШПИОН */
-            --spy-3d-stack: 
-                0 1px 0 #941a1a,
-                0 2px 0 #851717,
-                0 3px 0 #751414,
-                0 4px 0 #661111,
-                0 5px 0 #570e0e,
-                0 6px 10px rgba(0,0,0,0.8);
-
-            /* Мягкое белое свечение */
-            --white-glow-halo: radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 65%);
+            --neon-blue: #00d2ff;
+            --neon-red: #ff3131;
+            --neon-gold: #ffd700;
+            --neon-green: #00ff00;
+            --bg-black: #020205;
+            --glow-white: #ffffff;
         }
 
-        /* ========================================
-           2. ГЛОБАЛЬНЫЙ СБРОС (GLOBAL RESET)
-           ========================================
-        */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { 
+            box-sizing: border-box; 
+            margin: 0; padding: 0; 
+            -webkit-user-select: none; 
             -webkit-tap-highlight-color: transparent;
-            -webkit-user-select: none;
-            user-select: none;
+            outline: none; 
         }
 
-        html, body {
+        body { 
+            background: var(--bg-black); 
+            color: #fff; 
+            font-family: 'Rubik One', sans-serif; 
+            height: 100vh; 
             width: 100vw;
-            height: 100vh;
-            background-color: var(--clr-bg-pure);
-            color: var(--clr-white);
-            overflow: hidden;
-            font-family: var(--font-ops);
-            display: flex;
-            justify-content: center;
+            overflow: hidden; 
+            display: flex; 
+            justify-content: center; 
             align-items: center;
         }
 
-        /* ========================================
-           3. КОНТЕЙНЕРЫ (LAYOUT)
-           ========================================
-        */
-        .app-monolith {
-            width: 100%;
-            height: 100%;
-            max-width: 440px;
-            position: relative;
-            display: flex;
+        .app-shell { 
+            width: 100%; 
+            height: 100%; 
+            max-width: 500px; 
+            position: relative; 
+            display: flex; 
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
         }
 
-        .view-frame {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 45px;
-            z-index: 100;
+        .screen { 
+            position: absolute; 
+            inset: 0; 
+            display: none; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 50px 30px; 
+            background: var(--bg-black); 
         }
+        .screen.active { display: flex; animation: fadeIn 0.3s ease; }
 
-        /* ФОН ТОЛЬКО ДЛЯ ГЛАВНОГО МЕНЮ */
-        #view-main-menu {
-            background-image: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.75)), 
-                              url('https://avatars.mds.yandex.net/i?id=bf88c867806a71c96d2d94c597a3c9ea_l-8271622-images-thumbs&n=13');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* ОСТАЛЬНЫЕ ЭКРАНЫ */
-        #view-settings, #view-id-gate {
-            background-color: var(--clr-bg-pure);
-        }
-
-        .view-frame.active {
-            display: flex;
-            animation: viewFadeTransition 0.5s ease-out forwards;
-        }
-
-        /* ========================================
-           4. ПЕРФЕКТНЫЙ ЛОГОТИП (LOGO STACK)
-           ========================================
-        */
-        .perfect-logo-container {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            margin-bottom: 55px;
-        }
-
-        /* БЕЛОЕ СВЕТОВОЕ ОБЛАКО ЗА ЛОГО */
-        .white-halo-effect {
-            position: absolute;
-            width: 320px;
-            height: 320px;
-            background: var(--white-glow-halo);
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: -1;
-            pointer-events: none;
-            filter: blur(15px);
-        }
-
-        /* ШПИОН (УМЕНЬШЕННЫЙ, ОБЪЕМНЫЙ) */
-        .spy-monolith-text {
-            font-family: var(--font-spy);
-            font-size: 74px; /* Уменьшил для идеальной гармонии */
-            color: var(--clr-red-neon);
-            text-transform: uppercase;
-            letter-spacing: -4px;
-            line-height: 0.9;
-            transform: scaleY(1.15);
-            text-shadow: var(--spy-3d-stack);
-            margin-bottom: 22px;
-            text-align: center;
-        }
-
-        .brawl-monolith-text {
-            font-size: 32px;
-            color: var(--clr-white);
-            text-transform: uppercase;
+        /* --- ГЛАВНЫЙ ЭКРАН --- */
+        .logo-box { text-align: center; margin-bottom: 50px; }
+        .main-spy { font-size: 110px; color: var(--neon-red); text-shadow: 0 0 35px var(--neon-red); line-height: 0.85; }
+        .sub-brawl { font-family: 'Black Ops One'; font-size: 30px; color: var(--neon-gold); text-shadow: 0 0 10px var(--neon-gold); }
+        
+        /* EDITION 2026 ПОД БРАВЛ СТАРС */
+        .edition-2026 { 
+            font-family: 'Black Ops One'; 
+            font-size: 16px; 
+            color: #fff; 
+            text-shadow: 0 0 15px #fff; 
+            margin-top: 10px;
             letter-spacing: 2px;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
-            margin-bottom: 6px;
         }
 
-        .stars-monolith-text {
-            font-size: 74px;
-            color: var(--clr-red-neon);
-            text-transform: uppercase;
-            line-height: 0.85;
-            text-shadow: 0 3px 0 #851717, 0 0 12px rgba(255, 49, 49, 0.3);
-            margin-bottom: 18px;
+        .btn-list { width: 100%; display: flex; flex-direction: column; gap: 20px; }
+        .btn-main {
+            width: 100%; padding: 25px; background: #000; border: 4px solid var(--neon-blue); 
+            box-shadow: 0 0 15px var(--neon-blue); border-radius: 40px; color: #fff; 
+            font-family: 'Exo 2'; font-weight: 900; font-size: 24px; text-transform: uppercase; 
+            cursor: pointer; text-align: center;
+        }
+        .btn-exit { border-color: #333; box-shadow: none; color: #666; }
+
+        /* --- НАСТРОЙКА ЛОББИ --- */
+        .title-neon { font-family: 'Exo 2'; font-size: 32px; color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.8); margin-bottom: 30px; }
+        .tab-row { display: flex; width: 100%; gap: 10px; margin-bottom: 30px; }
+        .tab { 
+            flex: 1; padding: 18px; border-radius: 20px; border: 3px solid; background: #000; 
+            font-family: 'Exo 2'; font-size: 15px; text-transform: uppercase; text-align: center;
+        }
+        .tab-participants { border-color: var(--neon-blue); color: var(--neon-blue); box-shadow: 0 0 12px var(--neon-blue); }
+        .tab-spy { border-color: var(--neon-red); color: var(--neon-red); box-shadow: 0 0 12px var(--neon-red); }
+
+        .slider-wrap { width: 100%; margin-bottom: 25px; }
+        .label-row { display: flex; justify-content: space-between; font-family: 'Exo 2'; font-size: 14px; color: #888; margin-bottom: 10px; }
+        .val-num { font-family: 'Black Ops One'; color: #fff; font-size: 20px; }
+        
+        input[type=range] { width: 100%; -webkit-appearance: none; background: transparent; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; background: #222; border-radius: 3px; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 24px; width: 24px; border-radius: 50%; background: #fff; box-shadow: 0 0 10px #fff; margin-top: -9px; }
+
+        /* КНОПКА №6: СОЗДАТЬ КОМНАТУ */
+        .btn-gold { border-color: var(--neon-gold); box-shadow: 0 0 20px var(--neon-gold); color: #fff !important; margin-top: 15px; }
+
+        /* --- ВХОД ПО ID (БЕЛЫЙ НЕОН) --- */
+        .id-display { display: flex; align-items: center; gap: 10px; margin: 40px 0; }
+        .id-digit { 
+            font-family: 'Black Ops One'; font-size: 48px; width: 40px; text-align: center; 
+            border-bottom: 4px solid #fff; color: #fff; text-shadow: 0 0 20px #fff; 
+        }
+        .id-sep { font-family: 'Black Ops One'; font-size: 48px; color: #fff; text-shadow: 0 0 20px #fff; transform: translateY(-8px); }
+
+        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; width: 100%; }
+        .key { 
+            padding: 22px; background: #0a0a0f; border: 2px solid #1a1a22; border-radius: 25px; 
+            font-size: 32px; color: #fff; font-family: 'Black Ops One'; display: flex; justify-content: center; align-items: center;
         }
 
-        .edition-monolith-text {
-            font-size: 16px;
-            color: var(--clr-white);
-            opacity: 0.65;
-            letter-spacing: 5px;
-            text-transform: uppercase;
+        /* --- ЛОББИ --- */
+        .tg-pill { 
+            padding: 10px 25px; border: 2px solid var(--neon-blue); border-radius: 50px; 
+            color: var(--neon-blue); font-family: 'Exo 2'; font-size: 18px; 
+            box-shadow: 0 0 15px var(--neon-blue); margin-bottom: 30px; 
         }
-
-        /* ========================================
-           5. ИНТЕРФЕЙС КНОПОК (UI CONTROLS)
-           ========================================
-        */
-        .ui-vertical-stack {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .btn-monolith {
-            width: 100%;
-            padding: 24px 0;
-            background: rgba(0, 0, 0, 0.85);
-            border: 3.5px solid var(--clr-blue-neon);
-            box-shadow: 0 0 12px var(--clr-blue-neon);
-            border-radius: 22px;
-            color: var(--clr-white);
-            font-size: 22px;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-            text-align: center;
-        }
-
-        .btn-monolith:active {
-            transform: scale(0.95);
-            box-shadow: 0 0 25px var(--clr-blue-neon);
-            background: var(--clr-blue-neon);
-            color: #000;
-        }
-
-        /* КНОПКА №6: СОЗДАТЬ КОМНАТУ (ЗОЛОТОЙ НЕОН) */
-        .btn-monolith-gold {
-            border-color: var(--clr-gold-neon);
-            box-shadow: 0 0 18px var(--clr-gold-neon);
-            color: var(--clr-white) !important;
-        }
-
-        .btn-monolith-gold:active {
-            background: var(--clr-gold-neon);
-            color: #000 !important;
-        }
-
-        .btn-monolith-back {
-            border-color: #2a2a2a;
-            color: #555555;
-            box-shadow: none;
-            margin-top: 15px;
-        }
-
-        /* ========================================
-           6. НАСТРОЙКИ (SETTINGS UI)
-           ========================================
-        */
-        .section-header-text {
-            font-size: 30px;
-            color: var(--clr-white);
-            text-shadow: 0 0 15px rgba(255,255,255,0.2);
-            margin-bottom: 45px;
-            text-transform: uppercase;
-        }
-
-        .tab-navigation-grid {
-            display: flex;
-            width: 100%;
-            gap: 15px;
-            margin-bottom: 40px;
-        }
-
-        .tab-link {
-            flex: 1;
-            padding: 18px 0;
-            border: 2.5px solid;
-            border-radius: 16px;
-            font-size: 14px;
-            text-align: center;
-            text-transform: uppercase;
-            background: #000;
-        }
-
-        .tab-link-blue { border-color: var(--clr-blue-neon); color: var(--clr-blue-neon); }
-        .tab-link-red { border-color: var(--clr-red-neon); color: var(--clr-red-neon); }
-
-        /* ИДЕНТИФИКАТОРЫ */
-        .id-display-box {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 50px 0;
-        }
-
-        .id-char-underline {
-            width: 34px;
-            font-size: 42px;
-            border-bottom: 4.5px solid var(--clr-white);
-            color: var(--clr-white);
-            text-align: center;
-        }
-
-        /* ========================================
-           7. АНИМАЦИИ (ANIMATIONS)
-           ========================================
-        */
-        @keyframes viewFadeTransition {
-            from { opacity: 0; transform: scale(1.03); }
-            to { opacity: 1; transform: scale(1); }
-        }
+        .p-list { width: 100%; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        .p-item { background: #0f0f15; border: 2px solid #222; border-radius: 20px; padding: 18px; display: flex; justify-content: space-between; }
+        .p-ready { color: var(--neon-green); text-shadow: 0 0 10px var(--neon-green); font-family: 'Exo 2'; text-transform: uppercase; font-size: 14px; }
+        .p-wait { color: var(--neon-red); text-shadow: 0 0 10px var(--neon-red); font-family: 'Exo 2'; text-transform: uppercase; font-size: 14px; }
 
     </style>
 </head>
 <body>
-
-    <div class="app-monolith">
+    <div class="app-shell">
         
-        <div id="view-main-menu" class="view-frame active">
-            
-            <div class="perfect-logo-container">
-                <div class="white-halo-effect"></div>
-                <div class="spy-monolith-text">ШПИОН</div>
-                <div class="brawl-monolith-text">BRAWL</div>
-                <div class="stars-monolith-text">STARS</div>
-                <div class="edition-monolith-text">EDITION 2026</div>
+        <div id="scr-menu" class="screen active">
+            <div class="logo-box">
+                <div class="main-spy">SPY</div>
+                <div class="sub-brawl">BRAWL STARS</div>
+                <div class="edition-2026">EDITION 2026</div>
             </div>
-            
-            <div class="ui-vertical-stack">
-                <button class="btn-monolith" onclick="AppEngine.navigateTo('view-settings')">СОЗДАТЬ ЛОББИ</button>
-                <button class="btn-monolith" onclick="AppEngine.navigateTo('view-id-gate')">ВХОД ПО ID</button>
-                <button class="btn-monolith btn-monolith-back" onclick="tg.close()">ВЫХОД</button>
+            <div class="btn-list">
+                <button class="btn-main" onclick="App.nav('scr-setup')">СОЗДАТЬ ЛОББИ</button>
+                <button class="btn-main" onclick="App.nav('scr-join')">ВХОД ПО ID</button>
+                <button class="btn-main btn-exit" onclick="tg.close()">ВЫХОД</button>
             </div>
         </div>
 
-        <div id="view-settings" class="view-frame">
-            <h2 class="section-header-text">НАСТРОЙКИ БИТВЫ</h2>
-            
-            <div class="tab-navigation-grid">
-                <div class="tab-link tab-link-blue">УЧАСТНИКИ</div>
-                <div class="tab-link tab-link-red">ШПИОН</div>
+        <div id="scr-setup" class="screen">
+            <h2 class="title-neon">НАСТРОЙКА ЛОББИ</h2>
+            <div class="tab-row">
+                <div class="tab tab-participants">УЧАСТНИКИ</div>
+                <div class="tab tab-spy">ШПИОН</div>
             </div>
 
-            <div id="session-id-label" style="color:var(--clr-gold-neon); font-size: 28px; margin-bottom: 40px; letter-spacing: 2px;">ID: 0000-0000</div>
-
-            <div class="ui-vertical-stack">
-                <button class="btn-monolith btn-monolith-gold" onclick="AppEngine.initRoom()">СОЗДАТЬ КОМНАТУ</button>
-                <button class="btn-monolith btn-monolith-back" onclick="AppEngine.navigateTo('view-main-menu')">МЕНЮ</button>
-            </div>
-        </div>
-
-        <div id="view-id-gate" class="view-frame">
-            <h2 class="section-header-text">ID КОМНАТЫ</h2>
-            
-            <div class="id-display-box">
-                <div class="id-char-underline">_</div><div class="id-char-underline">_</div><div class="id-char-underline">_</div><div class="id-char-underline">_</div>
-                <div style="font-size: 30px; color: #fff;">-</div>
-                <div class="id-char-underline">_</div><div class="id-char-underline">_</div><div class="id-char-underline">_</div><div class="id-char-underline">_</div>
+            <div class="slider-wrap">
+                <div class="label-row">ИГРОКИ <span class="val-num" id="p-val">8</span></div>
+                <input type="range" min="3" max="20" value="8" oninput="document.getElementById('p-val').innerText = this.value">
             </div>
 
-            <div class="ui-vertical-stack">
-                <button class="btn-monolith btn-monolith-back" onclick="AppEngine.navigateTo('view-main-menu')">ОТМЕНА</button>
+            <div class="slider-wrap">
+                <div class="label-row">ШПИОНЫ <span class="val-num" id="s-val">1</span></div>
+                <input type="range" min="1" max="5" value="1" oninput="document.getElementById('s-val').innerText = this.value">
+            </div>
+
+            <div id="id-prev" style="font-family:'Black Ops One'; font-size: 24px; color: var(--neon-gold); margin: 20px 0;">ID: ....-....</div>
+
+            <div class="btn-list">
+                <button class="btn-main btn-gold" onclick="App.createRoom()">СОЗДАТЬ КОМНАТУ</button>
+                <button class="btn-main" style="border-color:#333;" onclick="App.nav('scr-menu')">НАЗАД</button>
             </div>
         </div>
 
+        <div id="scr-join" class="screen">
+            <h2 class="title-neon">ID КОМНАТЫ</h2>
+            <div class="id-display">
+                <div class="id-digit" id="c1">_</div><div class="id-digit" id="c2">_</div><div class="id-digit" id="c3">_</div><div class="id-digit" id="c4">_</div>
+                <div class="id-sep">-</div>
+                <div class="id-digit" id="c5">_</div><div class="id-digit" id="c6">_</div><div class="id-digit" id="c7">_</div><div class="id-digit" id="c8">_</div>
+            </div>
+            <div class="numpad">
+                <script>for(let i=1; i<=9; i++) document.write(`<div class="key" onclick="App.key('${i}')">${i}</div>`);</script>
+                <div class="key" style="color:var(--neon-red)" onclick="App.key('C')">C</div>
+                <div class="key" onclick="App.key('0')">0</div>
+                <div class="key" style="color:var(--neon-gold)" onclick="App.joinRoom()">OK</div>
+            </div>
+            <button class="btn-main" style="margin-top:25px; border-color:#333;" onclick="App.nav('scr-menu')">НАЗАД</button>
+        </div>
+
+        <div id="scr-room" class="screen">
+            <div class="tg-pill" id="my-name">@USER</div>
+            <h2 class="title-neon">ЛОББИ БИТВЫ</h2>
+            <div id="active-id" style="font-family:'Black Ops One'; font-size: 26px; color: var(--neon-gold); margin-bottom: 25px;">ID: ....-....</div>
+            <div class="p-list" id="player-ui"></div>
+            <div class="btn-list" style="margin-top:25px;">
+                <button class="btn-main" id="ready-btn" style="border-color:var(--neon-green);" onclick="App.toggleReady()">ГОТОВ</button>
+                <button class="btn-main btn-gold" id="start-btn" style="display:none;">НАЧАТЬ ИГРУ</button>
+                <button class="btn-main" style="border-color:var(--neon-red);" onclick="location.reload()">ВЫЙТИ</button>
+            </div>
+        </div>
     </div>
 
     <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDbopGDAnN6RxiXoAk_Il90WZBCW0bVBvg",
+            authDomain: "brawlspy.firebaseapp.com",
+            databaseURL: "https://brawlspy-default-rtdb.firebaseio.com",
+            projectId: "brawlspy",
+            storageBucket: "brawlspy.firebasestorage.app",
+            messagingSenderId: "803859610634",
+            appId: "1:803859610634:web:2310aa16bb6e61049833f3"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
         const tg = window.Telegram.WebApp;
-        tg.expand();
+        const user = tg.initDataUnsafe.user || { id: 777, username: "Brawler" };
+        document.getElementById('my-name').innerText = "@" + (user.username || "Guest");
 
-        const AppEngine = {
-            activeRoom: null,
-
-            /**
-             * Переход между видами
-             */
-            navigateTo: function(viewId) {
-                const views = document.querySelectorAll('.view-frame');
-                views.forEach(v => v.classList.remove('active'));
-                
-                const target = document.getElementById(viewId);
-                if (target) {
-                    target.classList.add('active');
+        const App = {
+            room: null, input: "", isReady: false,
+            nav: (id) => {
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                document.getElementById(id).classList.add('active');
+                if(id === 'scr-setup') {
+                    App.room = Math.floor(1000+Math.random()*8999)+"-"+Math.floor(1000+Math.random()*8999);
+                    document.getElementById('id-prev').innerText = "ID: " + App.room;
                 }
-
-                if (viewId === 'view-settings') {
-                    this.activeRoom = this.createId();
-                    document.getElementById('session-id-label').innerText = "ID: " + this.activeRoom;
-                }
-
+            },
+            key: (v) => {
+                if(v === 'C') App.input = "";
+                else if(App.input.length < 8) App.input += v;
+                for(let i=1; i<=8; i++) document.getElementById('c'+i).innerText = App.input[i-1] || "_";
                 tg.HapticFeedback.impactOccurred('medium');
-                console.log("System Status: View changed to " + viewId);
             },
-
-            /**
-             * Создание сессионного ключа
-             */
-            createId: function() {
-                const partA = Math.floor(1000 + Math.random() * 8999);
-                const partB = Math.floor(1000 + Math.random() * 8999);
-                return `${partA}-${partB}`;
+            createRoom: () => { App.nav('scr-room'); App.sync(); },
+            joinRoom: () => {
+                if(App.input.length === 8) {
+                    App.room = App.input.slice(0,4) + "-" + App.input.slice(4,8);
+                    App.nav('scr-room'); App.sync();
+                }
             },
-
-            /**
-             * Финализация создания комнаты
-             */
-            initRoom: function() {
-                tg.HapticFeedback.notificationOccurred('success');
-                tg.showAlert(`ЛОББИ [${this.activeRoom}] УСПЕШНО РАЗВЕРНУТО!`);
+            sync: () => {
+                document.getElementById('active-id').innerText = "ID: " + App.room;
+                db.ref('rooms/'+App.room+'/players/'+user.id).set({ name: "@"+(user.username||"p"), ready: false });
+                db.ref('rooms/'+App.room+'/players').on('value', snap => {
+                    const ui = document.getElementById('player-ui');
+                    ui.innerHTML = "";
+                    const data = snap.val();
+                    if(data) Object.values(data).forEach(p => {
+                        ui.innerHTML += `<div class="p-item"><span>${p.name}</span><span class="${p.ready?'p-ready':'p-wait'}">${p.ready?'ГОТОВ':'ЖДЕМ'}</span></div>`;
+                    });
+                });
+            },
+            toggleReady: () => {
+                App.isReady = !App.isReady;
+                db.ref('rooms/'+App.room+'/players/'+user.id).update({ ready: App.isReady });
+                document.getElementById('ready-btn').innerText = App.isReady ? "ОТМЕНА" : "ГОТОВ";
             }
         };
-
-        // Блокировка прокрутки для мобильных браузеров
-        document.addEventListener('touchmove', function(e) {
-            e.preventDefault();
-        }, { passive: false });
     </script>
 </body>
 </html>
