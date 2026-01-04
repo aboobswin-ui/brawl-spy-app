@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>BRAWL SPY ULTIMATE</title>
+    <title>BRAWL SPY - EDITION 2026 ULTIMATE</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rubik+One&family=Exo+2:wght@900&display=swap" rel="stylesheet">
     
@@ -18,16 +18,28 @@
             --neon-gold: #ffd700;
             --neon-green: #00ff00;
             --bg-black: #020205;
-            --glow-white: rgba(255, 255, 255, 0.9);
+            --glow-white: rgba(255, 255, 255, 1);
+            --transition-speed: 0.3s;
         }
 
-        /* ГЛОБАЛЬНЫЕ СТИЛИ И ЦЕНТРИРОВАНИЕ */
+        /* ПОЛНЫЙ СБРОС И БАЗА */
         * { 
             box-sizing: border-box; 
             margin: 0; padding: 0; 
             -webkit-user-select: none; 
-            outline: none; 
             -webkit-tap-highlight-color: transparent;
+            outline: none; 
+        }
+
+        @keyframes pulse-gold {
+            0% { box-shadow: 0 0 10px var(--neon-gold); }
+            50% { box-shadow: 0 0 25px var(--neon-gold); }
+            100% { box-shadow: 0 0 10px var(--neon-gold); }
+        }
+
+        @keyframes neon-flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+            20%, 22%, 24%, 55% { opacity: 0.8; }
         }
 
         body { 
@@ -35,19 +47,35 @@
             color: #fff; 
             font-family: 'Rubik One', sans-serif; 
             height: 100vh; 
+            width: 100vw;
+            overflow: hidden; 
             display: flex; 
             justify-content: center; 
-            align-items: center; 
-            overflow: hidden;
+            align-items: center;
         }
 
         .app-shell { 
             width: 100%; 
             height: 100%; 
-            max-width: 450px; 
+            max-width: 500px; 
             position: relative; 
             display: flex; 
             flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* EDITION 2026 */
+        .edition-layer {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            z-index: 1000;
+            font-family: 'Black Ops One';
+            font-size: 16px;
+            color: var(--neon-blue);
+            text-shadow: 0 0 15px var(--neon-blue);
+            letter-spacing: 1px;
+            animation: neon-flicker 3s infinite;
         }
 
         .screen { 
@@ -56,188 +84,194 @@
             display: none; 
             flex-direction: column; 
             align-items: center; 
-            padding: 50px 25px 40px; 
+            justify-content: center; /* СТРОГО ПО ЦЕНТРУ */
+            padding: 60px 35px; 
             background: var(--bg-black); 
+            z-index: 10;
         }
 
-        .screen.active { display: flex; animation: fadeIn 0.3s ease-in-out; }
+        .screen.active { display: flex; animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
 
-        /* --- ГЛАВНОЕ МЕНЮ --- */
-        .logo-container { text-align: center; margin-bottom: 50px; }
-        .spy-title { font-size: 95px; color: var(--neon-red); text-shadow: 0 0 35px var(--neon-red); line-height: 1; }
-        .brawl-subtitle { font-family: 'Black Ops One'; font-size: 30px; color: var(--neon-gold); margin-top: -5px; }
+        /* ГЛАВНОЕ МЕНЮ (ПО ТЗ И ФОТО) */
+        .logo-wrap { text-align: center; margin-bottom: 60px; }
+        .main-spy-text { font-size: 110px; color: var(--neon-red); text-shadow: 0 0 40px var(--neon-red); line-height: 0.85; }
+        .stars-subtitle { font-family: 'Black Ops One'; font-size: 34px; color: var(--neon-gold); text-shadow: 0 0 10px var(--neon-gold); }
 
-        .btn-universal {
+        .btn-group { width: 100%; display: flex; flex-direction: column; gap: 22px; }
+
+        .btn-core {
             width: 100%;
-            padding: 24px;
-            background: #000;
+            padding: 26px;
+            background: rgba(0,0,0,0.8);
             border: 4px solid var(--neon-blue);
-            box-shadow: 0 0 15px var(--neon-blue);
-            border-radius: 35px;
+            box-shadow: 0 0 18px var(--neon-blue);
+            border-radius: 40px;
             color: #fff;
             font-family: 'Exo 2';
             font-weight: 900;
-            font-size: 22px;
+            font-size: 24px;
             text-transform: uppercase;
-            margin-bottom: 20px;
             cursor: pointer;
-            transition: transform 0.1s;
-            text-align: center;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
         }
-        .btn-universal:active { transform: scale(0.97); }
+        .btn-core:active { transform: scale(0.95); filter: brightness(1.3); }
+        
+        .btn-exit-style { border-color: #333; box-shadow: none; color: #666; }
 
-        /* КНОПКА №6: СОЗДАТЬ КОМНАТУ [cite: 2026-01-04] */
-        .btn-special-6 {
-            border-color: var(--neon-gold);
-            box-shadow: 0 0 18px var(--neon-gold);
-            color: #ffffff !important;
-            margin-top: 40px;
+        /* НАСТРОЙКА ЛОББИ [cite: 2026-01-03] */
+        .header-lobby { font-family: 'Exo 2'; font-size: 32px; color: #fff; text-shadow: 0 0 20px var(--glow-white); margin-bottom: 35px; text-transform: uppercase; }
+        
+        .tab-system { display: flex; width: 100%; gap: 15px; margin-bottom: 40px; }
+        .tab-unit { 
+            flex: 1; padding: 20px; border-radius: 25px; text-align: center; 
+            font-family: 'Exo 2'; font-size: 16px; border: 3px solid; background: #000; 
+            text-transform: uppercase; font-weight: 900;
+        }
+        .unit-participants { border-color: var(--neon-blue); color: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); }
+        .unit-spy { border-color: var(--neon-red); color: var(--neon-red); box-shadow: 0 0 15px var(--neon-red); }
+
+        .slider-container { width: 100%; margin-bottom: 30px; }
+        .slider-info { display: flex; justify-content: space-between; font-family: 'Exo 2'; color: #888; margin-bottom: 12px; font-size: 14px; text-transform: uppercase; }
+        .slider-val-num { color: #fff; font-family: 'Black Ops One'; font-size: 22px; }
+
+        /* КНОПКА №6: СОЗДАТЬ КОМНАТУ (БЕЛЫЙ ТЕКСТ) [cite: 2026-01-04] */
+        .btn-create-special { 
+            border-color: var(--neon-gold); 
+            box-shadow: 0 0 20px var(--neon-gold); 
+            color: #ffffff !important; 
+            animation: pulse-gold 2s infinite;
+            margin-top: 25px;
         }
 
-        /* --- НАСТРОЙКА ЛОББИ [cite: 2026-01-03] --- */
-        .lobby-settings-title {
+        /* ВХОД ПО ID: БЕЛЫЙ НЕОН */
+        .id-input-wrapper { display: flex; align-items: center; gap: 10px; margin: 45px 0; }
+        .digit-slot { 
+            font-family: 'Black Ops One'; font-size: 50px; width: 42px; text-align: center; 
+            border-bottom: 5px solid #fff; color: #fff; text-shadow: 0 0 25px #fff; 
+        }
+        .dash-slot { font-family: 'Black Ops One'; font-size: 50px; color: #fff; text-shadow: 0 0 25px #fff; transform: translateY(-8px); }
+
+        .numpad-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; width: 100%; }
+        .numpad-key { 
+            aspect-ratio: 1.1; background: #08080c; border: 2px solid #1a1a22; border-radius: 28px; 
+            font-size: 34px; color: #fff; font-family: 'Black Ops One'; display: flex; 
+            justify-content: center; align-items: center; transition: 0.1s;
+        }
+        .numpad-key:active { background: #222; transform: scale(0.9); }
+
+        /* ЛОББИ: ТГ ЮЗ НЕОН */
+        .lobby-tg-pill {
+            background: rgba(0, 210, 255, 0.1);
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 15px var(--neon-blue);
+            padding: 12px 30px;
+            border-radius: 50px;
+            color: var(--neon-blue);
             font-family: 'Exo 2';
-            font-size: 30px;
-            color: #fff;
-            text-shadow: 0 0 15px var(--glow-white);
-            text-transform: uppercase;
+            font-size: 18px;
             margin-bottom: 40px;
+            text-transform: lowercase;
+            text-shadow: 0 0 5px var(--neon-blue);
         }
 
-        .tabs-container { display: flex; width: 100%; gap: 15px; margin-bottom: 30px; }
-        .tab-btn {
-            flex: 1;
-            padding: 18px;
-            border-radius: 20px;
-            text-align: center;
-            font-family: 'Exo 2';
-            font-size: 15px;
-            border: 3px solid;
-            background: #000;
-            text-transform: uppercase;
+        .player-row-list { 
+            width: 100%; flex: 1; overflow-y: auto; 
+            display: flex; flex-direction: column; gap: 15px; 
+            padding-right: 5px;
         }
-        .tab-blue { border-color: var(--neon-blue); box-shadow: 0 0 12px var(--neon-blue); color: var(--neon-blue); }
-        .tab-red { border-color: var(--neon-red); box-shadow: 0 0 12px var(--neon-red); color: var(--neon-red); }
-
-        .control-group { width: 100%; margin-bottom: 25px; }
-        .control-label { 
-            font-family: 'Exo 2'; font-size: 14px; color: #888; 
-            display: flex; justify-content: space-between; margin-bottom: 12px;
-            text-transform: uppercase;
+        .p-card { 
+            background: #0a0a0f; border: 2px solid #222; border-radius: 25px; 
+            padding: 20px; display: flex; justify-content: space-between; align-items: center;
         }
-        .control-value { font-family: 'Black Ops One'; color: #fff; font-size: 20px; }
-
-        input[type=range] { width: 100%; -webkit-appearance: none; background: transparent; }
-        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; background: #222; border-radius: 3px; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 26px; width: 26px; border-radius: 50%; background: #fff; box-shadow: 0 0 10px #fff; margin-top: -10px; }
-
-        /* --- ВХОД ПО ID --- */
-        .id-header { font-family: 'Exo 2'; font-size: 32px; color: #fff; margin-bottom: 10px; text-transform: uppercase; }
-        .id-input-field { display: flex; align-items: center; gap: 8px; margin: 45px 0; }
-        .digit-box { font-family: 'Black Ops One'; font-size: 42px; width: 38px; text-align: center; border-bottom: 4px solid #fff; color: #fff; }
-        .id-divider { font-family: 'Black Ops One'; font-size: 42px; color: #fff; transform: translateY(-6px); }
-
-        .numpad-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; width: 100%; }
-        .num-btn { 
-            padding: 24px; background: #0d0d14; border: 2px solid #1a1a25; border-radius: 25px; 
-            font-size: 30px; color: #fff; font-family: 'Black Ops One'; display: flex; 
-            justify-content: center; align-items: center;
-        }
-
-        /* --- ЛОББИ СПИСОК --- */
-        .room-id-header { font-family: 'Black Ops One'; font-size: 24px; color: var(--neon-gold); margin-bottom: 30px; }
-        .player-list-container { width: 100%; flex: 1; overflow-y: auto; margin-bottom: 20px; }
-        .player-item { 
-            width: 100%; background: #0a0a10; border: 2px solid #222; 
-            border-radius: 22px; padding: 18px; display: flex; justify-content: space-between; 
-            align-items: center; margin-bottom: 15px;
-        }
-        .status-ready-text { color: var(--neon-green); text-shadow: 0 0 10px var(--neon-green); font-family: 'Exo 2'; font-size: 14px; text-transform: uppercase; }
-        .status-wait-text { color: var(--neon-red); text-shadow: 0 0 10px var(--neon-red); font-family: 'Exo 2'; font-size: 14px; text-transform: uppercase; }
+        .p-name { font-family: 'Exo 2'; font-size: 20px; font-weight: 900; }
+        .p-status { font-family: 'Exo 2'; font-size: 14px; text-transform: uppercase; font-weight: 900; }
 
     </style>
 </head>
 <body>
+    <div class="edition-layer">EDITION 2026</div>
+    
     <div class="app-shell">
         
         <div id="scr-menu" class="screen active">
-            <div class="logo-container">
-                <div class="spy-title">SPY</div>
-                <div class="brawl-subtitle">BRAWL STARS</div>
+            <div class="logo-wrap">
+                <div class="main-spy-text">SPY</div>
+                <div class="stars-subtitle">BRAWL STARS</div>
             </div>
-            <button class="btn-universal" onclick="App.nav('scr-setup')">СОЗДАТЬ ЛОББИ</button>
-            <button class="btn-universal" onclick="App.nav('scr-join')">ВХОД ПО ID</button>
-            <button class="btn-universal" style="border-color: #333; box-shadow: none;" onclick="tg.close()">ВЫХОД</button>
-            
-            <button class="btn-universal btn-special-6" onclick="App.nav('scr-setup')">СОЗДАТЬ КОМНАТУ</button>
+            <div class="btn-group">
+                <button class="btn-core" onclick="App.nav('scr-setup')">СОЗДАТЬ ЛОББИ</button>
+                <button class="btn-core" onclick="App.nav('scr-join')">ВХОД ПО ID</button>
+                <button class="btn-core btn-exit-style" onclick="tg.close()">ВЫХОД</button>
+            </div>
         </div>
 
         <div id="scr-setup" class="screen">
-            <h2 class="lobby-settings-title">НАСТРОЙКА ЛОББИ</h2>
-            <div class="tabs-container">
-                <div class="tab-btn tab-blue">УЧАСТНИКИ</div>
-                <div class="tab-btn tab-red">ШПИОН</div>
+            <h2 class="header-lobby">НАСТРОЙКА ЛОББИ</h2>
+            <div class="tab-system">
+                <div class="tab-unit unit-participants">УЧАСТНИКИ</div>
+                <div class="tab-unit unit-spy">ШПИОН</div>
             </div>
 
-            <div class="control-group">
-                <div class="control-label">УЧАСТНИКИ <span class="control-value" id="disp-p">8</span></div>
-                <input type="range" min="3" max="20" value="8" oninput="document.getElementById('disp-p').innerText = this.value">
+            <div class="slider-container">
+                <div class="slider-info">УЧАСТНИКИ <span class="slider-val-num" id="p-val">8</span></div>
+                <input type="range" min="3" max="25" value="8" style="width:100%" oninput="document.getElementById('p-val').innerText = this.value">
             </div>
 
-            <div class="control-group">
-                <div class="control-label">ШПИОНЫ <span class="control-value" id="disp-s">1</span></div>
-                <input type="range" min="1" max="10" value="1" oninput="document.getElementById('disp-s').innerText = this.value">
+            <div class="slider-container">
+                <div class="slider-info">ШПИОНЫ <span class="slider-val-num" id="s-val">1</span></div>
+                <input type="range" min="1" max="12" value="1" style="width:100%" oninput="document.getElementById('s-val').innerText = this.value">
             </div>
 
-            <div class="control-group">
-                <div class="control-label">ВРЕМЯ (МИН) <span class="control-value" id="disp-t">5</span></div>
-                <input type="range" min="1" max="15" value="5" oninput="document.getElementById('disp-t').innerText = this.value">
-            </div>
+            <div id="setup-id-display" style="font-family:'Black Ops One'; font-size: 26px; color: var(--neon-gold); margin: 20px 0;">ID: ....-....</div>
 
-            <div id="setup-id-tag" style="font-family:'Black Ops One'; font-size: 24px; color: var(--neon-gold); margin: 25px 0;">ID: ....-....</div>
-
-            <div style="width:100%; margin-top: auto;">
-                <button class="btn-universal btn-special-6" onclick="App.createRoom()">СОЗДАТЬ КОМНАТУ</button>
-                <button class="btn-universal" style="border-color:#222; box-shadow:none;" onclick="App.nav('scr-menu')">НАЗАД</button>
+            <div class="btn-group">
+                <button class="btn-core btn-create-special" onclick="App.createRoom()">СОЗДАТЬ КОМНАТУ</button>
+                <button class="btn-core" style="border-color:#222; box-shadow:none;" onclick="App.nav('scr-menu')">НАЗАД</button>
             </div>
         </div>
 
         <div id="scr-join" class="screen">
-            <h2 class="id-header">ID КОМНАТЫ</h2>
-            <div class="id-input-field">
-                <div class="digit-box" id="c1">_</div><div class="digit-box" id="c2">_</div><div class="digit-box" id="c3">_</div><div class="digit-box" id="c4">_</div>
-                <div class="id-divider">-</div>
-                <div class="digit-box" id="c5">_</div><div class="digit-box" id="c6">_</div><div class="digit-box" id="c7">_</div><div class="digit-box" id="c8">_</div>
+            <h2 class="header-lobby">ID ЛОББИ</h2>
+            <div class="id-input-wrapper">
+                <div class="digit-slot" id="c1">_</div><div class="digit-slot" id="c2">_</div><div class="digit-slot" id="c3">_</div><div class="digit-slot" id="c4">_</div>
+                <div class="dash-slot">-</div>
+                <div class="digit-slot" id="c5">_</div><div class="digit-slot" id="c6">_</div><div class="digit-slot" id="c7">_</div><div class="digit-slot" id="c8">_</div>
             </div>
             
-            <div class="numpad-grid">
-                <script>for(let i=1; i<=9; i++) document.write(`<div class="num-btn" onclick="App.press('${i}')">${i}</div>`);</script>
-                <div class="num-btn" style="color:var(--neon-red)" onclick="App.press('C')">C</div>
-                <div class="num-btn" onclick="App.press('0')">0</div>
-                <div class="num-btn" style="color:var(--neon-gold)" onclick="App.joinRoom()">OK</div>
+            <div class="numpad-container">
+                <script>for(let i=1; i<=9; i++) document.write(`<div class="numpad-key" onclick="App.key('${i}')">${i}</div>`);</script>
+                <div class="numpad-key" style="color:var(--neon-red)" onclick="App.key('C')">C</div>
+                <div class="numpad-key" onclick="App.key('0')">0</div>
+                <div class="numpad-key" style="color:var(--neon-gold)" onclick="App.joinRoom()">OK</div>
             </div>
-            <button class="btn-universal" style="margin-top:40px; border-color:#222; box-shadow:none;" onclick="App.nav('scr-menu')">НАЗАД</button>
+            <button class="btn-core" style="margin-top:35px; border-color:#222;" onclick="App.nav('scr-menu')">НАЗАД</button>
         </div>
 
         <div id="scr-room" class="screen">
-            <h2 class="lobby-settings-title">ЛОББИ БИТВЫ</h2>
-            <div id="active-id-display" class="room-id-header">ID: ....-....</div>
+            <div class="lobby-tg-pill" id="lobby-username">@loading...</div>
+            <h2 class="header-lobby">ЛОББИ БИТВЫ</h2>
+            <div id="room-id-label" style="font-family:'Black Ops One'; font-size: 28px; color: var(--neon-gold); margin-bottom: 30px;">ID: ....-....</div>
             
-            <div class="player-list-container" id="player-list-ui"></div>
+            <div class="player-row-list" id="ui-players"></div>
             
-            <div style="width:100%; margin-top: auto;">
-                <button class="btn-universal" id="ready-btn" style="border-color:var(--neon-green); box-shadow: 0 0 15px var(--neon-green);" onclick="App.toggleReady()">ГОТОВ</button>
-                <button class="btn-universal btn-special-6" id="start-game-btn" style="display:none">НАЧАТЬ ИГРУ</button>
-                <button class="btn-universal" style="border-color:var(--neon-red); box-shadow:none;" onclick="App.leave()">ВЫЙТИ</button>
+            <div class="btn-group" style="margin-top: 30px;">
+                <button class="btn-core" id="ready-btn-ui" style="border-color:var(--neon-green); box-shadow: 0 0 20px var(--neon-green);" onclick="App.toggleReady()">ГОТОВ</button>
+                <button class="btn-core btn-create-special" id="start-btn-ui" style="display:none;">НАЧАТЬ ИГРУ</button>
+                <button class="btn-core" style="border-color:var(--neon-red);" onclick="location.reload()">ВЫЙТИ</button>
             </div>
         </div>
 
     </div>
 
     <script>
-        // FIREBASE CONFIG
+        // FIREBASE КОНФИГ
         const firebaseConfig = {
             apiKey: "AIzaSyDbopGDAnN6RxiXoAk_Il90WZBCW0bVBvg",
             authDomain: "brawlspy.firebaseapp.com",
@@ -250,58 +284,59 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const tg = window.Telegram.WebApp;
-        tg.expand();
-
-        const user = tg.initDataUnsafe.user || { id: Date.now(), username: "Player_" + Math.floor(Math.random()*99) };
+        const user = tg.initDataUnsafe.user || { id: 1001, username: "LocalSpy" };
+        
+        document.getElementById('lobby-username').innerText = "@" + (user.username || "Anonymous");
 
         const App = {
-            room: null,
-            input: "",
+            activeRoom: null,
+            inputBuffer: "",
             ready: false,
 
             nav: (id) => {
                 document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
                 document.getElementById(id).classList.add('active');
                 if(id === 'scr-setup') {
-                    const c = Math.floor(1000+Math.random()*8999) + "-" + Math.floor(1000+Math.random()*8999);
-                    App.room = c;
-                    document.getElementById('setup-id-tag').innerText = "ID: " + c;
+                    const roomCode = Math.floor(1000+Math.random()*8999)+"-"+Math.floor(1000+Math.random()*8999);
+                    App.activeRoom = roomCode;
+                    document.getElementById('setup-id-display').innerText = "ID: " + roomCode;
                 }
             },
 
-            press: (v) => {
-                if(v === 'C') App.input = "";
-                else if(App.input.length < 8) App.input += v;
-                for(let i=1; i<=8; i++) document.getElementById('c'+i).innerText = App.input[i-1] || "_";
+            key: (val) => {
+                if(val === 'C') App.inputBuffer = "";
+                else if(App.inputBuffer.length < 8) App.inputBuffer += val;
+                for(let i=1; i<=8; i++) {
+                    const cell = document.getElementById('c'+i);
+                    cell.innerText = App.inputBuffer[i-1] || "_";
+                }
                 tg.HapticFeedback.impactOccurred('medium');
             },
 
             createRoom: () => { App.nav('scr-room'); App.connect(); },
             joinRoom: () => {
-                if(App.input.length === 8) {
-                    App.room = App.input.slice(0,4) + "-" + App.input.slice(4,8);
+                if(App.inputBuffer.length === 8) {
+                    App.activeRoom = App.inputBuffer.slice(0,4) + "-" + App.inputBuffer.slice(4,8);
                     App.nav('scr-room'); App.connect();
                 }
             },
 
             connect: () => {
-                document.getElementById('active-id-display').innerText = "ID: " + App.room;
-                db.ref('rooms/' + App.room + '/players/' + user.id).set({ 
-                    name: "@" + (user.username || "guest"), 
-                    ready: false 
-                });
+                document.getElementById('room-id-label').innerText = "ID: " + App.activeRoom;
+                const playerPath = 'rooms/' + App.activeRoom + '/players/' + user.id;
+                db.ref(playerPath).set({ name: "@" + (user.username || "spy"), ready: false });
 
-                db.ref('rooms/' + App.room + '/players').on('value', snap => {
-                    const players = snap.val();
-                    const ui = document.getElementById('player-list-ui');
-                    ui.innerHTML = "";
-                    if(players) {
-                        Object.keys(players).forEach(uid => {
-                            const p = players[uid];
-                            ui.innerHTML += `
-                                <div class="player-item">
-                                    <span style="font-family:'Exo 2'; font-size:18px;">${p.name}</span>
-                                    <span class="${p.ready ? 'status-ready-text' : 'status-wait-text'}">${p.ready ? 'ГОТОВ' : 'ЖДЕМ'}</span>
+                db.ref('rooms/' + App.activeRoom + '/players').on('value', snap => {
+                    const list = document.getElementById('ui-players');
+                    list.innerHTML = "";
+                    const data = snap.val();
+                    if(data) {
+                        Object.keys(data).forEach(uid => {
+                            const p = data[uid];
+                            list.innerHTML += `
+                                <div class="p-card">
+                                    <span class="p-name">${p.name}</span>
+                                    <span class="p-status" style="color:${p.ready?'var(--neon-green)':'var(--neon-red)'}">${p.ready?'ГОТОВ':'ЖДЁМ'}</span>
                                 </div>`;
                         });
                     }
@@ -310,14 +345,11 @@
 
             toggleReady: () => {
                 App.ready = !App.ready;
-                db.ref('rooms/' + App.room + '/players/' + user.id).update({ ready: App.ready });
-                document.getElementById('ready-btn').innerText = App.ready ? "ОТМЕНА" : "ГОТОВ";
-                tg.HapticFeedback.notificationOccurred('success');
-            },
-
-            leave: () => {
-                if(App.room) db.ref('rooms/' + App.room + '/players/' + user.id).remove();
-                location.reload();
+                db.ref('rooms/' + App.activeRoom + '/players/' + user.id).update({ ready: App.ready });
+                const btn = document.getElementById('ready-btn-ui');
+                btn.innerText = App.ready ? "ОТМЕНА" : "ГОТОВ";
+                btn.style.borderColor = App.ready ? "var(--neon-red)" : "var(--neon-green)";
+                btn.style.boxShadow = App.ready ? "0 0 20px var(--neon-red)" : "0 0 20px var(--neon-green)";
             }
         };
     </script>
