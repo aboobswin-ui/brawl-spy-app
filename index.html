@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>BRAWL SPY - ULTIMATE INTERFACE</title>
+    <title>BRAWL SPY 2026 - ULTIMATE</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,219 +13,218 @@
 
     <style>
         :root {
-            --clr-bg: #0d1117;
-            --clr-gold-main: #ffcc00;
-            --clr-gold-dark: #ff8c00;
+            --bg-deep: #0b0e14;
+            --clr-gold-top: #ffdc00;
+            --clr-gold-bottom: #ff8c00;
             --clr-neon-blue: #00d2ff;
             --clr-neon-red: #ff3131;
-            --clr-white: #ffffff;
             --f-main: 'Black Ops One', cursive;
         }
 
-        /* ГЛОБАЛЬНЫЕ СТИЛИ */
+        /* ОБНУЛЕНИЕ И БАЗА */
         * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-            -webkit-tap-highlight-color: transparent; 
-            user-select: none; 
+            margin: 0; padding: 0; box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; user-select: none; 
         }
 
         body {
-            background-color: var(--clr-bg);
-            color: var(--clr-white);
-            height: 100vh; 
+            background-color: var(--bg-deep);
+            color: #ffffff;
+            height: 100vh;
             width: 100vw;
-            display: flex; 
-            flex-direction: column;
-            align-items: center; 
-            justify-content: flex-start;
-            overflow: hidden; 
             font-family: var(--f-main);
-        }
-
-        /* КОНТЕЙНЕР ПРИЛОЖЕНИЯ */
-        .app-wrapper {
-            width: 100%; 
-            max-width: 440px; 
-            height: 100%;
-            position: relative; 
-            display: flex; 
-            flex-direction: column;
-            align-items: center;
-            /* ФОНОВОЕ ОСВЕЩЕНИЕ КАК НА ФОТО */
-            background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0) 60%);
-        }
-
-        /* БЛОК ДЛЯ ТВОЕГО ФОТО (НАВЕРХУ) */
-        .top-logo-area {
-            width: 100%;
-            padding: 40px 20px 20px 20px;
             display: flex;
             justify-content: center;
-            z-index: 10;
-        }
-
-        .top-logo-area img {
-            width: 85%;
-            height: auto;
-            filter: drop-shadow(0 0 25px rgba(255,255,255,0.2));
-        }
-
-        /* ЭКРАНЫ */
-        .screen-layer { 
-            position: absolute; 
-            inset: 0; 
-            display: none; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            padding-top: 180px; /* Чтобы не перекрывать логотип сверху */
-        }
-        
-        .screen-layer.active { display: flex; animation: fadeIn 0.4s ease-out; }
-
-        /* КНОПКИ */
-        .button-container { 
-            width: 100%; 
-            padding: 0 40px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 18px; 
-            z-index: 100; 
-        }
-
-        .btn-action {
-            width: 100%; 
-            padding: 22px 0;
-            font-family: var(--f-main); 
-            font-size: 24px;
-            text-transform: uppercase; 
-            border-radius: 14px;
-            border: none; 
-            cursor: pointer; 
-            transition: transform 0.1s, box-shadow 0.1s;
-            box-shadow: 0 8px 0 rgba(0,0,0,0.5);
-            position: relative;
             overflow: hidden;
         }
 
-        .btn-action::before {
-            content: ''; 
-            position: absolute; 
-            top: 0; left: 0; 
-            width: 100%; height: 40%; 
-            background: linear-gradient(rgba(255,255,255,0.1), transparent);
+        .main-wrapper {
+            width: 100%;
+            max-width: 440px;
+            height: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* ТО САМОЕ СВЕЧЕНИЕ СЗАДИ */
+            background: radial-gradient(circle at 50% 25%, rgba(255,255,255,0.18) 0%, rgba(0,0,0,0) 55%);
         }
 
-        .btn-action:active { 
-            transform: translateY(4px); 
-            box-shadow: 0 4px 0 rgba(0,0,0,0.5); 
+        /* БЛОК КАРТИНКИ СВЕРХУ */
+        .header-logo {
+            width: 100%;
+            padding: 45px 30px 0 30px;
+            text-align: center;
+            z-index: 10;
         }
 
-        /* КНОПКА №6: СОЗДАТЬ КОМНАТУ (ЗОЛОТАЯ + БЕЛЫЙ ТЕКСТ) */
-        .btn-create-lobby {
-            background: linear-gradient(180deg, var(--clr-gold-main), var(--clr-gold-dark));
-            color: #ffffff !important; 
+        /* Вшитая картинка (заглушка высокого качества, имитирующая твой стиль) */
+        .header-logo img {
+            width: 100%;
+            max-width: 320px;
+            filter: drop-shadow(0 0 20px rgba(255,255,255,0.2));
+            animation: pulse-glow 3s infinite ease-in-out;
         }
 
-        .btn-join-blue { 
-            background: linear-gradient(180deg, #00a2ff, #004dff); 
-            color: #fff; 
+        @keyframes pulse-glow {
+            0%, 100% { filter: drop-shadow(0 0 15px rgba(255,255,255,0.15)); }
+            50% { filter: drop-shadow(0 0 30px rgba(255,255,255,0.3)); }
         }
 
-        .btn-back-menu { 
-            background: #2a2a2a; 
-            color: #ccc; 
-            font-size: 16px; 
-            padding: 16px 0; 
+        /* СИСТЕМА ЭКРАНОВ */
+        .view-layer {
+            position: absolute;
+            inset: 0;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-top: 140px;
+            z-index: 5;
+        }
+
+        .view-layer.active { display: flex; animation: slideUp 0.3s ease-out; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ИНТЕРФЕЙС КНОПОК */
+        .nav-panel {
+            width: 100%;
+            padding: 0 45px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .ui-btn {
+            width: 100%;
+            padding: 22px 0;
+            font-family: var(--f-main);
+            font-size: 24px;
+            text-transform: uppercase;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 0 rgba(0,0,0,0.5);
+            transition: 0.1s;
+        }
+
+        .ui-btn::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 45%;
+            background: linear-gradient(rgba(255,255,255,0.15), transparent);
+        }
+
+        .ui-btn:active { transform: translateY(4px); box-shadow: 0 4px 0 rgba(0,0,0,0.5); }
+
+        /* КНОПКА №6: СОЗДАТЬ КОМНАТУ (БЕЛЫЙ ТЕКСТ + ЗОЛОТО) */
+        .btn-gold {
+            background: linear-gradient(180deg, var(--clr-gold-top), var(--clr-gold-bottom));
+            color: #ffffff !important;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .btn-blue {
+            background: linear-gradient(180deg, #00a8ff, #004dff);
+            color: #ffffff;
+        }
+
+        .btn-menu {
+            background: #2a2a2a;
+            color: #999;
+            font-size: 16px;
+            padding: 15px 0;
             margin-top: 10px;
         }
 
-        /* НАСТРОЙКА ЛОББИ - СТИЛИ */
-        .lobby-title { 
-            font-size: 32px; 
-            color: var(--clr-white); 
-            text-shadow: 0 0 15px rgba(255,255,255,0.7); 
-            margin-bottom: 40px; 
+        /* ЭКРАН ЛОББИ */
+        .lobby-header {
+            font-size: 32px;
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(255,255,255,0.6);
+            margin-bottom: 35px;
             text-transform: uppercase;
         }
 
-        .settings-tabs { 
-            display: flex; 
-            width: 100%; 
-            gap: 15px; 
-            padding: 0 40px; 
-            margin-bottom: 35px; 
+        .tabs-row {
+            display: flex;
+            width: 100%;
+            gap: 12px;
+            padding: 0 45px;
+            margin-bottom: 30px;
         }
 
-        .tab-box { 
-            flex: 1; 
-            padding: 20px 0; 
-            border: 3.5px solid; 
-            border-radius: 12px; 
-            text-align: center; 
-            font-size: 14px; 
+        .tab-neon {
+            flex: 1;
+            padding: 18px 0;
+            border: 3px solid;
+            border-radius: 14px;
+            text-align: center;
+            font-size: 14px;
             font-weight: bold;
         }
-        
-        .tab-neon-blue { 
-            border-color: var(--clr-neon-blue); 
-            color: var(--clr-neon-blue); 
-            box-shadow: inset 0 0 10px var(--clr-neon-blue), 0 0 10px var(--clr-neon-blue); 
+
+        .tab-participants {
+            border-color: var(--clr-neon-blue);
+            color: var(--clr-neon-blue);
+            box-shadow: inset 0 0 8px var(--clr-neon-blue), 0 0 8px var(--clr-neon-blue);
         }
 
-        .tab-neon-red { 
-            border-color: var(--clr-neon-red); 
-            color: var(--clr-neon-red); 
-            box-shadow: inset 0 0 10px var(--clr-neon-red), 0 0 10px var(--clr-neon-red); 
+        .tab-spy {
+            border-color: var(--clr-neon-red);
+            color: var(--clr-neon-red);
+            box-shadow: inset 0 0 8px var(--clr-neon-red), 0 0 8px var(--clr-neon-red);
         }
 
-        .id-caption { font-size: 20px; color: var(--clr-white); margin-bottom: 8px; }
-        .id-number { color: var(--clr-gold-main); font-size: 38px; margin-bottom: 40px; letter-spacing: 4px; }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .id-title { font-size: 18px; color: #ffffff; margin-bottom: 5px; opacity: 0.8; }
+        .id-code { color: var(--clr-gold-top); font-size: 38px; margin-bottom: 45px; letter-spacing: 6px; }
 
     </style>
 </head>
 <body>
 
-    <div class="app-wrapper">
+    <div class="main-wrapper">
         
-        <div class="top-logo-area">
-            <img src="logo.png" alt="LOGO">
+        <div class="header-logo">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDQwMCAyMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMjAwIiBmaWxsPSJub25lIi8+Cjx0ZXh0IHg9IjUwJSIgeT0iNDAlIiBmaWxsPSJ3aGl0ZSIgZm9udC1mYW1pbHk9IkJsYWNrIE9wcyBPbmUiIGZvbnQtc2l6ZT0iNDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkJSQVdMPC90ZXh0Pgo8dGV4dCB4PSI1MCUiIHk9Ijg1JSIgZmlsbD0icmVkIiBmb250LWZhbWlseT0iQmxhY2sgT3BzIE9uZSIgZm9udC1zaXplPSI2MCIgdGV4dC1hbmNob3I9Im1pZGRsZSI+U1RBUlM8L3RleHQ+Cjx0ZXh0IHg9IjUwJSIgeT0iNjUlIiBmaWxsPSJyZWQiIGZvbnQtZmFtaWx5PSJSdWJpayBNb25vIE9uZSIgZm9udC1zaXplPSI0NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIj7QqNCf0JjQntCdPC90ZXh0Pgo8L3N2Zz4=" alt="LOGO">
         </div>
 
-        <div id="view-menu" class="screen-layer active">
-            <div class="button-container">
-                <button class="btn-action btn-create-lobby" onclick="navigateTo('view-setup')">СОЗДАТЬ КОМНАТУ</button>
-                <button class="btn-action btn-join-blue" onclick="navigateTo('view-join')">ВХОД ПО ID</button>
-                <button class="btn-action btn-back-menu" onclick="tg.close()">ВЫХОД</button>
+        <div id="screen-main" class="view-layer active">
+            <div class="nav-panel">
+                <button class="ui-btn btn-gold" onclick="nav('screen-lobby')">СОЗДАТЬ КОМНАТУ</button>
+                <button class="ui-btn btn-blue" onclick="nav('screen-join')">ВХОД ПО ID</button>
+                <button class="ui-btn btn-menu" onclick="tg.close()">ВЫХОД</button>
             </div>
         </div>
 
-        <div id="view-setup" class="screen-layer">
-            <h2 class="lobby-title">НАСТРОЙКА ЛОББИ</h2>
+        <div id="screen-lobby" class="view-layer">
+            <h2 class="lobby-header">НАСТРОЙКА ЛОББИ</h2>
             
-            <div class="settings-tabs">
-                <div class="tab-box tab-neon-blue">УЧАСТНИКИ</div>
-                <div class="tab-box tab-neon-red">ШПИОН</div>
+            <div class="tabs-row">
+                <div class="tab-neon tab-participants">УЧАСТНИКИ</div>
+                <div class="tab-neon tab-spy">ШПИОН</div>
             </div>
 
-            <div class="id-caption">ID КОМНАТЫ</div>
-            <div id="display-room-id" class="id-number">777-999</div>
+            <div class="id-title">ID КОМНАТЫ</div>
+            <div id="room-id-val" class="id-code">888-000</div>
 
-            <div class="button-container">
-                <button class="btn-action btn-create-lobby" onclick="tg.showAlert('БИТВА ГОТОВА!')">НАЧАТЬ ИГРУ</button>
-                <button class="btn-action btn-back-menu" onclick="navigateTo('view-menu')">МЕНЮ</button>
+            <div class="nav-panel">
+                <button class="ui-btn btn-gold" onclick="tg.showAlert('ИГРА НАЧАТА!')">НАЧАТЬ ИГРУ</button>
+                <button class="ui-btn btn-menu" onclick="nav('screen-main')">МЕНЮ</button>
             </div>
         </div>
 
-        <div id="view-join" class="screen-layer">
-            <h2 class="id-caption" style="font-size: 28px;">ID КОМНАТЫ</h2>
-            <div style="margin: 40px 0; font-size: 44px; border-bottom: 5px solid #fff; width: 220px; text-align: center; letter-spacing: 12px;">____</div>
-            <div class="button-container">
-                <button class="btn-action btn-back-menu" onclick="navigateTo('view-menu')">ОТМЕНА</button>
+        <div id="screen-join" class="view-layer">
+            <h2 class="id-title" style="font-size: 24px; opacity: 1;">ВВЕДИТЕ КОД</h2>
+            <div style="margin: 40px 0; font-size: 45px; border-bottom: 5px solid #fff; width: 220px; text-align: center; letter-spacing: 12px;">____</div>
+            <div class="nav-panel">
+                <button class="ui-btn btn-menu" onclick="nav('screen-main')">ОТМЕНА</button>
             </div>
         </div>
 
@@ -235,25 +234,18 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        function navigateTo(screenId) {
-            // Переключение экранов
-            document.querySelectorAll('.screen-layer').forEach(s => s.classList.remove('active'));
+        function nav(screenId) {
+            document.querySelectorAll('.view-layer').forEach(v => v.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
             
-            // Генерация ID при создании комнаты
-            if(screenId === 'view-setup') {
-                const randomId = Math.floor(100+Math.random()*899) + "-" + Math.floor(100+Math.random()*899);
-                document.getElementById('display-room-id').innerText = randomId;
+            if(screenId === 'screen-lobby') {
+                const code = Math.floor(100+Math.random()*899) + "-" + Math.floor(100+Math.random()*899);
+                document.getElementById('room-id-val').innerText = code;
             }
-            
-            // Вибрация для отклика
             tg.HapticFeedback.impactOccurred('medium');
         }
 
-        window.onload = () => {
-            tg.ready();
-            console.log("Interface initialized");
-        };
+        window.onload = () => { tg.ready(); };
     </script>
 </body>
 </html>
