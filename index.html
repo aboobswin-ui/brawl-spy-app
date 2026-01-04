@@ -81,7 +81,7 @@
             transform: scale(1);
         }
 
-        /* --- МОДАЛЬНЫЕ ОКНА (ИГРОВЫЕ) --- */
+        /* --- МОДАЛЬНЫЕ ОКНА (ИГРОВЫЕ) - КОМПАКТНЫЕ --- */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -102,58 +102,79 @@
         }
 
         .modal-container {
-            background: var(--card-bg);
-            border: 4px solid var(--neon-blue);
-            border-radius: 25px;
-            padding: 30px;
-            width: 90%;
-            max-width: 380px;
+            background: rgba(15, 15, 25, 0.95);
+            border: none; /* УБИРАЕМ ОБВОДКУ */
+            border-radius: 20px;
+            padding: 25px;
+            width: 85%;
+            max-width: 320px;
             text-align: center;
-            box-shadow: 0 0 40px rgba(0, 210, 255, 0.5);
+            /* НЕОНОВОЕ СВЕЧЕНИЕ БЕЗ ОБВОДКИ */
+            box-shadow: 0 0 25px rgba(0, 210, 255, 0.4),
+                        0 0 40px rgba(0, 210, 255, 0.1) inset;
             animation: modalAppear 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .modal-container.red-border {
-            border-color: var(--neon-red);
-            box-shadow: 0 0 40px rgba(255, 49, 49, 0.5);
+        .modal-container.red-glow {
+            box-shadow: 0 0 25px rgba(255, 49, 49, 0.4),
+                        0 0 40px rgba(255, 49, 49, 0.1) inset;
         }
 
-        .modal-container.gold-border {
-            border-color: var(--neon-gold);
-            box-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
+        .modal-container.gold-glow {
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.4),
+                        0 0 40px rgba(255, 215, 0, 0.1) inset;
         }
 
         .modal-title {
             font-family: 'Exo 2';
-            font-size: 28px;
+            font-size: 22px;
             color: #ffffff;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-transform: uppercase;
-            text-shadow: 0 0 15px var(--glow-white);
+            text-shadow: 0 0 10px var(--glow-white);
         }
 
         .modal-message {
             font-family: 'Exo 2';
-            font-size: 18px;
+            font-size: 16px;
             color: #cccccc;
-            margin-bottom: 30px;
-            line-height: 1.5;
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+
+        /* ОСОБЫЙ СТИЛЬ ДЛЯ УВЕДОМЛЕНИЯ О КОМНАТЕ */
+        .room-created-message {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: var(--neon-gold);
+        }
+
+        .room-id-display {
+            font-family: 'Black Ops One';
+            font-size: 20px;
+            color: #ffffff; /* БЕЛЫЙ ЦВЕТ ДЛЯ ID */
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            text-shadow: 0 0 8px #ffffff;
         }
 
         .modal-buttons {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             justify-content: center;
         }
 
         .modal-btn {
             flex: 1;
-            padding: 16px;
+            padding: 14px;
             border: none;
-            border-radius: 18px;
+            border-radius: 15px;
             font-family: 'Exo 2';
             font-weight: 900;
-            font-size: 18px;
+            font-size: 16px;
             cursor: pointer;
             transition: all 0.2s;
             text-transform: uppercase;
@@ -164,17 +185,17 @@
         }
 
         .modal-btn-confirm {
-            background: #000;
-            border: 3px solid var(--neon-green);
+            background: rgba(0, 0, 0, 0.8);
             color: var(--neon-green);
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.2),
+                        0 0 15px rgba(0, 255, 0, 0.1) inset;
         }
 
         .modal-btn-cancel {
-            background: #000;
-            border: 3px solid var(--neon-red);
+            background: rgba(0, 0, 0, 0.8);
             color: var(--neon-red);
-            box-shadow: 0 0 15px rgba(255, 49, 49, 0.3);
+            box-shadow: 0 0 10px rgba(255, 49, 49, 0.2),
+                        0 0 15px rgba(255, 49, 49, 0.1) inset;
         }
 
         /* АНИМАЦИИ */
@@ -184,8 +205,8 @@
         }
 
         @keyframes modalAppear {
-            from { transform: scale(0.8) rotate(-5deg); opacity: 0; }
-            to { transform: scale(1) rotate(0); opacity: 1; }
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
 
         /* --- ЭКРАН 1: ГЛАВНОЕ МЕНЮ --- */
@@ -233,7 +254,7 @@
             max-width: 320px;
             padding: 18px;
             background: rgba(0, 0, 0, 0.8);
-            border: none; /* УБИРАЕМ ОБВОДКУ */
+            border: none;
             border-radius: 20px;
             color: #ffffff;
             font-family: 'Exo 2';
@@ -246,7 +267,6 @@
             align-items: center;
             justify-content: center;
             transition: all 0.15s ease;
-            /* ЛЕГКОЕ СВЕЧЕНИЕ БЕЗ ОБВОДКИ */
             box-shadow: 0 0 15px rgba(0, 210, 255, 0.3),
                         0 0 30px rgba(0, 210, 255, 0.1) inset;
         }
@@ -273,7 +293,7 @@
             font-family: 'Exo 2';
             font-size: 28px;
             color: #ffffff;
-            text-shadow: 0 0 20px var(--glow-white);
+            text-shadow: 0 0 15px var(--glow-white); /* СЛАБЕЕ СВЕЧЕНИЕ */
             margin-bottom: 30px;
             text-transform: uppercase;
             text-align: center;
@@ -356,16 +376,19 @@
         }
 
         /* --- ЭКРАН 3: НАСТРОЙКА ЛОББИ --- */
-        .id-display-white {
+        .lobby-title {
+            font-family: 'Exo 2'; /* ТОТ ЖЕ ШРИФТ, ЧТО И У КНОПКИ */
+            font-size: 24px;
             color: #ffffff;
-            font-family: 'Black Ops One';
-            font-size: 18px;
-            letter-spacing: 1px;
-            margin-bottom: 20px;
+            text-shadow: 0 0 12px var(--glow-white); /* СЛАБЕЕ СВЕЧЕНИЕ */
+            margin-bottom: 25px;
+            text-transform: uppercase;
             text-align: center;
             width: 100%;
-            opacity: 0.8;
+            font-weight: 900;
         }
+
+        /* ID УДАЛЕН ИЗ ЭТОГО ЭКРАНА - БУДЕТ ТОЛЬКО В КОМНАТЕ */
 
         .user-identity-card {
             display: flex;
@@ -393,19 +416,18 @@
             text-shadow: 0 0 8px #ffffff;
         }
 
-        /* НОВЫЙ СТИЛЬ НАСТРОЕК (БЕЗ ОБВОДКИ, КОМПАКТНЫЙ) */
+        /* НАСТРОЙКИ */
         .settings-row {
             width: 100%;
             max-width: 320px;
             background: rgba(15, 15, 25, 0.6);
-            border: none; /* УБИРАЕМ ОБВОДКУ */
+            border: none;
             border-radius: 18px;
             padding: 12px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin: 0 auto 12px;
-            /* ЛЕГКОЕ СВЕЧЕНИЕ */
             box-shadow: 0 0 12px rgba(0, 210, 255, 0.15),
                         0 0 20px rgba(0, 210, 255, 0.05) inset;
         }
@@ -425,7 +447,7 @@
             width: 38px;
             height: 38px;
             background: rgba(0, 0, 0, 0.7);
-            border: none; /* УБИРАЕМ ОБВОДКУ */
+            border: none;
             border-radius: 10px;
             color: var(--neon-blue);
             font-size: 26px;
@@ -434,7 +456,6 @@
             justify-content: center;
             font-family: 'Rubik One';
             cursor: pointer;
-            /* СВЕЧЕНИЕ */
             box-shadow: 0 0 8px rgba(0, 210, 255, 0.2),
                         0 0 12px rgba(0, 210, 255, 0.1) inset;
         }
@@ -471,7 +492,7 @@
             max-width: 320px;
             padding: 18px;
             background: rgba(0, 0, 0, 0.8);
-            border: none; /* УБИРАЕМ ОБВОДКУ */
+            border: none;
             box-shadow: 0 0 15px rgba(255, 215, 0, 0.3),
                         0 0 30px rgba(255, 215, 0, 0.1) inset;
             border-radius: 20px;
@@ -495,6 +516,18 @@
         }
 
         /* --- ЭКРАН 4: АКТИВНАЯ КОМНАТА --- */
+        .room-id-display-main {
+            font-family: 'Black Ops One';
+            font-size: 18px;
+            color: #ffffff;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            text-align: center;
+            width: 100%;
+            opacity: 0.9;
+            text-shadow: 0 0 8px #ffffff;
+        }
+
         .players-scroll-area {
             width: 100%;
             max-width: 320px;
@@ -618,7 +651,7 @@
 
     <!-- МОДАЛЬНЫЕ ОКНА (ИГРОВЫЕ) -->
     <div class="modal-overlay" id="confirm-modal">
-        <div class="modal-container red-border">
+        <div class="modal-container red-glow">
             <div class="modal-title">ПОДТВЕРЖДЕНИЕ</div>
             <div class="modal-message" id="confirm-message">Вы уверены?</div>
             <div class="modal-buttons">
@@ -629,7 +662,7 @@
     </div>
 
     <div class="modal-overlay" id="alert-modal">
-        <div class="modal-container gold-border">
+        <div class="modal-container gold-glow">
             <div class="modal-title" id="alert-title">УВЕДОМЛЕНИЕ</div>
             <div class="modal-message" id="alert-message">Сообщение</div>
             <div class="modal-buttons">
@@ -655,7 +688,7 @@
         </div>
 
         <div id="scr-join" class="screen">
-            <h2 class="title-neon-white">ВВЕДИТЕ ID</h2> <!-- ИЗМЕНИЛ НАЗВАНИЕ -->
+            <h2 class="title-neon-white">ВВЕДИТЕ ID</h2>
             
             <div class="id-input-container">
                 <div class="id-digit-box" id="d1">_</div>
@@ -690,8 +723,8 @@
         </div>
 
         <div id="scr-lobby" class="screen">
-            <h2 class="title-neon-white" style="margin-bottom:0">НАСТРОЙКА ЛОББИ</h2> <!-- ПОДНЯЛ ВЫШЕ -->
-            <div class="id-display-white" id="lobby-id-val">ID: 0000-0000</div>
+            <h2 class="lobby-title">НАСТРОЙКА ЛОББИ</h2> <!-- НОВЫЙ СТИЛЬ -->
+            <!-- ID УДАЛЕН ИЗ ЭТОГО ЭКРАНА -->
 
             <div class="user-identity-card">
                 <div class="avatar-frame" id="my-ava"></div>
@@ -722,8 +755,8 @@
         </div>
 
         <div id="scr-room" class="screen">
-            <h2 class="title-neon-white" style="margin-bottom:0">КОМНАТА ИГРЫ</h2>
-            <div class="id-display-white" id="room-id-val">ID: 0000-0000</div>
+            <h2 class="lobby-title" style="margin-bottom:5px">КОМНАТА ИГРЫ</h2>
+            <div class="room-id-display-main" id="room-id-val">ID: 0000-0000</div>
 
             <div class="players-scroll-area" id="room-slots">
                 <!-- Слоты игроков будут здесь -->
@@ -755,9 +788,18 @@
                 tg.HapticFeedback.impactOccurred('medium');
             },
             
-            showAlert: (title, message) => {
+            showAlert: (title, message, showId = false, roomId = '') => {
                 document.getElementById('alert-title').innerText = title;
-                document.getElementById('alert-message').innerText = message;
+                
+                if (showId && roomId) {
+                    // ОСОБЫЙ ФОРМАТ ДЛЯ УВЕДОМЛЕНИЯ О КОМНАТЕ
+                    document.getElementById('alert-message').innerHTML = 
+                        `<div class="room-created-message">${message}</div>
+                         <div class="room-id-display">${roomId}</div>`;
+                } else {
+                    document.getElementById('alert-message').innerText = message;
+                }
+                
                 document.getElementById('alert-modal').classList.add('active');
                 tg.HapticFeedback.impactOccurred('light');
             },
@@ -777,12 +819,11 @@
             }
         };
 
-        // ГЕНЕРАЦИЯ РАНДОМНОГО ID
+        // ГЕНЕРАЦИЯ РАНДОМНОГО ID (ТОЛЬКО ЦИФРЫ)
         function generateRandomId() {
-            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789';
             let result = '';
             for (let i = 0; i < 8; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
+                result += Math.floor(Math.random() * 10); // ТОЛЬКО ЦИФРЫ 0-9
                 if (i === 3) result += '-';
             }
             return result;
@@ -808,9 +849,6 @@
                 target.classList.add('active');
                 App.state.currentScreen = screenId;
                 
-                if(screenId === 'scr-lobby') {
-                    document.getElementById('lobby-id-val').innerText = "ID: " + App.state.lobbyId;
-                }
                 if(screenId === 'scr-room') {
                     App.buildRoom();
                 }
@@ -842,7 +880,6 @@
                     "Вы уверены, что хотите покинуть комнату?",
                     () => {
                         App.navigate('scr-menu');
-                        Modal.showAlert("ВЫХОД", "Вы покинули комнату");
                     }
                 );
             },
@@ -871,7 +908,6 @@
                     App.state.lobbyId = App.state.inputCode.slice(0,4) + "-" + App.state.inputCode.slice(4,8);
                     App.state.isAdmin = false;
                     App.navigate('scr-room');
-                    Modal.showAlert("ПОДКЛЮЧЕНИЕ", "Подключение к комнате...");
                 } else {
                     Modal.showAlert("ОШИБКА", "Введите 8 цифр");
                     tg.HapticFeedback.notificationOccurred('error');
@@ -914,7 +950,8 @@
                 App.state.isAdmin = true;
                 App.state.lobbyId = generateRandomId();
                 App.navigate('scr-room');
-                Modal.showAlert("УСПЕХ", "Комната создана! ID: " + App.state.lobbyId);
+                // ОСОБОЕ УВЕДОМЛЕНИЕ С ID ПОД ТЕКСТОМ
+                Modal.showAlert("УСПЕХ", "Комната создана!", true, "ID: " + App.state.lobbyId);
             },
 
             // Логика комнаты
@@ -941,16 +978,16 @@
                 }
             },
 
-            // Переключение готовности
+            // Переключение готовности (БЕЗ ОКНА УВЕДОМЛЕНИЯ)
             toggleReady: () => {
                 App.state.isReady = !App.state.isReady;
                 const btn = document.getElementById('ready-btn');
-                btn.innerText = App.state.isReady ? 'ОТМЕНА' : 'ГОТОВ';
+                btn.innerText = App.state.isReady ? 'НЕ ГОТОВ' : 'ГОТОВ'; // ИЗМЕНИЛ НА "НЕ ГОТОВ"
                 btn.classList.toggle('active-ready', App.state.isReady);
                 
                 App.buildRoom();
                 tg.HapticFeedback.notificationOccurred('success');
-                Modal.showAlert("СТАТУС", App.state.isReady ? "Вы готовы к игре!" : "Вы не готовы");
+                // УБРАЛ Modal.showAlert - теперь статус меняется без окна
             },
 
             // Начать игру
