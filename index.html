@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>BRAWL SPY 2026 - ULTIMATE TITAN MONOLITH</title>
+    <title>BRAWL SPY 2026 - ULTIMATE ALIGNMENT MONOLITH</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,30 +12,38 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <style>
-        /* --- ГЛОБАЛЬНЫЕ КОНСТАНТЫ И ПЕРЕМЕННЫЕ --- */
+        /* ========================================
+           1. СИСТЕМНЫЕ ПЕРЕМЕННЫЕ (VARIABLES)
+           ========================================
+        */
         :root {
-            --clr-neon-red: #ff3131;
-            --clr-neon-blue: #00d2ff;
-            --clr-neon-gold: #ffd700;
+            --clr-red-neon: #ff3131;
+            --clr-blue-neon: #00d2ff;
+            --clr-gold-neon: #ffd700;
             --clr-white: #ffffff;
-            --clr-bg-black: #010103;
+            --clr-bg-pure: #010103;
             
             /* Шрифты */
-            --f-spy: 'Rubik Mono One', sans-serif;
-            --f-main: 'Black Ops One', cursive;
+            --font-spy: 'Rubik Mono One', sans-serif;
+            --font-ops: 'Black Ops One', cursive;
 
-            /* Глубина объема (3D Shadow Stack) */
-            --spy-volume: 
-                0 1px 0 #8b0000, 
-                0 2px 0 #7b0000, 
-                0 3px 0 #6b0000, 
-                0 4px 0 #5b0000, 
-                0 5px 0 #4b0000, 
-                0 6px 0 #3b0000,
-                0 10px 15px rgba(0,0,0,0.8);
+            /* Физика 3D объема для ШПИОН */
+            --spy-3d-stack: 
+                0 1px 0 #941a1a,
+                0 2px 0 #851717,
+                0 3px 0 #751414,
+                0 4px 0 #661111,
+                0 5px 0 #570e0e,
+                0 6px 10px rgba(0,0,0,0.8);
+
+            /* Мягкое белое свечение */
+            --white-glow-halo: radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 65%);
         }
 
-        /* --- СИСТЕМА СТАБИЛИЗАЦИИ ИНТЕРФЕЙСА --- */
+        /* ========================================
+           2. ГЛОБАЛЬНЫЙ СБРОС (GLOBAL RESET)
+           ========================================
+        */
         * {
             margin: 0;
             padding: 0;
@@ -43,23 +51,25 @@
             -webkit-tap-highlight-color: transparent;
             -webkit-user-select: none;
             user-select: none;
-            outline: none;
         }
 
         html, body {
             width: 100vw;
             height: 100vh;
-            background-color: var(--clr-bg-black);
+            background-color: var(--clr-bg-pure);
             color: var(--clr-white);
             overflow: hidden;
-            font-family: var(--f-main);
+            font-family: var(--font-ops);
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        /* ГЛАВНЫЙ КОНТЕЙНЕР ПРИЛОЖЕНИЯ */
-        .app-shell {
+        /* ========================================
+           3. КОНТЕЙНЕРЫ (LAYOUT)
+           ========================================
+        */
+        .app-monolith {
             width: 100%;
             height: 100%;
             max-width: 440px;
@@ -68,11 +78,10 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 10;
+            overflow: hidden;
         }
 
-        /* --- СИСТЕМА ЭКРАНОВ --- */
-        .screen-layer {
+        .view-frame {
             position: absolute;
             top: 0;
             left: 0;
@@ -82,186 +91,203 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 40px;
-            z-index: 20;
+            padding: 45px;
+            z-index: 100;
         }
 
-        /* ГЛАВНОЕ МЕНЮ (СПЕЦИАЛЬНЫЙ ФОН) */
-        #screen-main-menu {
-            background-image: linear-gradient(
-                to bottom,
-                rgba(0, 0, 0, 0.8) 0%,
-                rgba(0, 0, 0, 0.5) 50%,
-                rgba(0, 0, 0, 0.9) 100%
-            ), url('https://avatars.mds.yandex.net/i?id=bf88c867806a71c96d2d94c597a3c9ea_l-8271622-images-thumbs&n=13');
+        /* ФОН ТОЛЬКО ДЛЯ ГЛАВНОГО МЕНЮ */
+        #view-main-menu {
+            background-image: linear-gradient(rgba(0,0,0,0.75), rgba(0,0,0,0.75)), 
+                              url('https://avatars.mds.yandex.net/i?id=bf88c867806a71c96d2d94c597a3c9ea_l-8271622-images-thumbs&n=13');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
         }
 
-        /* ДРУГИЕ ОКНА (СТРОГИЙ ЧЕРНЫЙ) */
-        #screen-lobby-settings, #screen-id-enter {
-            background-color: var(--clr-bg-black);
+        /* ОСТАЛЬНЫЕ ЭКРАНЫ */
+        #view-settings, #view-id-gate {
+            background-color: var(--clr-bg-pure);
         }
 
-        .screen-layer.active {
+        .view-frame.active {
             display: flex;
-            animation: appFadeIn 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            animation: viewFadeTransition 0.5s ease-out forwards;
         }
 
-        /* --- ОБЪЕМНЫЙ ТИТАНОВЫЙ ЛОГОТИП --- */
-        .logo-titan-stack {
+        /* ========================================
+           4. ПЕРФЕКТНЫЙ ЛОГОТИП (LOGO STACK)
+           ========================================
+        */
+        .perfect-logo-container {
+            position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
             width: 100%;
-            margin-bottom: 50px;
+            margin-bottom: 55px;
+        }
+
+        /* БЕЛОЕ СВЕТОВОЕ ОБЛАКО ЗА ЛОГО */
+        .white-halo-effect {
+            position: absolute;
+            width: 320px;
+            height: 320px;
+            background: var(--white-glow-halo);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -1;
             pointer-events: none;
+            filter: blur(15px);
         }
 
-        /* ШПИОН (МАКСИМАЛЬНЫЙ ОБЪЕМ) */
-        .spy-vol-text {
-            font-family: var(--f-spy);
-            font-size: 92px; /* Увеличено до предела */
-            color: var(--clr-neon-red);
+        /* ШПИОН (УМЕНЬШЕННЫЙ, ОБЪЕМНЫЙ) */
+        .spy-monolith-text {
+            font-family: var(--font-spy);
+            font-size: 74px; /* Уменьшил для идеальной гармонии */
+            color: var(--clr-red-neon);
             text-transform: uppercase;
-            letter-spacing: -5px;
-            line-height: 0.8;
-            transform: scaleY(1.25);
-            text-shadow: var(--spy-volume);
-            margin-bottom: 25px;
-            position: relative;
+            letter-spacing: -4px;
+            line-height: 0.9;
+            transform: scaleY(1.15);
+            text-shadow: var(--spy-3d-stack);
+            margin-bottom: 22px;
+            text-align: center;
         }
 
-        /* BRAWL (ПОД ШПИОНОМ) */
-        .brawl-vol-text {
-            font-size: 38px;
+        .brawl-monolith-text {
+            font-size: 32px;
             color: var(--clr-white);
             text-transform: uppercase;
             letter-spacing: 2px;
-            text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
-            margin-bottom: 4px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
+            margin-bottom: 6px;
         }
 
-        /* STARS (ПОД БРАВЛОМ) */
-        .stars-vol-text {
-            font-size: 82px;
-            color: var(--clr-neon-red);
+        .stars-monolith-text {
+            font-size: 74px;
+            color: var(--clr-red-neon);
             text-transform: uppercase;
-            line-height: 0.8;
-            text-shadow: 0 4px 0 #7b0000, 0 0 10px rgba(255, 49, 49, 0.3);
-            margin-bottom: 15px;
+            line-height: 0.85;
+            text-shadow: 0 3px 0 #851717, 0 0 12px rgba(255, 49, 49, 0.3);
+            margin-bottom: 18px;
         }
 
-        /* EDITION 2026 (НИЗ) */
-        .edition-vol-text {
+        .edition-monolith-text {
             font-size: 16px;
             color: var(--clr-white);
-            opacity: 0.6;
-            letter-spacing: 6px;
+            opacity: 0.65;
+            letter-spacing: 5px;
             text-transform: uppercase;
         }
 
-        /* --- СИСТЕМА КНОПОК --- */
-        .btn-container {
+        /* ========================================
+           5. ИНТЕРФЕЙС КНОПОК (UI CONTROLS)
+           ========================================
+        */
+        .ui-vertical-stack {
             width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            gap: 20px;
         }
 
-        .btn-titan {
+        .btn-monolith {
             width: 100%;
             padding: 24px 0;
             background: rgba(0, 0, 0, 0.85);
-            border: 3px solid var(--clr-neon-blue);
-            box-shadow: 0 0 12px var(--clr-neon-blue);
+            border: 3.5px solid var(--clr-blue-neon);
+            box-shadow: 0 0 12px var(--clr-blue-neon);
             border-radius: 22px;
             color: var(--clr-white);
-            font-size: 24px;
+            font-size: 22px;
             text-transform: uppercase;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
-            position: relative;
-            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            text-align: center;
         }
 
-        .btn-titan:active {
-            transform: scale(0.94);
-            box-shadow: 0 0 25px var(--clr-neon-blue);
-            background: var(--clr-neon-blue);
+        .btn-monolith:active {
+            transform: scale(0.95);
+            box-shadow: 0 0 25px var(--clr-blue-neon);
+            background: var(--clr-blue-neon);
             color: #000;
         }
 
-        /* КНОПКА №6: СОЗДАТЬ КОМНАТУ (БЕЛЫЙ ТЕКСТ + ЗОЛОТО) */
-        .btn-titan-gold {
-            border-color: var(--clr-neon-gold);
-            box-shadow: 0 0 20px var(--clr-neon-gold);
+        /* КНОПКА №6: СОЗДАТЬ КОМНАТУ (ЗОЛОТОЙ НЕОН) */
+        .btn-monolith-gold {
+            border-color: var(--clr-gold-neon);
+            box-shadow: 0 0 18px var(--clr-gold-neon);
             color: var(--clr-white) !important;
         }
 
-        .btn-titan-gold:active {
-            background: var(--clr-neon-gold);
+        .btn-monolith-gold:active {
+            background: var(--clr-gold-neon);
             color: #000 !important;
         }
 
-        .btn-titan-back {
-            border-color: #222;
-            color: #555;
+        .btn-monolith-back {
+            border-color: #2a2a2a;
+            color: #555555;
             box-shadow: none;
-            margin-top: 10px;
+            margin-top: 15px;
         }
 
-        /* --- ИНТЕРФЕЙС НАСТРОЕК --- */
-        .settings-header {
-            font-size: 32px;
+        /* ========================================
+           6. НАСТРОЙКИ (SETTINGS UI)
+           ========================================
+        */
+        .section-header-text {
+            font-size: 30px;
             color: var(--clr-white);
+            text-shadow: 0 0 15px rgba(255,255,255,0.2);
             margin-bottom: 45px;
             text-transform: uppercase;
-            text-shadow: 0 0 15px rgba(255,255,255,0.2);
         }
 
-        .tab-system {
+        .tab-navigation-grid {
             display: flex;
             width: 100%;
-            gap: 12px;
+            gap: 15px;
             margin-bottom: 40px;
         }
 
-        .tab-el {
+        .tab-link {
             flex: 1;
             padding: 18px 0;
-            border-radius: 18px;
-            border: 3px solid;
+            border: 2.5px solid;
+            border-radius: 16px;
             font-size: 14px;
             text-align: center;
             text-transform: uppercase;
-            font-weight: bold;
+            background: #000;
         }
 
-        .tab-el-blue { border-color: var(--clr-neon-blue); color: var(--clr-neon-blue); }
-        .tab-el-red { border-color: var(--clr-neon-red); color: var(--clr-neon-red); }
+        .tab-link-blue { border-color: var(--clr-blue-neon); color: var(--clr-blue-neon); }
+        .tab-link-red { border-color: var(--clr-red-neon); color: var(--clr-red-neon); }
 
-        /* --- ГРИД ВВОДА ID --- */
-        .id-input-grid {
+        /* ИДЕНТИФИКАТОРЫ */
+        .id-display-box {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             margin: 50px 0;
         }
 
-        .id-char-line {
-            width: 35px;
-            font-size: 46px;
-            border-bottom: 5px solid var(--clr-white);
+        .id-char-underline {
+            width: 34px;
+            font-size: 42px;
+            border-bottom: 4.5px solid var(--clr-white);
             color: var(--clr-white);
             text-align: center;
-            text-shadow: 0 0 10px var(--clr-white);
         }
 
-        /* --- СИСТЕМНЫЕ АНИМАЦИИ --- */
-        @keyframes appFadeIn {
-            from { opacity: 0; transform: scale(1.05); }
+        /* ========================================
+           7. АНИМАЦИИ (ANIMATIONS)
+           ========================================
+        */
+        @keyframes viewFadeTransition {
+            from { opacity: 0; transform: scale(1.03); }
             to { opacity: 1; transform: scale(1); }
         }
 
@@ -269,50 +295,52 @@
 </head>
 <body>
 
-    <div class="app-shell">
+    <div class="app-monolith">
         
-        <div id="screen-main-menu" class="screen-layer active">
-            <div class="logo-titan-stack">
-                <div class="spy-vol-text">ШПИОН</div>
-                <div class="brawl-vol-text">BRAWL</div>
-                <div class="stars-vol-text">STARS</div>
-                <div class="edition-vol-text">EDITION 2026</div>
+        <div id="view-main-menu" class="view-frame active">
+            
+            <div class="perfect-logo-container">
+                <div class="white-halo-effect"></div>
+                <div class="spy-monolith-text">ШПИОН</div>
+                <div class="brawl-monolith-text">BRAWL</div>
+                <div class="stars-monolith-text">STARS</div>
+                <div class="edition-monolith-text">EDITION 2026</div>
             </div>
             
-            <div class="btn-container">
-                <button class="btn-titan" onclick="BrawlSpy.nav('screen-lobby-settings')">СОЗДАТЬ ЛОББИ</button>
-                <button class="btn-titan" onclick="BrawlSpy.nav('screen-id-enter')">ВХОД ПО ID</button>
-                <button class="btn-titan btn-titan-back" onclick="tg.close()">ВЫХОД</button>
+            <div class="ui-vertical-stack">
+                <button class="btn-monolith" onclick="AppEngine.navigateTo('view-settings')">СОЗДАТЬ ЛОББИ</button>
+                <button class="btn-monolith" onclick="AppEngine.navigateTo('view-id-gate')">ВХОД ПО ID</button>
+                <button class="btn-monolith btn-monolith-back" onclick="tg.close()">ВЫХОД</button>
             </div>
         </div>
 
-        <div id="screen-lobby-settings" class="screen-layer">
-            <h2 class="settings-header">НАСТРОЙКИ БИТВЫ</h2>
+        <div id="view-settings" class="view-frame">
+            <h2 class="section-header-text">НАСТРОЙКИ БИТВЫ</h2>
             
-            <div class="tab-system">
-                <div class="tab-el tab-el-blue">УЧАСТНИКИ</div>
-                <div class="tab-el tab-el-red">ШПИОН</div>
+            <div class="tab-navigation-grid">
+                <div class="tab-link tab-link-blue">УЧАСТНИКИ</div>
+                <div class="tab-link tab-link-red">ШПИОН</div>
             </div>
 
-            <div id="lobby-id-display" style="color:var(--clr-neon-gold); font-size: 28px; margin-bottom: 40px; letter-spacing: 3px;">ID: 0000-0000</div>
+            <div id="session-id-label" style="color:var(--clr-gold-neon); font-size: 28px; margin-bottom: 40px; letter-spacing: 2px;">ID: 0000-0000</div>
 
-            <div class="btn-container">
-                <button class="btn-titan btn-titan-gold" onclick="BrawlSpy.createRoom()">СОЗДАТЬ КОМНАТУ</button>
-                <button class="btn-titan btn-titan-back" onclick="BrawlSpy.nav('screen-main-menu')">МЕНЮ</button>
+            <div class="ui-vertical-stack">
+                <button class="btn-monolith btn-monolith-gold" onclick="AppEngine.initRoom()">СОЗДАТЬ КОМНАТУ</button>
+                <button class="btn-monolith btn-monolith-back" onclick="AppEngine.navigateTo('view-main-menu')">МЕНЮ</button>
             </div>
         </div>
 
-        <div id="screen-id-enter" class="screen-layer">
-            <h2 class="settings-header">ID КОМНАТЫ</h2>
+        <div id="view-id-gate" class="view-frame">
+            <h2 class="section-header-text">ID КОМНАТЫ</h2>
             
-            <div class="id-input-grid">
-                <div class="id-char-line">_</div><div class="id-char-line">_</div><div class="id-char-line">_</div><div class="id-char-line">_</div>
-                <div style="font-size: 30px;">-</div>
-                <div class="id-char-line">_</div><div class="id-char-line">_</div><div class="id-char-line">_</div><div class="id-char-line">_</div>
+            <div class="id-display-box">
+                <div class="id-char-underline">_</div><div class="id-char-underline">_</div><div class="id-char-underline">_</div><div class="id-char-underline">_</div>
+                <div style="font-size: 30px; color: #fff;">-</div>
+                <div class="id-char-underline">_</div><div class="id-char-underline">_</div><div class="id-char-underline">_</div><div class="id-char-underline">_</div>
             </div>
 
-            <div class="btn-container">
-                <button class="btn-titan btn-titan-back" onclick="BrawlSpy.nav('screen-main-menu')">ОТМЕНА</button>
+            <div class="ui-vertical-stack">
+                <button class="btn-monolith btn-monolith-back" onclick="AppEngine.navigateTo('view-main-menu')">ОТМЕНА</button>
             </div>
         </div>
 
@@ -321,63 +349,52 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.enableClosingConfirmation();
 
-        /**
-         * УЛЬТИМАТИВНЫЙ КОНТРОЛЛЕР ПРИЛОЖЕНИЯ
-         */
-        const BrawlSpy = {
-            currentRoomId: null,
+        const AppEngine = {
+            activeRoom: null,
 
             /**
-             * Умная навигация
+             * Переход между видами
              */
-            nav: function(targetId) {
-                // Скрытие всех слоев с задержкой для анимации
-                const layers = document.querySelectorAll('.screen-layer');
-                layers.forEach(l => l.classList.remove('active'));
+            navigateTo: function(viewId) {
+                const views = document.querySelectorAll('.view-frame');
+                views.forEach(v => v.classList.remove('active'));
                 
-                const target = document.getElementById(targetId);
+                const target = document.getElementById(viewId);
                 if (target) {
                     target.classList.add('active');
                 }
 
-                // Логика для конкретных экранов
-                if (targetId === 'screen-lobby-settings') {
-                    this.currentRoomId = this.generateSessionId();
-                    document.getElementById('lobby-id-display').innerText = "ID: " + this.currentRoomId;
+                if (viewId === 'view-settings') {
+                    this.activeRoom = this.createId();
+                    document.getElementById('session-id-label').innerText = "ID: " + this.activeRoom;
                 }
 
                 tg.HapticFeedback.impactOccurred('medium');
+                console.log("System Status: View changed to " + viewId);
             },
 
             /**
-             * Генератор сессионного ключа
+             * Создание сессионного ключа
              */
-            generateSessionId: function() {
-                const s1 = Math.floor(1000 + Math.random() * 8999);
-                const s2 = Math.floor(1000 + Math.random() * 8999);
-                return `${s1}-${s2}`;
+            createId: function() {
+                const partA = Math.floor(1000 + Math.random() * 8999);
+                const partB = Math.floor(1000 + Math.random() * 8999);
+                return `${partA}-${partB}`;
             },
 
             /**
-             * Процесс создания комнаты
+             * Финализация создания комнаты
              */
-            createRoom: function() {
+            initRoom: function() {
                 tg.HapticFeedback.notificationOccurred('success');
-                tg.showAlert(`БИТВА [${this.currentRoomId}] СФОРМИРОВАНА. ОЖИДАНИЕ ИГРОКОВ...`);
+                tg.showAlert(`ЛОББИ [${this.activeRoom}] УСПЕШНО РАЗВЕРНУТО!`);
             }
         };
 
-        // Инициализация при загрузке
-        window.onload = () => {
-            tg.ready();
-            console.log("Brawl Spy Titan Edition Loaded Successfully.");
-        };
-
-        // Защита от свайпов и багов прокрутки
-        document.addEventListener('touchmove', (e) => {
-            if (e.touches.length > 1) e.preventDefault();
+        // Блокировка прокрутки для мобильных браузеров
+        document.addEventListener('touchmove', function(e) {
+            e.preventDefault();
         }, { passive: false });
     </script>
 </body>
