@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>BRAWL SPY ULTIMATE EDITION 2026</title>
     
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rubik+One&family=Exo+2:wght@700;900&display=swap" rel="stylesheet">
@@ -1102,7 +1106,23 @@
         tg.expand();
         tg.enableClosingConfirmation();
 
-        // БАЗА БРАВЛЕРОВ С РАБОЧИМИ ССЫЛКАМИ С brawlstats.com
+        // ========== FIREBASE КОНФИГУРАЦИЯ ==========
+        const firebaseConfig = {
+            apiKey: "AIzaSyDbopGDAnN6RxiXoAk_Il90WZBCW0bVBvg",
+            authDomain: "brawlspy.firebaseapp.com",
+            databaseURL: "https://brawlspy-default-rtdb.firebaseio.com",
+            projectId: "brawlspy",
+            storageBucket: "brawlspy.firebasestorage.app",
+            messagingSenderId: "803859610634",
+            appId: "1:803859610634:web:2310aa16bb6e61049833f3",
+            measurementId: "G-6B5WV279QC"
+        };
+
+        // Инициализация Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // БАЗА БРАВЛЕРОВ С РАБОЧИМИ ССЫЛКАМИ
         const brawlersList = [
             { name: "ШЕЛЛИ", image: "https://brawlstats.com/characters/shelly.png" },
             { name: "КОЛЬТ", image: "https://brawlstats.com/characters/colt.png" },
@@ -1129,74 +1149,6 @@
             { name: "ГРИФФ", image: "https://brawlstats.com/characters/griff.png" },
             { name: "ГРОМ", image: "https://brawlstats.com/characters/grom.png" }
         ];
-
-        // СИСТЕМА ХРАНЕНИЯ КОМНАТ (localStorage для симуляции сервера)
-        const RoomStorage = {
-            key: 'brawl_spy_rooms',
-            
-            getAllRooms: () => {
-                const rooms = localStorage.getItem(RoomStorage.key);
-                return rooms ? JSON.parse(rooms) : {};
-            },
-            
-            saveRoom: (roomId, roomData) => {
-                const rooms = RoomStorage.getAllRooms();
-                rooms[roomId] = roomData;
-                localStorage.setItem(RoomStorage.key, JSON.stringify(rooms));
-            },
-            
-            getRoom: (roomId) => {
-                const rooms = RoomStorage.getAllRooms();
-                return rooms[roomId] || null;
-            },
-            
-            deleteRoom: (roomId) => {
-                const rooms = RoomStorage.getAllRooms();
-                delete rooms[roomId];
-                localStorage.setItem(RoomStorage.key, JSON.stringify(rooms));
-            },
-            
-            addPlayerToRoom: (roomId, playerData) => {
-                const room = RoomStorage.getRoom(roomId);
-                if (!room) return false;
-                
-                if (room.players.length >= room.maxPlayers) {
-                    return false; // Комната заполнена
-                }
-                
-                // Проверяем, нет ли уже такого игрока
-                const existingPlayer = room.players.find(p => p.id === playerData.id);
-                if (!existingPlayer) {
-                    room.players.push(playerData);
-                    RoomStorage.saveRoom(roomId, room);
-                }
-                return true;
-            },
-            
-            removePlayerFromRoom: (roomId, playerId) => {
-                const room = RoomStorage.getRoom(roomId);
-                if (!room) return;
-                
-                room.players = room.players.filter(p => p.id !== playerId);
-                RoomStorage.saveRoom(roomId, room);
-                
-                // Если комната пустая, удаляем ее
-                if (room.players.length === 0) {
-                    RoomStorage.deleteRoom(roomId);
-                }
-            },
-            
-            updatePlayerReady: (roomId, playerId, isReady) => {
-                const room = RoomStorage.getRoom(roomId);
-                if (!room) return;
-                
-                const player = room.players.find(p => p.id === playerId);
-                if (player) {
-                    player.isReady = isReady;
-                    RoomStorage.saveRoom(roomId, room);
-                }
-            }
-        };
 
         // СИСТЕМА МОДАЛЬНЫХ ОКОН
         const Modal = {
@@ -1254,6 +1206,115 @@
             return 'player_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
         }
 
+        // ========== FIREBASE HELPERS ==========
+        const FirebaseManager = {
+            // Слушатель изменений в комнате
+            roomListener: null,
+            
+            // Создать комнату
+            createRoom: async (roomId, roomData) => {
+                try {
+                    await database.ref('rooms/' + roomId).set(roomData);
+                    return true;
+                } catch (error) {
+                    console.error('Ошибка создания комнаты:', error);
+                    return false;
+                }
+            },
+            
+            // Получить комнату
+            getRoom: async (roomId) => {
+                try {
+                    const snapshot = await database.ref('rooms/' + roomId).once('value');
+                    return snapshot.val();
+                } catch (error) {
+                    console.error('Ошибка получения комнаты:', error);
+                    return null;
+                }
+            },
+            
+            // Добавить игрока в комнату
+            addPlayerToRoom: async (roomId, playerData) => {
+                try {
+                    const room = await FirebaseManager.getRoom(roomId);
+                    if (!room) return false;
+                    
+                    if (room.players && Object.keys(room.players).length >= room.maxPlayers) {
+                        return false; // Комната заполнена
+                    }
+                    
+                    const playerId = playerData.id;
+                    await database.ref('rooms/' + roomId + '/players/' + playerId).set(playerData);
+                    return true;
+                } catch (error) {
+                    console.error('Ошибка добавления игрока:', error);
+                    return false;
+                }
+            },
+            
+            // Удалить игрока из комнаты
+            removePlayerFromRoom: async (roomId, playerId) => {
+                try {
+                    await database.ref('rooms/' + roomId + '/players/' + playerId).remove();
+                    
+                    // Проверяем, остались ли игроки в комнате
+                    const room = await FirebaseManager.getRoom(roomId);
+                    if (room && (!room.players || Object.keys(room.players).length === 0)) {
+                        // Удаляем комнату если пустая
+                        await database.ref('rooms/' + roomId).remove();
+                    }
+                    return true;
+                } catch (error) {
+                    console.error('Ошибка удаления игрока:', error);
+                    return false;
+                }
+            },
+            
+            // Обновить готовность игрока
+            updatePlayerReady: async (roomId, playerId, isReady) => {
+                try {
+                    await database.ref('rooms/' + roomId + '/players/' + playerId + '/isReady').set(isReady);
+                    return true;
+                } catch (error) {
+                    console.error('Ошибка обновления готовности:', error);
+                    return false;
+                }
+            },
+            
+            // Начать игру
+            startGameInRoom: async (roomId, gameData) => {
+                try {
+                    await database.ref('rooms/' + roomId + '/gameStarted').set(true);
+                    await database.ref('rooms/' + roomId + '/gameData').set(gameData);
+                    return true;
+                } catch (error) {
+                    console.error('Ошибка начала игры:', error);
+                    return false;
+                }
+            },
+            
+            // Слушать изменения в комнате
+            listenToRoom: (roomId, callback) => {
+                // Удаляем предыдущий слушатель
+                if (FirebaseManager.roomListener) {
+                    FirebaseManager.roomListener();
+                }
+                
+                FirebaseManager.roomListener = database.ref('rooms/' + roomId).on('value', (snapshot) => {
+                    const room = snapshot.val();
+                    callback(room);
+                });
+            },
+            
+            // Остановить прослушивание
+            stopListening: () => {
+                if (FirebaseManager.roomListener) {
+                    FirebaseManager.roomListener();
+                    FirebaseManager.roomListener = null;
+                }
+            }
+        };
+
         // ОСНОВНОЕ ПРИЛОЖЕНИЕ
         const App = {
             state: {
@@ -1265,7 +1326,9 @@
                 isReady: false,
                 isAdmin: true,
                 playerId: generatePlayerId(),
-                currentRoomId: null
+                currentRoomId: null,
+                username: '',
+                photoUrl: ''
             },
 
             // Навигация
@@ -1297,7 +1360,8 @@
                     () => {
                         // Выходим из комнаты если находимся в ней
                         if (App.state.currentRoomId) {
-                            RoomStorage.removePlayerFromRoom(App.state.currentRoomId, App.state.playerId);
+                            FirebaseManager.removePlayerFromRoom(App.state.currentRoomId, App.state.playerId);
+                            FirebaseManager.stopListening();
                         }
                         tg.close();
                     }
@@ -1311,7 +1375,8 @@
                     () => {
                         // Выходим из комнаты
                         if (App.state.currentRoomId) {
-                            RoomStorage.removePlayerFromRoom(App.state.currentRoomId, App.state.playerId);
+                            FirebaseManager.removePlayerFromRoom(App.state.currentRoomId, App.state.playerId);
+                            FirebaseManager.stopListening();
                             App.state.currentRoomId = null;
                         }
                         App.navigate('scr-menu');
@@ -1338,12 +1403,12 @@
             },
 
             // Подключение по коду
-            joinByCode: () => {
+            joinByCode: async () => {
                 if(App.state.inputCode.length === 8 && /^\d+$/.test(App.state.inputCode)) {
                     const roomId = App.state.inputCode.slice(0,4) + "-" + App.state.inputCode.slice(4,8);
                     
-                    // Проверяем существование комнаты
-                    const room = RoomStorage.getRoom(roomId);
+                    // Проверяем существование комнаты в Firebase
+                    const room = await FirebaseManager.getRoom(roomId);
                     
                     if (!room) {
                         Modal.showAlert("ОШИБКА", "Комната не найдена");
@@ -1352,7 +1417,8 @@
                     }
                     
                     // Проверяем заполненность комнаты
-                    if (room.players.length >= room.maxPlayers) {
+                    const playerCount = room.players ? Object.keys(room.players).length : 0;
+                    if (playerCount >= room.maxPlayers) {
                         Modal.showAlert("ОШИБКА", "Извините, комната заполнена");
                         tg.HapticFeedback.notificationOccurred('error');
                         return;
@@ -1368,17 +1434,37 @@
                     // Добавляем игрока в комнату
                     const playerData = {
                         id: App.state.playerId,
-                        username: tg.initDataUnsafe.user?.username || 'Игрок',
-                        photo_url: tg.initDataUnsafe.user?.photo_url || '',
+                        username: App.state.username || 'Игрок',
+                        photo_url: App.state.photoUrl || '',
                         isReady: false,
                         isAdmin: false
                     };
                     
-                    const success = RoomStorage.addPlayerToRoom(roomId, playerData);
+                    const success = await FirebaseManager.addPlayerToRoom(roomId, playerData);
                     if (!success) {
                         Modal.showAlert("ОШИБКА", "Не удалось присоединиться к комнате");
                         return;
                     }
+                    
+                    // Начинаем слушать изменения в комнате
+                    FirebaseManager.listenToRoom(roomId, (room) => {
+                        if (room) {
+                            App.state.participants = room.maxPlayers;
+                            App.state.spies = room.spies;
+                            App.buildRoom();
+                            
+                            // Если игра началась
+                            if (room.gameStarted && App.state.currentScreen === 'scr-room') {
+                                Game.initializeGame(Object.values(room.players || {}), room.spies);
+                                App.navigate('scr-game');
+                            }
+                        } else {
+                            // Комната удалена
+                            Modal.showAlert("ИНФО", "Комната была удалена");
+                            FirebaseManager.stopListening();
+                            App.navigate('scr-menu');
+                        }
+                    });
                     
                     App.navigate('scr-room');
                     Modal.showAlert("УСПЕХ", "Вы присоединились к комнате!");
@@ -1401,26 +1487,51 @@
             },
 
             // Создание финальной комнаты
-            createFinalRoom: () => {
+            createFinalRoom: async () => {
                 App.state.isAdmin = true;
                 App.state.lobbyId = generateRandomId();
                 App.state.currentRoomId = App.state.lobbyId;
                 
-                // Создаем комнату в хранилище
+                // Создаем комнату в Firebase
                 const roomData = {
                     maxPlayers: App.state.participants,
                     spies: App.state.spies,
-                    players: [{
-                        id: App.state.playerId,
-                        username: tg.initDataUnsafe.user?.username || 'Хост',
-                        photo_url: tg.initDataUnsafe.user?.photo_url || '',
-                        isReady: false,
-                        isAdmin: true
-                    }],
-                    gameStarted: false
+                    players: {
+                        [App.state.playerId]: {
+                            id: App.state.playerId,
+                            username: App.state.username || 'Хост',
+                            photo_url: App.state.photoUrl || '',
+                            isReady: false,
+                            isAdmin: true
+                        }
+                    },
+                    gameStarted: false,
+                    createdAt: Date.now()
                 };
                 
-                RoomStorage.saveRoom(App.state.lobbyId, roomData);
+                const success = await FirebaseManager.createRoom(App.state.lobbyId, roomData);
+                if (!success) {
+                    Modal.showAlert("ОШИБКА", "Не удалось создать комнату");
+                    return;
+                }
+                
+                // Начинаем слушать изменения в комнате
+                FirebaseManager.listenToRoom(App.state.lobbyId, (room) => {
+                    if (room) {
+                        App.buildRoom();
+                        
+                        // Если игра началась
+                        if (room.gameStarted && App.state.currentScreen === 'scr-room') {
+                            Game.initializeGame(Object.values(room.players || {}), room.spies);
+                            App.navigate('scr-game');
+                        }
+                    } else {
+                        // Комната удалена
+                        Modal.showAlert("ИНФО", "Комната была удалена");
+                        FirebaseManager.stopListening();
+                        App.navigate('scr-menu');
+                    }
+                });
                 
                 App.navigate('scr-room');
                 Modal.showAlert("УСПЕХ", "Комната создана!", true, "ID: " + App.state.lobbyId);
@@ -1430,82 +1541,85 @@
             buildRoom: () => {
                 if (!App.state.currentRoomId) return;
                 
-                const room = RoomStorage.getRoom(App.state.currentRoomId);
-                if (!room) {
-                    // Если комнаты нет, возвращаем в меню
-                    App.navigate('scr-menu');
-                    return;
-                }
-                
-                document.getElementById('room-id-val').innerText = "ID: " + App.state.currentRoomId;
-                const container = document.getElementById('room-slots');
-                container.innerHTML = '';
-
-                // Обновляем настройки из комнаты
-                App.state.participants = room.maxPlayers;
-                App.state.spies = room.spies;
-
-                // Проверяем готовность всех игроков
-                let allReady = room.players.length > 0;
-                let myReadyStatus = false;
-
-                // Отображаем всех игроков в комнате
-                room.players.forEach((player, index) => {
-                    const isMe = player.id === App.state.playerId;
-                    
-                    if (isMe) {
-                        myReadyStatus = player.isReady || false;
-                        App.state.isReady = myReadyStatus;
+                // Получаем комнату из Firebase
+                FirebaseManager.getRoom(App.state.currentRoomId).then(room => {
+                    if (!room) {
+                        // Если комнаты нет, возвращаем в меню
+                        App.navigate('scr-menu');
+                        return;
                     }
                     
-                    if (!player.isReady) {
-                        allReady = false;
+                    document.getElementById('room-id-val').innerText = "ID: " + App.state.currentRoomId;
+                    const container = document.getElementById('room-slots');
+                    container.innerHTML = '';
+
+                    // Обновляем настройки из комнаты
+                    App.state.participants = room.maxPlayers;
+                    App.state.spies = room.spies;
+
+                    // Проверяем готовность всех игроков
+                    let allReady = true;
+                    let myReadyStatus = false;
+                    const players = room.players ? Object.values(room.players) : [];
+
+                    // Отображаем всех игроков в комнате
+                    players.forEach((player, index) => {
+                        const isMe = player.id === App.state.playerId;
+                        
+                        if (isMe) {
+                            myReadyStatus = player.isReady || false;
+                            App.state.isReady = myReadyStatus;
+                        }
+                        
+                        if (!player.isReady) {
+                            allReady = false;
+                        }
+
+                        const card = document.createElement('div');
+                        card.className = `player-slot-card occupied`;
+                        
+                        card.innerHTML = `
+                            <div class="slot-info">
+                                <div class="slot-ava" style="${player.photo_url ? 'background-image:url('+player.photo_url+')' : ''}"></div>
+                                <div class="slot-name">${player.username || 'Игрок ' + (index+1)} ${player.isAdmin ? '👑' : ''}</div>
+                            </div>
+                            <div class="status-indicator ${player.isReady ? 'status-ready' : 'status-not-ready'}">
+                                ${player.isReady ? 'ГОТОВ' : 'НЕ ГОТОВ'}
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    });
+
+                    // Добавляем пустые слоты если нужно
+                    for(let i = players.length; i < room.maxPlayers; i++) {
+                        const card = document.createElement('div');
+                        card.className = `player-slot-card`;
+                        
+                        card.innerHTML = `
+                            <div class="slot-info">
+                                <div class="slot-ava"></div>
+                                <div class="slot-name">Свободно</div>
+                            </div>
+                            <div class="status-indicator status-empty">
+                                НЕТ
+                            </div>
+                        `;
+                        container.appendChild(card);
                     }
 
-                    const card = document.createElement('div');
-                    card.className = `player-slot-card occupied`;
-                    
-                    card.innerHTML = `
-                        <div class="slot-info">
-                            <div class="slot-ava" style="${player.photo_url ? 'background-image:url('+player.photo_url+')' : ''}"></div>
-                            <div class="slot-name">${player.username || 'Игрок ' + (index+1)} ${player.isAdmin ? '👑' : ''}</div>
-                        </div>
-                        <div class="status-indicator ${player.isReady ? 'status-ready' : 'status-not-ready'}">
-                            ${player.isReady ? 'ГОТОВ' : 'НЕ ГОТОВ'}
-                        </div>
-                    `;
-                    container.appendChild(card);
+                    // Обновляем кнопку готовности
+                    const btn = document.getElementById('ready-btn');
+                    btn.innerText = myReadyStatus ? 'НЕ ГОТОВ' : 'ГОТОВ';
+                    btn.classList.toggle('active-ready', myReadyStatus);
+
+                    // Показываем кнопку "Начать игру" только если все готовы и я админ
+                    const startBtn = document.getElementById('start-btn');
+                    startBtn.style.display = (allReady && App.state.isAdmin && players.length >= 2) ? 'block' : 'none';
                 });
-
-                // Добавляем пустые слоты если нужно
-                for(let i = room.players.length; i < room.maxPlayers; i++) {
-                    const card = document.createElement('div');
-                    card.className = `player-slot-card`;
-                    
-                    card.innerHTML = `
-                        <div class="slot-info">
-                            <div class="slot-ava"></div>
-                            <div class="slot-name">Свободно</div>
-                        </div>
-                        <div class="status-indicator status-empty">
-                            НЕТ
-                        </div>
-                    `;
-                    container.appendChild(card);
-                }
-
-                // Обновляем кнопку готовности
-                const btn = document.getElementById('ready-btn');
-                btn.innerText = myReadyStatus ? 'НЕ ГОТОВ' : 'ГОТОВ';
-                btn.classList.toggle('active-ready', myReadyStatus);
-
-                // Показываем кнопку "Начать игру" только если все готовы и я админ
-                const startBtn = document.getElementById('start-btn');
-                startBtn.style.display = (allReady && App.state.isAdmin) ? 'block' : 'none';
             },
 
             // Переключение готовности
-            toggleReady: () => {
+            toggleReady: async () => {
                 if (!App.state.currentRoomId) return;
                 
                 App.state.isReady = !App.state.isReady;
@@ -1513,24 +1627,23 @@
                 btn.innerText = App.state.isReady ? 'НЕ ГОТОВ' : 'ГОТОВ';
                 btn.classList.toggle('active-ready', App.state.isReady);
                 
-                // Обновляем в хранилище
-                RoomStorage.updatePlayerReady(App.state.currentRoomId, App.state.playerId, App.state.isReady);
-                
-                // Обновляем отображение комнаты
-                setTimeout(() => App.buildRoom(), 100);
+                // Обновляем в Firebase
+                await FirebaseManager.updatePlayerReady(App.state.currentRoomId, App.state.playerId, App.state.isReady);
                 
                 tg.HapticFeedback.notificationOccurred('success');
             },
 
             // Начать игру (проверка всех игроков)
-            startGame: () => {
+            startGame: async () => {
                 if (!App.state.currentRoomId) return;
                 
-                const room = RoomStorage.getRoom(App.state.currentRoomId);
+                const room = await FirebaseManager.getRoom(App.state.currentRoomId);
                 if (!room) return;
 
+                const players = room.players ? Object.values(room.players) : [];
+
                 // Проверяем, все ли игроки готовы
-                const allReady = room.players.every(p => p.isReady);
+                const allReady = players.every(p => p.isReady);
                 if (!allReady) {
                     Modal.showAlert("ОЖИДАНИЕ", "Не все игроки готовы!");
                     tg.HapticFeedback.notificationOccurred('warning');
@@ -1538,14 +1651,25 @@
                 }
 
                 // Проверяем минимальное количество игроков
-                if (room.players.length < 2) {
+                if (players.length < 2) {
                     Modal.showAlert("ОШИБКА", "Нужно минимум 2 игрока!");
                     tg.HapticFeedback.notificationOccurred('error');
                     return;
                 }
 
+                // Создаем данные игры
+                const gameData = {
+                    players: players,
+                    spies: room.spies,
+                    startedAt: Date.now()
+                };
+
+                // Обновляем комнату в Firebase
+                await database.ref('rooms/' + App.state.currentRoomId + '/gameStarted').set(true);
+                await database.ref('rooms/' + App.state.currentRoomId + '/gameData').set(gameData);
+
                 // Переходим к игре
-                Game.initializeGame(room.players, room.spies);
+                Game.initializeGame(players, room.spies);
                 App.navigate('scr-game');
                 tg.HapticFeedback.notificationOccurred('success');
             }
@@ -1580,8 +1704,6 @@
                 document.getElementById('continue-btn').style.display = 'none';
 
                 // Определяем роль (шпион или бравлер)
-                // В реальной игре здесь должна быть логика распределения ролей между всеми игроками
-                // Для симуляции: текущий игрок с шансом стать шпионом
                 const playerIndex = Game.allPlayers.findIndex(p => p.id === App.state.playerId);
                 const isSpy = Math.random() < (Game.spiesCount / Game.allPlayers.length);
                 Game.myRole = isSpy ? 'SPY' : 'BRAWLER';
@@ -1760,18 +1882,19 @@
 
                 // Через 3 секунды возвращаем в комнату
                 setTimeout(() => {
-                    App.navigate('scr-room');
-                    // Сбрасываем готовность всех игроков
+                    // Сбрасываем игру в Firebase
                     if (App.state.currentRoomId) {
-                        const room = RoomStorage.getRoom(App.state.currentRoomId);
-                        if (room) {
-                            room.players.forEach(player => {
-                                RoomStorage.updatePlayerReady(App.state.currentRoomId, player.id, false);
-                            });
-                        }
+                        database.ref('rooms/' + App.state.currentRoomId + '/gameStarted').set(false);
+                        database.ref('rooms/' + App.state.currentRoomId + '/gameData').remove();
+                        
+                        // Сбрасываем готовность всех игроков
+                        Game.allPlayers.forEach(player => {
+                            database.ref('rooms/' + App.state.currentRoomId + '/players/' + player.id + '/isReady').set(false);
+                        });
                     }
+                    
                     App.state.isReady = false;
-                    App.buildRoom();
+                    App.navigate('scr-room');
                 }, 3000);
 
                 // Останавливаем таймер
@@ -1816,7 +1939,8 @@
                         clearInterval(Game.votingTimer);
                         // Выходим из комнаты
                         if (App.state.currentRoomId) {
-                            RoomStorage.removePlayerFromRoom(App.state.currentRoomId, App.state.playerId);
+                            FirebaseManager.removePlayerFromRoom(App.state.currentRoomId, App.state.playerId);
+                            FirebaseManager.stopListening();
                             App.state.currentRoomId = null;
                         }
                         App.navigate('scr-menu');
@@ -1825,21 +1949,31 @@
             }
         };
 
-        // Подгрузка данных профиля
-        if(tg.initDataUnsafe.user) {
-            const user = tg.initDataUnsafe.user;
-            document.getElementById('my-tag').innerText = "@" + (user.username || "player");
-            if(user.photo_url) {
-                document.getElementById('my-ava').style.backgroundImage = `url(${user.photo_url})`;
-            }
-        }
-
         // Инициализация при загрузке
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Загружаем данные пользователя из Telegram
+            if(tg.initDataUnsafe.user) {
+                const user = tg.initDataUnsafe.user;
+                App.state.username = user.username || 'Игрок';
+                App.state.photoUrl = user.photo_url || '';
+                
+                document.getElementById('my-tag').innerText = "@" + App.state.username;
+                if(App.state.photoUrl) {
+                    document.getElementById('my-ava').style.backgroundImage = `url(${App.state.photoUrl})`;
+                }
+            }
+
+            // Проверяем подключение к Firebase
+            try {
+                // Простая проверка подключения
+                await database.ref('.info/connected').once('value');
+                console.log('Firebase подключен успешно!');
+            } catch (error) {
+                console.error('Ошибка подключения к Firebase:', error);
+                Modal.showAlert("ОШИБКА", "Проблемы с подключением к серверу");
+            }
+
             App.navigate('scr-menu');
-            
-            // Очищаем старые комнаты при загрузке (для тестирования)
-            // localStorage.removeItem('brawl_spy_rooms');
         });
     </script>
 </body>
