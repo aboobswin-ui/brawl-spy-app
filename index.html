@@ -3,636 +3,244 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>BRAWL SPY ULTIMATE EDITION 2026</title>
+    <title>BRAWL SPY ULTIMATE ONLINE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rubik+One&family=Exo+2:wght@900&display=swap" rel="stylesheet">
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rubik+One&family=Exo+2:wght@700;900&display=swap" rel="stylesheet">
-    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
+
     <style>
-        /* --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ЦВЕТОВ --- */
         :root {
-            --neon-blue: #00d2ff;
-            --neon-red: #ff3131;
-            --neon-gold: #ffd700;
-            --neon-green: #00ff00;
-            --bg-black: #020205;
-            --card-bg: #0a0a10;
-            --glow-white: rgba(255, 255, 255, 0.9);
-            --transition-speed: 0.25s;
+            --neon-blue: #00d2ff; --neon-red: #ff3131; --neon-gold: #ffd700; --neon-green: #00ff00;
+            --bg-black: #020205; --glow-white: rgba(255, 255, 255, 0.9);
         }
 
-        /* --- СБРОС СТИЛЕЙ И БАЗА --- */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            outline: none;
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-user-select: none; outline: none; transition: all 0.3s ease; }
+        
+        body { 
+            background: var(--bg-black); color: #fff; font-family: 'Rubik One', sans-serif; 
+            height: 100vh; overflow: hidden; display: flex; justify-content: center;
         }
 
-        html, body {
-            width: 100%;
-            height: 100%;
-            background-color: var(--bg-black);
-            color: #ffffff;
-            font-family: 'Rubik One', sans-serif;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        .app-shell { width: 100%; height: 100%; max-width: 450px; position: relative; }
+
+        .screen { 
+            position: absolute; inset: 0; display: none; flex-direction: column; 
+            align-items: center; padding: 40px 25px 30px; background: var(--bg-black); 
+        }
+        .screen.active { display: flex; animation: fadeIn 0.4s ease; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+        /* --- ГЛАВНОЕ МЕНЮ --- */
+        .logo-spy { font-size: 90px; color: var(--neon-red); text-shadow: 0 0 35px var(--neon-red); margin-top: 40px; }
+        .logo-sub { font-family: 'Black Ops One'; font-size: 30px; color: var(--neon-gold); margin-bottom: 40px; }
+
+        .btn-main { 
+            width: 100%; padding: 20px; background: rgba(0,0,0,0.6); border: 4px solid var(--neon-blue); 
+            box-shadow: 0 0 15px var(--neon-blue); border-radius: 25px; color: #fff; 
+            font-family: 'Exo 2'; font-weight: 900; font-size: 20px; text-transform: uppercase; 
+            margin-bottom: 15px; cursor: pointer; position: relative; overflow: hidden;
         }
 
-        /* --- ОСНОВНАЯ ОБОЛОЧКА ПРИЛОЖЕНИЯ --- */
-        .app-shell {
-            width: 100%;
-            height: 100%;
-            max-width: 450px;
-            background: radial-gradient(circle at center, #0a0a1a 0%, #020205 100%);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 0 50px rgba(0,0,0,1);
+        /* КНОПКА №6: СОЗДАТЬ КОМНАТУ [cite: 2026-01-04] */
+        .btn-create-special { 
+            border-color: var(--neon-gold); box-shadow: 0 0 15px var(--neon-gold); 
+            color: #ffffff !important; /* Текст белый по требованию [cite: 2026-01-04] */
         }
 
-        /* --- СИСТЕМА ЭКРАНОВ --- */
-        .screen {
-            position: absolute;
-            inset: 0;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            padding: 30px 25px;
-            z-index: 10;
-            opacity: 0;
-            transform: scale(1.05);
-            transition: opacity var(--transition-speed), transform var(--transition-speed);
-        }
-
-        .screen.active {
-            display: flex;
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        /* --- ЭКРАН 1: ГЛАВНОЕ МЕНЮ --- */
-        .main-menu-header {
-            text-align: center;
-            margin-top: 40px;
-            margin-bottom: 60px;
-        }
-
-        .main-logo-text {
-            font-size: 100px;
-            color: var(--neon-red);
-            text-shadow: 0 0 40px var(--neon-red), 0 0 10px rgba(0,0,0,0.5);
-            line-height: 0.8;
-            letter-spacing: -2px;
-        }
-
-        .sub-logo-text {
-            font-family: 'Black Ops One';
-            font-size: 32px;
-            color: var(--neon-gold);
-            margin-top: 15px;
-            text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
-        }
-
-        .edition-label {
-            font-family: 'Exo 2';
-            font-size: 16px;
-            font-weight: 400;
-            color: #ffffff;
-            opacity: 0.7;
-            margin-top: 8px;
-            letter-spacing: 3px;
+        /* --- НАСТРОЙКИ ЛОББИ [cite: 2026-01-03] --- */
+        .header-white { font-family: 'Exo 2'; font-size: 28px; color: #fff; text-shadow: 0 0 15px var(--glow-white); margin-bottom: 25px; text-transform: uppercase; }
+        
+        .tab-container { display: flex; width: 100%; gap: 12px; margin-bottom: 25px; }
+        .tab { 
+            flex: 1; padding: 15px; border-radius: 15px; text-align: center; 
+            font-family: 'Exo 2'; font-size: 14px; border: 2px solid; background: #000;
             text-transform: uppercase;
         }
+        .tab-participants { border-color: var(--neon-blue); box-shadow: 0 0 12px var(--neon-blue); color: var(--neon-blue); }
+        .tab-spy { border-color: var(--neon-red); box-shadow: 0 0 12px var(--neon-red); color: var(--neon-red); }
 
-        /* --- УНИВЕРСАЛЬНЫЕ КНОПКИ --- */
-        .btn-action {
-            width: 100%;
-            padding: 22px;
-            background: #000000;
-            border: 4px solid var(--neon-blue);
-            box-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
-            border-radius: 25px;
-            color: #ffffff;
-            font-family: 'Exo 2';
-            font-weight: 900;
-            font-size: 22px;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.15s ease;
+        /* --- ВВОД ID --- */
+        .id-display-row { display: flex; align-items: center; gap: 10px; margin: 35px 0; }
+        .id-box { 
+            font-family: 'Black Ops One'; font-size: 42px; width: 38px; text-align: center; 
+            border-bottom: 4px solid #fff; color: #fff; text-shadow: 0 0 10px #fff;
+        }
+        .dash { font-family: 'Black Ops One'; font-size: 38px; padding-bottom: 10px; color: #fff; }
+
+        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; width: 100%; }
+        .num-key { 
+            padding: 22px; background: #0d0d14; border: 2px solid #222; border-radius: 20px; 
+            font-size: 28px; color: #fff; font-family: 'Black Ops One'; display: flex; 
+            justify-content: center; align-items: center;
         }
 
-        .btn-action:active {
-            transform: scale(0.94);
-            box-shadow: 0 0 30px rgba(0, 210, 255, 0.7);
+        /* --- СПИСОК ИГРОКОВ --- */
+        .player-card { 
+            width: 100%; background: rgba(255,255,255,0.03); border: 2px solid #333; 
+            border-radius: 20px; padding: 15px; display: flex; justify-content: space-between; 
+            align-items: center; margin-bottom: 12px;
         }
+        .status-ready { color: var(--neon-green); text-shadow: 0 0 10px var(--neon-green); font-family: 'Exo 2'; font-size: 14px; }
+        .status-wait { color: var(--neon-red); text-shadow: 0 0 10px var(--neon-red); font-family: 'Exo 2'; font-size: 14px; }
 
-        .btn-secondary {
-            border-color: #252525;
-            box-shadow: none;
-            color: #888888;
-            margin-top: auto;
-            font-size: 18px;
-            border-radius: 40px;
-        }
-
-        /* --- ЭКРАН 2: ВВОД ID --- */
-        .title-neon-white {
-            font-family: 'Exo 2';
-            font-size: 32px;
-            color: #ffffff;
-            text-shadow: 0 0 20px var(--glow-white);
-            margin-bottom: 40px;
-            text-transform: uppercase;
-        }
-
-        .id-input-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 45px;
-        }
-
-        .id-digit-box {
-            font-family: 'Black Ops One';
-            font-size: 42px;
-            color: #ffffff;
-            text-shadow: 0 0 15px var(--glow-white);
-            width: 35px;
-            text-align: center;
-            border-bottom: 4px solid #ffffff;
-            padding-bottom: 5px;
-        }
-
-        .id-hyphen {
-            font-family: 'Black Ops One';
-            font-size: 36px;
-            color: #ffffff;
-            text-shadow: 0 0 15px var(--glow-white);
-            margin: 0 8px 25px 8px; /* Приподнятый дефис */
-        }
-
-        /* ЦИФРОВАЯ КЛАВИАТУРА */
-        .numpad-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .n-key {
-            width: 85px;
-            height: 85px;
-            background: #0d0d14;
-            border: 2px solid #252525;
-            border-radius: 20px;
-            font-size: 32px;
-            color: #ffffff;
-            font-family: 'Black Ops One';
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.1s;
-        }
-
-        .n-key:active {
-            background: #1a1a25;
-            transform: scale(0.9);
-            border-color: var(--neon-blue);
-        }
-
-        /* --- ЭКРАН 3: НАСТРОЙКА ЛОББИ --- */
-        .id-display-white {
-            color: #ffffff;
-            font-family: 'Black Ops One';
-            font-size: 20px;
-            letter-spacing: 1px;
-            margin-bottom: 25px;
-        }
-
-        .user-identity-card {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 35px;
-        }
-
-        .avatar-frame {
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            border: 2px solid #ffffff;
-            box-shadow: 0 0 15px var(--glow-white);
-            background: #222 center/cover;
-        }
-
-        .username-label {
-            font-family: 'Exo 2';
-            font-size: 18px;
-            color: #ffffff;
-            text-shadow: 0 0 8px #ffffff;
-        }
-
-        .settings-row {
-            width: 100%;
-            background: var(--card-bg);
-            border: 3px solid var(--neon-blue);
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
-            border-radius: 22px;
-            padding: 15px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 18px;
-        }
-
-        .settings-row.red-theme {
-            border-color: var(--neon-red);
-            box-shadow: 0 0 15px rgba(255, 49, 49, 0.3);
-        }
-
-        .control-group {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-        }
-
-        .circle-btn {
-            width: 45px;
-            height: 45px;
-            background: #000;
-            border: 2px solid var(--neon-blue);
-            border-radius: 12px;
-            color: var(--neon-blue);
-            font-size: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Rubik One';
-        }
-
-        .circle-btn.red-btn {
-            border-color: var(--neon-red);
-            color: var(--neon-red);
-        }
-
-        .value-display {
-            font-family: 'Black Ops One';
-            font-size: 32px;
-            min-width: 30px;
-            text-align: center;
-        }
-
-        /* КНОПКА СОЗДАТЬ КОМНАТУ (БЕЛЫЙ ТЕКСТ + ЖЕЛТЫЙ НЕОН) */
-        .btn-create-lobby {
-            width: 100%;
-            padding: 20px;
-            background: #000;
-            border: 5px solid var(--neon-gold);
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-            border-radius: 30px;
-            color: #ffffff; /* Строго белый по ТЗ */
-            font-family: 'Exo 2';
-            font-weight: 900;
-            font-size: 22px;
-            text-transform: uppercase;
-            margin-top: 15px;
-        }
-
-        /* --- ЭКРАН 4: АКТИВНАЯ КОМНАТА --- */
-        .players-scroll-area {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            margin-bottom: 25px;
-            overflow-y: auto;
-            padding-right: 5px;
-        }
-
-        .player-slot-card {
-            width: 100%;
-            background: rgba(10, 10, 16, 0.8);
-            border: 2px solid #222;
-            border-radius: 20px;
-            padding: 14px 18px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: border-color 0.3s;
-        }
-
-        .player-slot-card.occupied {
-            border-color: #444;
-        }
-
-        .slot-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .slot-ava {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.3);
-            background: #111 center/cover;
-        }
-
-        .slot-name {
-            font-family: 'Exo 2';
-            font-size: 16px;
-            color: #ffffff;
-        }
-
-        .status-indicator {
-            padding: 6px 14px;
-            border-radius: 12px;
-            font-family: 'Exo 2';
-            font-size: 13px;
-            font-weight: 900;
-            text-transform: uppercase;
-            border: 2px solid;
-        }
-
-        .status-ready {
-            border-color: var(--neon-green);
-            color: var(--neon-green);
-            box-shadow: 0 0 10px var(--neon-green);
-        }
-
-        .status-not-ready {
-            border-color: var(--neon-red);
-            color: var(--neon-red);
-            box-shadow: 0 0 10px var(--neon-red);
-        }
-
-        .status-empty {
-            border-color: #333;
-            color: #333;
-        }
-
-        /* КНОПКИ УПРАВЛЕНИЯ В КОМНАТЕ */
-        .room-controls-box {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            margin-top: auto;
-        }
-
-        .btn-ready-toggle {
-            border-color: var(--neon-green);
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
-        }
-
-        .btn-ready-toggle.active-ready {
-            border-color: var(--neon-red);
-            box-shadow: 0 0 15px rgba(255, 49, 49, 0.3);
-        }
-
-        /* СКРОЛЛБАР */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        .footer-btn { margin-top: auto; width: 100%; }
     </style>
 </head>
 <body>
-
     <div class="app-shell">
         
         <div id="scr-menu" class="screen active">
-            <div class="main-menu-header">
-                <div class="main-logo-text">SPY</div>
-                <div class="sub-logo-text">BRAWL STARS</div>
-                <div class="edition-label">edition 2026</div>
+            <h1 class="logo-spy">SPY</h1>
+            <div class="logo-sub">BRAWL STARS</div>
+            <button class="btn-main" onclick="App.nav('scr-setup')">НАСТРОЙКИ БИТВЫ</button>
+            <button class="btn-main" onclick="App.nav('scr-join')">ВХОД ПО ID</button>
+            <button class="btn-main" style="opacity:0.5">СТАТИСТИКА</button>
+            <button class="btn-main" style="opacity:0.5">МАГАЗИН</button>
+            <button class="btn-main" style="opacity:0.5">ПРОФИЛЬ</button>
+            <button class="btn-main btn-create-special" onclick="App.nav('scr-setup')">СОЗДАТЬ КОМНАТУ</button>
+        </div>
+
+        <div id="scr-setup" class="screen">
+            <h2 class="header-white">НАСТРОЙКА ЛОББИ</h2>
+            <div class="tab-container">
+                <div class="tab tab-participants">УЧАСТНИКИ</div>
+                <div class="tab tab-spy">ШПИОН</div>
             </div>
             
-            <button class="btn-action" onclick="App.navigate('scr-lobby')">Создать лобби</button>
-            <button class="btn-action" onclick="App.navigate('scr-join')">Вход по ID</button>
-            
-            <button class="btn-action btn-secondary" onclick="tg.close()">ВЫХОД</button>
+            <div style="flex:1; width:100%; display:flex; flex-direction:column; gap:20px; align-items:center;">
+                <div id="setup-id-preview" style="font-family:'Black Ops One'; font-size:24px; color:var(--neon-gold);">ID: ГЕНЕРАЦИЯ...</div>
+                <div style="color:#555; font-size:12px; text-align:center;">НАСТРОЙКИ БИТВЫ АКТИВНЫ</div>
+            </div>
+
+            <div class="footer-btn">
+                <button class="btn-main btn-create-special" onclick="App.createRoom()">СОЗДАТЬ ЛОББИ</button>
+                <button class="btn-main" style="border-color:#444; box-shadow:none;" onclick="App.nav('scr-menu')">В МЕНЮ</button>
+            </div>
         </div>
 
         <div id="scr-join" class="screen">
-            <h2 class="title-neon-white">ВВЕДИТЕ КОД</h2>
+            <h2 class="header-white">ID КОМНАТЫ</h2>
+            <div class="id-display-row">
+                <div class="id-box" id="c1">_</div><div class="id-box" id="c2">_</div><div class="id-box" id="c3">_</div><div class="id-box" id="c4">_</div>
+                <div class="dash">-</div>
+                <div class="id-box" id="c5">_</div><div class="id-box" id="c6">_</div><div class="id-box" id="c7">_</div><div class="id-box" id="c8">_</div>
+            </div>
             
-            <div class="id-input-container">
-                <div class="id-digit-box" id="d1">_</div>
-                <div class="id-digit-box" id="d2">_</div>
-                <div class="id-digit-box" id="d3">_</div>
-                <div class="id-digit-box" id="d4">_</div>
-                <div class="id-hyphen">-</div>
-                <div class="id-digit-box" id="d5">_</div>
-                <div class="id-digit-box" id="d6">_</div>
-                <div class="id-digit-box" id="d7">_</div>
-                <div class="id-digit-box" id="d8">_</div>
+            <div class="numpad">
+                <script>
+                    for(let i=1; i<=9; i++) document.write(`<div class="num-key" onclick="App.key('${i}')">${i}</div>`);
+                </script>
+                <div class="num-key" style="color:var(--neon-red)" onclick="App.key('C')">C</div>
+                <div class="num-key" onclick="App.key('0')">0</div>
+                <div class="num-key" style="color:var(--neon-gold)" onclick="App.joinRoom()">OK</div>
             </div>
-
-            <div class="numpad-grid">
-                <button class="n-key" onclick="App.pressKey('1')">1</button>
-                <button class="n-key" onclick="App.pressKey('2')">2</button>
-                <button class="n-key" onclick="App.pressKey('3')">3</button>
-                <button class="n-key" onclick="App.pressKey('4')">4</button>
-                <button class="n-key" onclick="App.pressKey('5')">5</button>
-                <button class="n-key" onclick="App.pressKey('6')">6</button>
-                <button class="n-key" onclick="App.pressKey('7')">7</button>
-                <button class="n-key" onclick="App.pressKey('8')">8</button>
-                <button class="n-key" onclick="App.pressKey('9')">9</button>
-                <button class="n-key" style="color:var(--neon-red)" onclick="App.pressKey('C')">C</button>
-                <button class="n-key" onclick="App.pressKey('0')">0</button>
-                <button class="n-key" style="color:var(--neon-gold)" onclick="App.joinByCode()">OK</button>
-            </div>
-
-            <button class="btn-action btn-secondary" onclick="App.navigate('scr-menu')">НАЗАД</button>
-        </div>
-
-        <div id="scr-lobby" class="screen">
-            <h2 class="title-neon-white" style="margin-bottom:5px">НАСТРОЙКА ЛОББИ</h2>
-            <div class="id-display-white" id="lobby-id-val">ID: 0000-0000</div>
-
-            <div class="user-identity-card">
-                <div class="avatar-frame" id="my-ava"></div>
-                <div class="username-label" id="my-tag">@player</div>
-            </div>
-
-            <div class="settings-row">
-                <span style="font-family:'Exo 2'; font-size:18px">УЧАСТНИКИ</span>
-                <div class="control-group">
-                    <button class="circle-btn" onclick="App.updateSettings('p', -1)">-</button>
-                    <span class="value-display" id="p-count">4</span>
-                    <button class="circle-btn" onclick="App.updateSettings('p', 1)">+</button>
-                </div>
-            </div>
-
-            <div class="settings-row red-theme">
-                <span style="font-family:'Exo 2'; font-size:18px">ШПИОН</span>
-                <div class="control-group">
-                    <button class="circle-btn red-btn" onclick="App.updateSettings('s', -1)">-</button>
-                    <span class="value-display" id="s-count">1</span>
-                    <button class="circle-btn red-btn" onclick="App.updateSettings('s', 1)">+</button>
-                </div>
-            </div>
-
-            <button class="btn-create-lobby" onclick="App.createFinalRoom()">СОЗДАТЬ КОМНАТУ</button>
-            
-            <button class="btn-action btn-secondary" onclick="App.navigate('scr-menu')">НАЗАД</button>
+            <button class="btn-main" style="margin-top:30px; border-color:#444;" onclick="App.nav('scr-menu')">НАЗАД</button>
         </div>
 
         <div id="scr-room" class="screen">
-            <h2 class="title-neon-white" style="margin-bottom:5px">КОМНАТА ИГРЫ</h2>
-            <div class="id-display-white" id="room-id-val">ID: 0000-0000</div>
-
-            <div class="players-scroll-area" id="room-slots">
+            <h2 class="header-white">ЛОББИ БИТВЫ</h2>
+            <div id="room-id-tag" style="font-family:'Black Ops One'; font-size:22px; margin-bottom:25px;">ID: ....-....</div>
+            
+            <div id="player-list-area" style="width:100%; flex:1; overflow-y:auto; padding-right:5px;">
                 </div>
 
-            <div class="room-controls-box">
-                <button class="btn-action btn-ready-toggle" id="ready-btn" onclick="App.toggleReady()">ГОТОВ</button>
-                <button class="btn-action" style="border-color:var(--neon-gold); color:var(--neon-gold); display:none;" id="start-btn" onclick="tg.showAlert('БИТВА НАЧИНАЕТСЯ!')">НАЧАТЬ ИГРУ</button>
-                <button class="btn-action btn-secondary" style="margin-top:10px" onclick="App.navigate('scr-menu')">ПОКИНУТЬ</button>
+            <div class="footer-btn">
+                <button class="btn-main" id="ready-btn" onclick="App.toggleReady()">ГОТОВ</button>
+                <button class="btn-main btn-create-special" id="start-btn" style="display:none">НАЧАТЬ ИГРУ</button>
+                <button class="btn-main" style="border-color:var(--neon-red); box-shadow:none;" onclick="App.leave()">ВЫЙТИ</button>
             </div>
         </div>
 
     </div>
 
     <script>
-        // ИНИЦИАЛИЗАЦИЯ TELEGRAM
+        // Твои реальные ключи
+        const firebaseConfig = {
+            apiKey: "AIzaSyDbopGDAnN6RxiXoAk_Il90WZBCW0bVBvg",
+            authDomain: "brawlspy.firebaseapp.com",
+            databaseURL: "https://brawlspy-default-rtdb.firebaseio.com",
+            projectId: "brawlspy",
+            storageBucket: "brawlspy.firebasestorage.app",
+            messagingSenderId: "803859610634",
+            appId: "1:803859610634:web:2310aa16bb6e61049833f3"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
         const tg = window.Telegram.WebApp;
         tg.expand();
-        tg.enableClosingConfirmation();
+        
+        const user = tg.initDataUnsafe.user || { id: Date.now(), username: "Player_" + Math.floor(Math.random()*99) };
 
-        // ОСНОВНОЕ ПРИЛОЖЕНИЕ
         const App = {
-            state: {
-                currentScreen: 'scr-menu',
-                inputCode: '',
-                participants: 4,
-                spies: 1,
-                lobbyId: '9574-3718',
-                isReady: false,
-                isAdmin: true
-            },
+            roomId: null,
+            inputStr: "",
+            isReady: false,
 
-            // Навигация
-            navigate: (screenId) => {
+            nav: (id) => {
                 document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-                const target = document.getElementById(screenId);
-                target.classList.add('active');
-                App.state.currentScreen = screenId;
+                document.getElementById(id).classList.add('active');
+                if(id === 'scr-setup') {
+                    const code = Math.floor(1000+Math.random()*9000) + "-" + Math.floor(1000+Math.random()*9000);
+                    document.getElementById('setup-id-preview').innerText = "ID: " + code;
+                    App.roomId = code;
+                }
+            },
+
+            key: (v) => {
+                if(v === 'C') App.inputStr = "";
+                else if(App.inputStr.length < 8) App.inputStr += v;
+                for(let i=1; i<=8; i++) document.getElementById('c'+i).innerText = App.inputStr[i-1] || "_";
+                tg.HapticFeedback.impactOccurred('medium');
+            },
+
+            createRoom: () => { App.nav('scr-room'); App.connect(); },
+
+            joinRoom: () => {
+                if(App.inputStr.length === 8) {
+                    App.roomId = App.inputStr.slice(0,4) + "-" + App.inputStr.slice(4,8);
+                    App.nav('scr-room');
+                    App.connect();
+                }
+            },
+
+            connect: () => {
+                document.getElementById('room-id-tag').innerText = "ID: " + App.roomId;
+                const ref = db.ref('rooms/' + App.roomId + '/players/' + user.id);
+                ref.set({ name: "@" + (user.username || "spy_player"), ready: false });
                 
-                if(screenId === 'scr-lobby') {
-                    document.getElementById('lobby-id-val').innerText = "ID: " + App.state.lobbyId;
-                }
-                if(screenId === 'scr-room') {
-                    App.buildRoom();
-                }
-                tg.HapticFeedback.impactOccurred('light');
-            },
-
-            // Ввод кода
-            pressKey: (key) => {
-                if(key === 'C') {
-                    App.state.inputCode = '';
-                } else if(App.state.inputCode.length < 8) {
-                    App.state.inputCode += key;
-                }
-                
-                for(let i=1; i<=8; i++) {
-                    const char = App.state.inputCode[i-1] || "_";
-                    const el = document.getElementById('d' + i);
-                    el.innerText = char;
-                    el.style.opacity = char === "_" ? "0.3" : "1";
-                }
-                tg.HapticFeedback.selectionChanged();
-            },
-
-            joinByCode: () => {
-                if(App.state.inputCode.length === 8) {
-                    App.state.lobbyId = App.state.inputCode.slice(0,4) + "-" + App.state.inputCode.slice(4,8);
-                    App.state.isAdmin = false;
-                    App.navigate('scr-room');
-                } else {
-                    tg.HapticFeedback.notificationOccurred('error');
-                }
-            },
-
-            // Настройки лобби
-            updateSettings: (type, delta) => {
-                if(type === 'p') {
-                    App.state.participants = Math.max(2, Math.min(12, App.state.participants + delta));
-                    document.getElementById('p-count').innerText = App.state.participants;
-                } else {
-                    App.state.spies = Math.max(1, Math.min(5, App.state.spies + delta));
-                    document.getElementById('s-count').innerText = App.state.spies;
-                }
-                tg.HapticFeedback.selectionChanged();
-            },
-
-            createFinalRoom: () => {
-                App.state.isAdmin = true;
-                App.navigate('scr-room');
-            },
-
-            // Логика комнаты
-            buildRoom: () => {
-                document.getElementById('room-id-val').innerText = "ID: " + App.state.lobbyId;
-                const container = document.getElementById('room-slots');
-                container.innerHTML = '';
-
-                for(let i=0; i < App.state.participants; i++) {
-                    const isMe = i === 0;
-                    const card = document.createElement('div');
-                    card.className = `player-slot-card ${isMe ? 'occupied' : ''}`;
-                    
-                    card.innerHTML = `
-                        <div class="slot-info">
-                            <div class="slot-ava" style="${isMe && tg.initDataUnsafe.user?.photo_url ? 'background-image:url('+tg.initDataUnsafe.user.photo_url+')' : ''}"></div>
-                            <div class="slot-name">${isMe ? '@' + (tg.initDataUnsafe.user?.username || 'Вы') : 'ОЖИДАНИЕ...'}</div>
-                        </div>
-                        <div class="status-indicator ${isMe ? (App.state.isReady ? 'status-ready' : 'status-not-ready') : 'status-empty'}">
-                            ${isMe ? (App.state.isReady ? 'ГОТОВ' : 'НЕ ГОТОВ') : 'ПУСТО'}
-                        </div>
-                    `;
-                    container.appendChild(card);
-                }
-
-                // Кнопки управления
-                const startBtn = document.getElementById('start-btn');
-                startBtn.style.display = (App.state.isAdmin && App.state.isReady) ? 'block' : 'none';
+                // Слушаем список игроков
+                db.ref('rooms/' + App.roomId + '/players').on('value', (snap) => {
+                    const players = snap.val();
+                    const list = document.getElementById('player-list-area');
+                    list.innerHTML = "";
+                    if(players) {
+                        Object.keys(players).forEach(id => {
+                            const p = players[id];
+                            list.innerHTML += `
+                                <div class="player-card">
+                                    <span style="font-family:'Exo 2'; font-size:18px;">${p.name}</span>
+                                    <span class="${p.ready ? 'status-ready' : 'status-wait'}">${p.ready ? 'ГОТОВ' : 'НЕ ГОТОВ'}</span>
+                                </div>`;
+                        });
+                    }
+                });
             },
 
             toggleReady: () => {
-                App.state.isReady = !App.state.isReady;
-                const btn = document.getElementById('ready-btn');
-                btn.innerText = App.state.isReady ? 'ОТМЕНА' : 'ГОТОВ';
-                btn.classList.toggle('active-ready', App.state.isReady);
-                
-                App.buildRoom();
+                App.isReady = !App.isReady;
+                db.ref('rooms/' + App.roomId + '/players/' + user.id).update({ ready: App.isReady });
+                document.getElementById('ready-btn').innerText = App.isReady ? "ОТМЕНА" : "ГОТОВ";
                 tg.HapticFeedback.notificationOccurred('success');
+            },
+
+            leave: () => {
+                if(App.roomId) db.ref('rooms/' + App.roomId + '/players/' + user.id).remove();
+                location.reload();
             }
         };
-
-        // Подгрузка данных профиля
-        if(tg.initDataUnsafe.user) {
-            const user = tg.initDataUnsafe.user;
-            document.getElementById('my-tag').innerText = "@" + (user.username || "player");
-            if(user.photo_url) {
-                document.getElementById('my-ava').style.backgroundImage = `url(${user.photo_url})`;
-            }
-        }
     </script>
 </body>
 </html>
