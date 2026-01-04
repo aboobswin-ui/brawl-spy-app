@@ -103,15 +103,14 @@
 
         .modal-container {
             background: rgba(15, 15, 25, 0.95);
-            border: none; /* УБИРАЕМ ОБВОДКУ */
+            border: none;
             border-radius: 20px;
             padding: 25px;
             width: 85%;
             max-width: 320px;
             text-align: center;
-            /* НЕОНОВОЕ СВЕЧЕНИЕ БЕЗ ОБВОДКИ */
-            box-shadow: 0 0 25px rgba(0, 210, 255, 0.4),
-                        0 0 40px rgba(0, 210, 255, 0.1) inset;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.4),
+                        0 0 40px rgba(255, 255, 255, 0.1) inset;
             animation: modalAppear 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
@@ -120,9 +119,9 @@
                         0 0 40px rgba(255, 49, 49, 0.1) inset;
         }
 
-        .modal-container.gold-glow {
-            box-shadow: 0 0 25px rgba(255, 215, 0, 0.4),
-                        0 0 40px rgba(255, 215, 0, 0.1) inset;
+        .modal-container.green-glow {
+            box-shadow: 0 0 25px rgba(0, 255, 0, 0.4),
+                        0 0 40px rgba(0, 255, 0, 0.1) inset;
         }
 
         .modal-title {
@@ -142,17 +141,17 @@
             line-height: 1.4;
         }
 
-        /* ОСОБЫЙ СТИЛЬ ДЛЯ УВЕДОМЛЕНИЯ О КОМНАТЕ */
         .room-created-message {
             font-size: 18px;
             margin-bottom: 10px;
-            color: var(--neon-gold);
+            color: #ffffff;
+            font-weight: bold;
         }
 
         .room-id-display {
             font-family: 'Black Ops One';
             font-size: 20px;
-            color: #ffffff; /* БЕЛЫЙ ЦВЕТ ДЛЯ ID */
+            color: #ffffff;
             letter-spacing: 2px;
             margin-bottom: 25px;
             padding: 10px;
@@ -186,7 +185,7 @@
 
         .modal-btn-confirm {
             background: rgba(0, 0, 0, 0.8);
-            color: var(--neon-green);
+            color: #ffffff;
             box-shadow: 0 0 10px rgba(0, 255, 0, 0.2),
                         0 0 15px rgba(0, 255, 0, 0.1) inset;
         }
@@ -248,7 +247,7 @@
             text-transform: uppercase;
         }
 
-        /* --- УНИВЕРСАЛЬНЫЕ КНОПКИ (БЕЗ ОБВОДКИ, С СВЕЧЕНИЕМ) --- */
+        /* --- УНИВЕРСАЛЬНЫЕ КНОПКИ --- */
         .btn-action {
             width: 100%;
             max-width: 320px;
@@ -293,7 +292,7 @@
             font-family: 'Exo 2';
             font-size: 28px;
             color: #ffffff;
-            text-shadow: 0 0 15px var(--glow-white); /* СЛАБЕЕ СВЕЧЕНИЕ */
+            text-shadow: 0 0 15px var(--glow-white);
             margin-bottom: 30px;
             text-transform: uppercase;
             text-align: center;
@@ -377,18 +376,16 @@
 
         /* --- ЭКРАН 3: НАСТРОЙКА ЛОББИ --- */
         .lobby-title {
-            font-family: 'Exo 2'; /* ТОТ ЖЕ ШРИФТ, ЧТО И У КНОПКИ */
+            font-family: 'Exo 2';
             font-size: 24px;
             color: #ffffff;
-            text-shadow: 0 0 12px var(--glow-white); /* СЛАБЕЕ СВЕЧЕНИЕ */
+            text-shadow: 0 0 12px var(--glow-white);
             margin-bottom: 25px;
             text-transform: uppercase;
             text-align: center;
             width: 100%;
             font-weight: 900;
         }
-
-        /* ID УДАЛЕН ИЗ ЭТОГО ЭКРАНА - БУДЕТ ТОЛЬКО В КОМНАТЕ */
 
         .user-identity-card {
             display: flex;
@@ -624,10 +621,257 @@
         }
 
         #start-btn {
-            box-shadow: 0 0 12px rgba(255, 215, 0, 0.2),
-                        0 0 20px rgba(255, 215, 0, 0.1) inset;
-            color: var(--neon-gold);
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.3), /* БЕЛЫЙ НЕОН */
+                        0 0 20px rgba(255, 255, 255, 0.1) inset;
+            color: #ffffff; /* БЕЛЫЙ ТЕКСТ */
             display: none;
+        }
+
+        /* --- ЭКРАН 5: ИГРА (КАРТЫ БРАВЛЕРОВ) --- */
+        .game-title {
+            font-family: 'Exo 2';
+            font-size: 26px;
+            color: #ffffff;
+            text-shadow: 0 0 15px var(--neon-blue);
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            text-align: center;
+            width: 100%;
+            font-weight: 900;
+        }
+
+        .role-reveal {
+            font-family: 'Exo 2';
+            font-size: 18px;
+            color: var(--neon-gold);
+            margin-bottom: 25px;
+            text-align: center;
+            text-shadow: 0 0 10px var(--neon-gold);
+            font-weight: bold;
+        }
+
+        .card-container {
+            width: 280px;
+            height: 380px;
+            perspective: 1000px;
+            margin: 0 auto 30px;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .card-front {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border: 3px solid var(--neon-blue);
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.5),
+                        inset 0 0 40px rgba(0, 210, 255, 0.1);
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, #0f0f1a, #1a1a2e);
+            border: 3px solid var(--neon-red);
+            box-shadow: 0 0 30px rgba(255, 49, 49, 0.5),
+                        inset 0 0 40px rgba(255, 49, 49, 0.1);
+            transform: rotateY(180deg);
+            padding: 20px;
+        }
+
+        .card-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px var(--neon-blue);
+        }
+
+        .card-title {
+            font-family: 'Exo 2';
+            font-size: 28px;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 10px;
+            text-shadow: 0 0 15px currentColor;
+        }
+
+        .card-title.spy {
+            color: var(--neon-red);
+        }
+
+        .card-title.brawler {
+            color: var(--neon-green);
+        }
+
+        .card-subtitle {
+            font-family: 'Exo 2';
+            font-size: 16px;
+            color: #cccccc;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .brawler-image {
+            width: 180px;
+            height: 180px;
+            object-fit: contain;
+            margin-bottom: 20px;
+            border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .brawler-name {
+            font-family: 'Exo 2';
+            font-size: 22px;
+            font-weight: 900;
+            color: #ffffff;
+            text-shadow: 0 0 10px #ffffff;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .brawler-role {
+            font-family: 'Exo 2';
+            font-size: 18px;
+            font-weight: bold;
+            padding: 8px 20px;
+            border-radius: 12px;
+            text-transform: uppercase;
+        }
+
+        .role-spy {
+            color: var(--neon-red);
+            border: 2px solid var(--neon-red);
+            box-shadow: 0 0 15px var(--neon-red);
+        }
+
+        .role-brawler {
+            color: var(--neon-green);
+            border: 2px solid var(--neon-green);
+            box-shadow: 0 0 15px var(--neon-green);
+        }
+
+        .game-controls {
+            width: 100%;
+            max-width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 20px auto 0;
+        }
+
+        .btn-vote {
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3),
+                        0 0 25px rgba(255, 215, 0, 0.1) inset;
+            color: var(--neon-gold);
+        }
+
+        .btn-restart {
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.3),
+                        0 0 25px rgba(0, 210, 255, 0.1) inset;
+            color: var(--neon-blue);
+            display: none;
+        }
+
+        /* --- ЭКРАН 6: ГОЛОСОВАНИЕ --- */
+        .voting-title {
+            font-family: 'Exo 2';
+            font-size: 26px;
+            color: var(--neon-red);
+            text-shadow: 0 0 20px var(--neon-red);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            text-align: center;
+            width: 100%;
+            font-weight: 900;
+        }
+
+        .voting-timer {
+            font-family: 'Black Ops One';
+            font-size: 32px;
+            color: var(--neon-red);
+            text-shadow: 0 0 25px var(--neon-red);
+            margin-bottom: 25px;
+            padding: 10px 20px;
+            border: 3px solid var(--neon-red);
+            border-radius: 15px;
+            background: rgba(139, 0, 0, 0.2);
+            box-shadow: 0 0 30px rgba(255, 49, 49, 0.4);
+        }
+
+        .voting-instruction {
+            font-family: 'Exo 2';
+            font-size: 16px;
+            color: #cccccc;
+            margin-bottom: 25px;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .voting-players {
+            width: 100%;
+            max-width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+            overflow-y: auto;
+            max-height: 250px;
+            padding-right: 5px;
+        }
+
+        .voting-player-card {
+            width: 100%;
+            background: rgba(20, 20, 30, 0.7);
+            border: 2px solid #333;
+            border-radius: 16px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .voting-player-card:hover {
+            border-color: var(--neon-blue);
+            background: rgba(30, 30, 45, 0.8);
+        }
+
+        .voting-player-card.selected {
+            border-color: var(--neon-red);
+            background: rgba(139, 0, 0, 0.3);
+            box-shadow: 0 0 15px rgba(255, 49, 49, 0.3);
+        }
+
+        .vote-count {
+            font-family: 'Black Ops One';
+            font-size: 20px;
+            color: var(--neon-green);
+            min-width: 30px;
+            text-align: center;
+            text-shadow: 0 0 10px var(--neon-green);
         }
 
         /* СКРОЛЛБАР */
@@ -649,7 +893,7 @@
 </head>
 <body>
 
-    <!-- МОДАЛЬНЫЕ ОКНА (ИГРОВЫЕ) -->
+    <!-- МОДАЛЬНЫЕ ОКНА -->
     <div class="modal-overlay" id="confirm-modal">
         <div class="modal-container red-glow">
             <div class="modal-title">ПОДТВЕРЖДЕНИЕ</div>
@@ -662,7 +906,7 @@
     </div>
 
     <div class="modal-overlay" id="alert-modal">
-        <div class="modal-container gold-glow">
+        <div class="modal-container green-glow">
             <div class="modal-title" id="alert-title">УВЕДОМЛЕНИЕ</div>
             <div class="modal-message" id="alert-message">Сообщение</div>
             <div class="modal-buttons">
@@ -674,6 +918,7 @@
     <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
     <div class="app-shell">
         
+        <!-- ЭКРАН 1: ГЛАВНОЕ МЕНЮ -->
         <div id="scr-menu" class="screen active">
             <div class="main-menu-header">
                 <div class="main-logo-text">SPY</div>
@@ -687,6 +932,7 @@
             <button class="btn-action btn-secondary" onclick="App.showExitConfirm()">ВЫХОД</button>
         </div>
 
+        <!-- ЭКРАН 2: ВВОД ID -->
         <div id="scr-join" class="screen">
             <h2 class="title-neon-white">ВВЕДИТЕ ID</h2>
             
@@ -722,9 +968,9 @@
             <button class="btn-action btn-secondary" onclick="App.navigate('scr-menu')">НАЗАД</button>
         </div>
 
+        <!-- ЭКРАН 3: НАСТРОЙКА ЛОББИ -->
         <div id="scr-lobby" class="screen">
-            <h2 class="lobby-title">НАСТРОЙКА ЛОББИ</h2> <!-- НОВЫЙ СТИЛЬ -->
-            <!-- ID УДАЛЕН ИЗ ЭТОГО ЭКРАНА -->
+            <h2 class="lobby-title">НАСТРОЙКА ЛОББИ</h2>
 
             <div class="user-identity-card">
                 <div class="avatar-frame" id="my-ava"></div>
@@ -754,6 +1000,7 @@
             <button class="btn-action btn-secondary" onclick="App.navigate('scr-menu')">НАЗАД</button>
         </div>
 
+        <!-- ЭКРАН 4: АКТИВНАЯ КОМНАТА -->
         <div id="scr-room" class="screen">
             <h2 class="lobby-title" style="margin-bottom:5px">КОМНАТА ИГРЫ</h2>
             <div class="room-id-display-main" id="room-id-val">ID: 0000-0000</div>
@@ -769,13 +1016,70 @@
             </div>
         </div>
 
+        <!-- ЭКРАН 5: ИГРА (КАРТЫ БРАВЛЕРОВ) -->
+        <div id="scr-game" class="screen">
+            <h2 class="game-title">ВАША РОЛЬ</h2>
+            <div class="role-reveal">Нажмите на карту, чтобы раскрыть свою роль</div>
+
+            <div class="card-container">
+                <div class="card" id="role-card" onclick="Game.revealCard()">
+                    <div class="card-front">
+                        <div class="card-icon">🃏</div>
+                        <div class="card-title">BRAWL SPY</div>
+                        <div class="card-subtitle">Нажмите, чтобы открыть</div>
+                    </div>
+                    <div class="card-back">
+                        <img class="brawler-image" id="brawler-img" src="" alt="Бравлер">
+                        <div class="brawler-name" id="brawler-name">Загрузка...</div>
+                        <div class="brawler-role" id="brawler-role">РОЛЬ</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-controls">
+                <button class="btn-action btn-vote" id="vote-btn" onclick="Game.startVoting()">НАЧАТЬ ГОЛОСОВАНИЕ</button>
+                <button class="btn-action btn-restart" id="restart-btn" onclick="Game.restartGame()">НАЧАТЬ ЗАНОВО</button>
+                <button class="btn-action btn-secondary" onclick="Game.returnToRoom()">ВЕРНУТЬСЯ В КОМНАТУ</button>
+            </div>
+        </div>
+
+        <!-- ЭКРАН 6: ГОЛОСОВАНИЕ -->
+        <div id="scr-voting" class="screen">
+            <h2 class="voting-title">ГОЛОСОВАНИЕ</h2>
+            <div class="voting-timer" id="voting-timer">01:00</div>
+            <div class="voting-instruction">Выберите игрока, которого считаете шпионом</div>
+
+            <div class="voting-players" id="voting-players">
+                <!-- Список игроков для голосования -->
+            </div>
+
+            <button class="btn-action" onclick="Game.submitVote()">ПОДТВЕРДИТЬ ВЫБОР</button>
+            <button class="btn-action btn-secondary" style="margin-top:10px" onclick="Game.cancelVoting()">ОТМЕНА</button>
+        </div>
+
     </div>
 
     <script>
-        // ИНИЦИАЛИЗАЦИЯ TELEGRAM (только для вибрации и данных)
+        // ИНИЦИАЛИЗАЦИЯ TELEGRAM
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.enableClosingConfirmation();
+
+        // БАЗА БРАВЛЕРОВ (99 штук - для масштабирования)
+        // Сейчас тестовый набор из 10 бравлеров
+        const brawlersList = [
+            { id: 16000000, name: "ШЕЛЛИ", image: "https://cdn.brawlstats.com/character-arts/16000000.png" },
+            { id: 16000001, name: "КОЛЬТ", image: "https://cdn.brawlstats.com/character-arts/16000001.png" },
+            { id: 16000002, name: "НИТА", image: "https://cdn.brawlstats.com/character-arts/16000002.png" },
+            { id: 16000003, name: "БУЛЛ", image: "https://cdn.brawlstats.com/character-arts/16000003.png" },
+            { id: 16000004, name: "ДЖЕССИ", image: "https://cdn.brawlstats.com/character-arts/16000004.png" },
+            { id: 16000005, name: "БРОК", image: "https://cdn.brawlstats.com/character-arts/16000005.png" },
+            { id: 16000006, name: "ДИНАМАЙК", image: "https://cdn.brawlstats.com/character-arts/16000006.png" },
+            { id: 16000007, name: "БО", image: "https://cdn.brawlstats.com/character-arts/16000007.png" },
+            { id: 16000008, name: "ТИК", image: "https://cdn.brawlstats.com/character-arts/16000008.png" },
+            { id: 16000009, name: "8-БИТ", image: "https://cdn.brawlstats.com/character-arts/16000009.png" },
+            // ... можно добавить остальные 89 бравлеров
+        ];
 
         // СИСТЕМА МОДАЛЬНЫХ ОКОН
         const Modal = {
@@ -792,7 +1096,6 @@
                 document.getElementById('alert-title').innerText = title;
                 
                 if (showId && roomId) {
-                    // ОСОБЫЙ ФОРМАТ ДЛЯ УВЕДОМЛЕНИЯ О КОМНАТЕ
                     document.getElementById('alert-message').innerHTML = 
                         `<div class="room-created-message">${message}</div>
                          <div class="room-id-display">${roomId}</div>`;
@@ -823,7 +1126,7 @@
         function generateRandomId() {
             let result = '';
             for (let i = 0; i < 8; i++) {
-                result += Math.floor(Math.random() * 10); // ТОЛЬКО ЦИФРЫ 0-9
+                result += Math.floor(Math.random() * 10);
                 if (i === 3) result += '-';
             }
             return result;
@@ -839,7 +1142,8 @@
                 lobbyId: generateRandomId(),
                 isReady: false,
                 isAdmin: true,
-                players: []
+                players: [],
+                allPlayersReady: false
             },
 
             // Навигация
@@ -914,43 +1218,23 @@
                 }
             },
 
-            // Настройки лобби
+            // Настройки лобби (БЕЗ ОГРАНИЧЕНИЙ)
             updateSettings: (type, delta) => {
                 if(type === 'p') {
-                    const newVal = App.state.participants + delta;
-                    if (newVal >= 2 && newVal <= 12) {
-                        App.state.participants = newVal;
-                        document.getElementById('p-count').innerText = App.state.participants;
-                        
-                        // Автоматически корректируем шпионов
-                        if (App.state.spies > App.state.participants - 1) {
-                            App.state.spies = Math.max(1, App.state.participants - 1);
-                            document.getElementById('s-count').innerText = App.state.spies;
-                        }
-                    }
+                    App.state.participants = Math.max(1, App.state.participants + delta);
+                    document.getElementById('p-count').innerText = App.state.participants;
                 } else {
-                    const newVal = App.state.spies + delta;
-                    const maxSpies = App.state.participants - 1;
-                    if (newVal >= 1 && newVal <= maxSpies) {
-                        App.state.spies = newVal;
-                        document.getElementById('s-count').innerText = App.state.spies;
-                    }
+                    App.state.spies = Math.max(0, App.state.spies + delta);
+                    document.getElementById('s-count').innerText = App.state.spies;
                 }
                 tg.HapticFeedback.selectionChanged();
             },
 
             // Создание финальной комнаты
             createFinalRoom: () => {
-                if (App.state.spies >= App.state.participants) {
-                    Modal.showAlert("ОШИБКА", "Шпионов должно быть меньше чем участников");
-                    tg.HapticFeedback.notificationOccurred('error');
-                    return;
-                }
-                
                 App.state.isAdmin = true;
                 App.state.lobbyId = generateRandomId();
                 App.navigate('scr-room');
-                // ОСОБОЕ УВЕДОМЛЕНИЕ С ID ПОД ТЕКСТОМ
                 Modal.showAlert("УСПЕХ", "Комната создана!", true, "ID: " + App.state.lobbyId);
             },
 
@@ -960,47 +1244,291 @@
                 const container = document.getElementById('room-slots');
                 container.innerHTML = '';
 
+                // Проверяем готовность всех игроков
+                let allReady = true;
+
                 for(let i = 0; i < App.state.participants; i++) {
                     const isMe = i === 0;
+                    const isReady = isMe ? App.state.isReady : false; // Для других игроков - не готовы
+                    
+                    if (!isReady && isMe) allReady = false;
+
                     const card = document.createElement('div');
                     card.className = `player-slot-card ${isMe ? 'occupied' : ''}`;
                     
                     card.innerHTML = `
                         <div class="slot-info">
                             <div class="slot-ava" style="${isMe && tg.initDataUnsafe.user?.photo_url ? 'background-image:url('+tg.initDataUnsafe.user.photo_url+')' : ''}"></div>
-                            <div class="slot-name">${isMe ? '@' + (tg.initDataUnsafe.user?.username || 'Вы') : 'ОЖИДАНИЕ...'}</div>
+                            <div class="slot-name">${isMe ? '@' + (tg.initDataUnsafe.user?.username || 'Вы') : 'Игрок ' + (i+1)}</div>
                         </div>
-                        <div class="status-indicator ${isMe ? (App.state.isReady ? 'status-ready' : 'status-not-ready') : 'status-empty'}">
-                            ${isMe ? (App.state.isReady ? 'ГОТОВ' : 'НЕ ГОТОВ') : 'ПУСТО'}
+                        <div class="status-indicator ${isMe ? (App.state.isReady ? 'status-ready' : 'status-not-ready') : 'status-not-ready'}">
+                            ${isMe ? (App.state.isReady ? 'ГОТОВ' : 'НЕ ГОТОВ') : 'НЕ ГОТОВ'}
                         </div>
                     `;
                     container.appendChild(card);
                 }
+
+                App.state.allPlayersReady = allReady;
             },
 
-            // Переключение готовности (БЕЗ ОКНА УВЕДОМЛЕНИЯ)
+            // Переключение готовности
             toggleReady: () => {
                 App.state.isReady = !App.state.isReady;
                 const btn = document.getElementById('ready-btn');
-                btn.innerText = App.state.isReady ? 'НЕ ГОТОВ' : 'ГОТОВ'; // ИЗМЕНИЛ НА "НЕ ГОТОВ"
+                btn.innerText = App.state.isReady ? 'НЕ ГОТОВ' : 'ГОТОВ';
                 btn.classList.toggle('active-ready', App.state.isReady);
                 
                 App.buildRoom();
                 tg.HapticFeedback.notificationOccurred('success');
-                // УБРАЛ Modal.showAlert - теперь статус меняется без окна
             },
 
-            // Начать игру
+            // Начать игру (проверка всех игроков)
             startGame: () => {
                 if (!App.state.isReady) {
                     Modal.showAlert("ОШИБКА", "Вы должны быть готовы!");
                     tg.HapticFeedback.notificationOccurred('error');
                     return;
                 }
-                
-                Modal.showAlert("СТАРТ", "Игра начинается! Шпионов: " + App.state.spies);
+
+                // Проверяем, все ли игроки готовы (в реальной игре здесь проверка сервера)
+                if (!App.state.allPlayersReady) {
+                    Modal.showAlert("ОЖИДАНИЕ", "Не все игроки готовы!");
+                    tg.HapticFeedback.notificationOccurred('warning');
+                    return;
+                }
+
+                // Переходим сразу к игре, без окна "СТАРТ"
+                Game.initializeGame();
+                App.navigate('scr-game');
                 tg.HapticFeedback.notificationOccurred('success');
-                // Здесь будет переход на экран игры
+            }
+        };
+
+        // СИСТЕМА ИГРЫ
+        const Game = {
+            myRole: null,
+            myBrawler: null,
+            isCardRevealed: false,
+            votingTimer: null,
+            timeLeft: 60,
+            selectedPlayer: null,
+            votes: {},
+
+            // Инициализация игры
+            initializeGame: () => {
+                Game.isCardRevealed = false;
+                Game.timeLeft = 60;
+                Game.selectedPlayer = null;
+                Game.votes = {};
+
+                // Случайно определяем роль (шпион или бравлер)
+                const isSpy = Math.random() < (App.state.spies / App.state.participants);
+                Game.myRole = isSpy ? 'SPY' : 'BRAWLER';
+
+                // Если бравлер - выбираем случайного из списка
+                if (!isSpy) {
+                    const randomIndex = Math.floor(Math.random() * brawlersList.length);
+                    Game.myBrawler = brawlersList[randomIndex];
+                } else {
+                    Game.myBrawler = null;
+                }
+
+                // Обновляем кнопку "Начать заново" (только для админа)
+                const restartBtn = document.getElementById('restart-btn');
+                restartBtn.style.display = App.state.isAdmin ? 'block' : 'none';
+
+                // Сбрасываем карту
+                const card = document.getElementById('role-card');
+                card.classList.remove('flipped');
+                
+                // Сбрасываем изображение и имя
+                document.getElementById('brawler-img').src = '';
+                document.getElementById('brawler-name').textContent = 'Загрузка...';
+                document.getElementById('brawler-role').textContent = 'РОЛЬ';
+            },
+
+            // Раскрытие карты
+            revealCard: () => {
+                if (Game.isCardRevealed) return;
+
+                const card = document.getElementById('role-card');
+                const brawlerImg = document.getElementById('brawler-img');
+                const brawlerName = document.getElementById('brawler-name');
+                const brawlerRole = document.getElementById('brawler-role');
+
+                // Анимация переворота
+                card.classList.add('flipped');
+
+                // Устанавливаем данные в зависимости от роли
+                if (Game.myRole === 'SPY') {
+                    brawlerImg.src = "https://cdn-icons-png.flaticon.com/512/894/894438.png"; // Иконка шпиона
+                    brawlerName.textContent = "ШПИОН";
+                    brawlerRole.textContent = "ШПИОН";
+                    brawlerRole.className = "brawler-role role-spy";
+                } else {
+                    brawlerImg.src = Game.myBrawler.image;
+                    brawlerName.textContent = Game.myBrawler.name;
+                    brawlerRole.textContent = "БРАВЛЕР";
+                    brawlerRole.className = "brawler-role role-brawler";
+                }
+
+                Game.isCardRevealed = true;
+                tg.HapticFeedback.impactOccurred('heavy');
+            },
+
+            // Начать голосование
+            startVoting: () => {
+                Game.initializeVoting();
+                App.navigate('scr-voting');
+            },
+
+            // Инициализация голосования
+            initializeVoting: () => {
+                Game.timeLeft = 60;
+                Game.selectedPlayer = null;
+                Game.votes = {};
+
+                // Обновляем таймер
+                document.getElementById('voting-timer').textContent = "01:00";
+
+                // Создаем список игроков для голосования
+                const container = document.getElementById('voting-players');
+                container.innerHTML = '';
+
+                for(let i = 0; i < App.state.participants; i++) {
+                    const isMe = i === 0;
+                    const playerName = isMe ? 'Вы' : `Игрок ${i+1}`;
+                    
+                    const playerCard = document.createElement('div');
+                    playerCard.className = 'voting-player-card';
+                    playerCard.dataset.playerId = i;
+                    playerCard.onclick = () => Game.selectPlayer(i);
+
+                    playerCard.innerHTML = `
+                        <div class="slot-info">
+                            <div class="slot-ava" style="${isMe && tg.initDataUnsafe.user?.photo_url ? 'background-image:url('+tg.initDataUnsafe.user.photo_url+')' : ''}"></div>
+                            <div class="slot-name">${playerName}</div>
+                        </div>
+                        <div class="vote-count" id="vote-count-${i}">0</div>
+                    `;
+
+                    container.appendChild(playerCard);
+                    Game.votes[i] = 0;
+                }
+
+                // Запускаем таймер
+                Game.startVotingTimer();
+            },
+
+            // Выбор игрока для голосования
+            selectPlayer: (playerId) => {
+                // Снимаем выделение со всех карточек
+                document.querySelectorAll('.voting-player-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+
+                // Выделяем выбранную карточку
+                const selectedCard = document.querySelector(`[data-player-id="${playerId}"]`);
+                selectedCard.classList.add('selected');
+
+                Game.selectedPlayer = playerId;
+                tg.HapticFeedback.selectionChanged();
+            },
+
+            // Подтверждение выбора
+            submitVote: () => {
+                if (Game.selectedPlayer === null) {
+                    Modal.showAlert("ОШИБКА", "Выберите игрока для голосования");
+                    return;
+                }
+
+                // В реальной игре здесь отправка голоса на сервер
+                Game.votes[Game.selectedPlayer]++;
+
+                // Обновляем счетчик голосов
+                document.getElementById(`vote-count-${Game.selectedPlayer}`).textContent = 
+                    Game.votes[Game.selectedPlayer];
+
+                Modal.showAlert("ГОЛОС", "Ваш голос учтен!");
+                
+                // Через 2 секунды показываем результаты
+                setTimeout(() => {
+                    Game.showVotingResults();
+                }, 2000);
+            },
+
+            // Показать результаты голосования
+            showVotingResults: () => {
+                // Находим игрока с максимальным количеством голосов
+                let maxVotes = -1;
+                let spyPlayerId = null;
+
+                for (const [playerId, votes] of Object.entries(Game.votes)) {
+                    if (votes > maxVotes) {
+                        maxVotes = votes;
+                        spyPlayerId = parseInt(playerId);
+                    }
+                }
+
+                // Показываем результат
+                const spyName = spyPlayerId === 0 ? 'Вы' : `Игрок ${spyPlayerId + 1}`;
+                Modal.showAlert("РЕЗУЛЬТАТ", `Большинство голосов против: ${spyName}`);
+
+                // Через 3 секунды возвращаем в комнату
+                setTimeout(() => {
+                    App.navigate('scr-room');
+                    // Сбрасываем готовность всех игроков
+                    App.state.isReady = false;
+                    App.state.allPlayersReady = false;
+                    const btn = document.getElementById('ready-btn');
+                    btn.innerText = 'ГОТОВ';
+                    btn.classList.remove('active-ready');
+                    App.buildRoom();
+                }, 3000);
+
+                // Останавливаем таймер
+                clearInterval(Game.votingTimer);
+            },
+
+            // Таймер голосования
+            startVotingTimer: () => {
+                Game.votingTimer = setInterval(() => {
+                    Game.timeLeft--;
+
+                    const minutes = Math.floor(Game.timeLeft / 60);
+                    const seconds = Game.timeLeft % 60;
+                    document.getElementById('voting-timer').textContent = 
+                        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                    if (Game.timeLeft <= 0) {
+                        clearInterval(Game.votingTimer);
+                        Game.showVotingResults();
+                    }
+                }, 1000);
+            },
+
+            // Отмена голосования
+            cancelVoting: () => {
+                clearInterval(Game.votingTimer);
+                App.navigate('scr-game');
+            },
+
+            // Начать игру заново (только для админа)
+            restartGame: () => {
+                if (!App.state.isAdmin) return;
+
+                Modal.showConfirm(
+                    "Начать игру заново? Все игроки вернутся в комнату.",
+                    () => {
+                        Game.initializeGame();
+                        Modal.showAlert("ИГРА", "Игра перезапущена!");
+                    }
+                );
+            },
+
+            // Вернуться в комнату
+            returnToRoom: () => {
+                App.navigate('scr-room');
             }
         };
 
