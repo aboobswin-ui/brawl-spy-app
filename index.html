@@ -91,12 +91,100 @@
             margin-bottom: 30px;
         }
 
+        /* ==================== ГЛАВНЫЙ ЭКРАН МУЛЬТИПЛЕЕРА ==================== */
+        .main-menu {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 70vh;
+            gap: 30px;
+        }
+
+        .menu-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #FFD700, #4ECDC4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .menu-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            margin-bottom: 40px;
+            text-align: center;
+            max-width: 600px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .menu-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all var(--transition-normal);
+            cursor: pointer;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .menu-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .menu-card-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .menu-card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #FFD700;
+        }
+
+        .menu-card-description {
+            opacity: 0.8;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+
+        .menu-card-badge {
+            display: inline-block;
+            background: rgba(255, 107, 107, 0.2);
+            color: #FF6B6B;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
         /* ==================== ИГРОВОЕ ПОЛЕ ==================== */
         .game-board {
-            display: grid;
+            display: none; /* Скрываем по умолчанию, показываем только при старте игры */
             grid-template-columns: 1fr 1fr;
             gap: 30px;
             margin-bottom: 40px;
+        }
+
+        .game-board.active {
+            display: grid;
         }
 
         @media (max-width: 768px) {
@@ -124,7 +212,7 @@
 
         .dice {
             aspect-ratio: 1;
-            background: linear-gradient(145deg, #ffffff, #e6e6e6);
+            background: linear-gradient(145deg, #2a2a4a, #1a1a2e);
             border-radius: 20px;
             display: flex;
             align-items: center;
@@ -132,20 +220,23 @@
             font-size: clamp(2.5rem, 5vw, 4rem);
             cursor: pointer;
             box-shadow: 
-                inset 0 4px 8px rgba(255,255,255,0.3),
-                inset 0 -4px 8px rgba(0,0,0,0.2),
+                inset 0 4px 8px rgba(255,255,255,0.1),
+                inset 0 -4px 8px rgba(0,0,0,0.3),
                 0 10px 20px rgba(0,0,0,0.3);
             transition: all var(--transition-normal);
             position: relative;
             overflow: hidden;
+            color: #FFD700;
+            border: 2px solid rgba(255, 215, 0, 0.3);
         }
 
         .dice:hover {
             transform: translateY(-5px) scale(1.05);
             box-shadow: 
-                inset 0 4px 8px rgba(255,255,255,0.4),
-                inset 0 -4px 8px rgba(0,0,0,0.3),
+                inset 0 4px 8px rgba(255,255,255,0.2),
+                inset 0 -4px 8px rgba(0,0,0,0.4),
                 0 15px 30px rgba(0,0,0,0.4);
+            border-color: rgba(255, 215, 0, 0.6);
         }
 
         .dice.locked {
@@ -155,6 +246,7 @@
                 inset 0 4px 8px rgba(255,255,255,0.2),
                 inset 0 -4px 8px rgba(0,0,0,0.3),
                 0 5px 15px rgba(255,107,107,0.4);
+            color: white;
         }
 
         .dice.locked::after {
@@ -545,6 +637,10 @@
             .status-item {
                 width: 100%;
             }
+            
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         /* ==================== ТЕМЫ ==================== */
@@ -670,27 +766,33 @@
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('welcomeModal')">✕</button>
             <h2 class="modal-title">🎲 ДОБРО ПОЖАЛОВАТЬ В YAHTZEE ULTIMATE!</h2>
-            <div style="margin: 30px 0;">
-                <p style="margin-bottom: 15px; font-size: 1.1rem;">Готовы к эпической битве кубиков?</p>
-                <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; margin: 20px 0;">
-                    <h3 style="color: #FFD700; margin-bottom: 15px;">✨ Особенности:</h3>
+            <div style="margin: 30px 0; max-height: 400px; overflow-y: auto; padding-right: 10px;">
+                <p style="margin-bottom: 20px; font-size: 1.2rem; line-height: 1.6; text-align: center;">
+                    Готовы к эпической битве кубиков?
+                </p>
+                <div style="background: rgba(255,255,255,0.05); padding: 25px; border-radius: 15px; margin: 20px 0;">
+                    <h3 style="color: #FFD700; margin-bottom: 20px; text-align: center; font-size: 1.4rem;">✨ Особенности:</h3>
                     <ul style="list-style: none;">
-                        <li style="padding: 8px 0; display: flex; align-items: center; gap: 10px;">
-                            <span style="color: #4ECDC4;">✓</span> Мультиплеер до 6 игроков
+                        <li style="padding: 12px 0; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                            <span style="color: #4ECDC4; font-size: 1.5rem;">◻</span>
+                            <span style="font-size: 1.1rem;">Мультиплеер до 6 игроков</span>
                         </li>
-                        <li style="padding: 8px 0; display: flex; align-items: center; gap: 10px;">
-                            <span style="color: #4ECDC4;">✓</span> Продвинутая система бонусов
+                        <li style="padding: 12px 0; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                            <span style="color: #4ECDC4; font-size: 1.5rem;">◻</span>
+                            <span style="font-size: 1.1rem;">Продвинутая система бонусов</span>
                         </li>
-                        <li style="padding: 8px 0; display: flex; align-items: center; gap: 10px;">
-                            <span style="color: #4ECDC4;">✓</span> Глобальный рейтинг
+                        <li style="padding: 12px 0; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                            <span style="color: #4ECDC4; font-size: 1.5rem;">✓</span>
+                            <span style="font-size: 1.1rem;">Глобальный рейтинг</span>
                         </li>
-                        <li style="padding: 8px 0; display: flex; align-items: center; gap: 10px;">
-                            <span style="color: #4ECDC4;">✓</span> 5 уровней сложности ИИ
+                        <li style="padding: 12px 0; display: flex; align-items: center; gap: 15px;">
+                            <span style="color: #4ECDC4; font-size: 1.5rem;">✓</span>
+                            <span style="font-size: 1.1rem;">5 уровней сложности ИИ</span>
                         </li>
                     </ul>
                 </div>
             </div>
-            <button class="btn btn-primary btn-large" onclick="closeModal('welcomeModal')">
+            <button class="btn btn-primary btn-large" onclick="startFromWelcome()" style="margin-top: 20px;">
                 🚀 НАЧАТЬ ИГРАТЬ
             </button>
         </div>
@@ -702,9 +804,14 @@
             <div id="gameOverContent" style="margin: 30px 0;">
                 <!-- Контент будет добавляться через JS -->
             </div>
-            <button class="btn btn-primary btn-large" onclick="startNewGame()">
-                🔄 НОВАЯ ИГРА
-            </button>
+            <div style="display: grid; gap: 15px; margin-top: 30px;">
+                <button class="btn btn-primary" onclick="startNewGame()">
+                    🔄 НОВАЯ ИГРА
+                </button>
+                <button class="btn" onclick="showMainMenu()">
+                    🏠 В ГЛАВНОЕ МЕНЮ
+                </button>
+            </div>
         </div>
     </div>
 
@@ -716,8 +823,83 @@
             <div class="subtitle" id="gameSubtitle">Эпическая битва кубиков в реальном времени</div>
         </div>
 
-        <!-- Игровое поле -->
-        <div class="game-board">
+        <!-- Главное меню (мультиплеер) -->
+        <div class="main-menu" id="mainMenu">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h2 class="menu-title">МУЛЬТИПЛЕЕР</h2>
+                <p class="menu-subtitle">Выберите режим игры и бросьте вызов друзьям или ИИ</p>
+            </div>
+            
+            <div class="menu-grid">
+                <div class="menu-card" onclick="createRoom()">
+                    <span class="menu-card-icon">🚀</span>
+                    <div class="menu-card-title">СОЗДАТЬ КОМНАТУ</div>
+                    <p class="menu-card-description">Создайте приватную комнату и пригласите друзей</p>
+                    <span class="menu-card-badge">До 6 игроков</span>
+                </div>
+                
+                <div class="menu-card" onclick="joinRoom()">
+                    <span class="menu-card-icon">🔗</span>
+                    <div class="menu-card-title">ПРИСОЕДИНИТЬСЯ</div>
+                    <p class="menu-card-description">Введите код комнаты, чтобы присоединиться к игре</p>
+                    <span class="menu-card-badge">Быстрый вход</span>
+                </div>
+                
+                <div class="menu-card" onclick="quickPlay()">
+                    <span class="menu-card-icon">⚡</span>
+                    <div class="menu-card-title">БЫСТРАЯ ИГРА</div>
+                    <p class="menu-card-description">Найдите случайных соперников по всему миру</p>
+                    <span class="menu-card-badge">Рейтинговый</span>
+                </div>
+                
+                <div class="menu-card" onclick="playVsAI()">
+                    <span class="menu-card-icon">🤖</span>
+                    <div class="menu-card-title">ПРОТИВ ИИ</div>
+                    <p class="menu-card-description">Сразитесь с искусственным интеллектом</p>
+                    <span class="menu-card-badge">5 уровней</span>
+                </div>
+                
+                <div class="menu-card" onclick="startSinglePlayer()">
+                    <span class="menu-card-icon">🎮</span>
+                    <div class="menu-card-title">ОДИНОЧНАЯ ИГРА</div>
+                    <p class="menu-card-description">Играйте в одиночку и побивайте свои рекорды</p>
+                    <span class="menu-card-badge">Тренировка</span>
+                </div>
+                
+                <div class="menu-card" onclick="showRules()">
+                    <span class="menu-card-icon">📖</span>
+                    <div class="menu-card-title">ОБУЧЕНИЕ</div>
+                    <p class="menu-card-description">Изучите правила и стратегии игры</p>
+                    <span class="menu-card-badge">Для новичков</span>
+                </div>
+            </div>
+            
+            <div style="margin-top: 40px; text-align: center; width: 100%;">
+                <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <div style="text-align: left;">
+                            <div style="font-size: 0.9rem; opacity: 0.7;">Онлайн игроков</div>
+                            <div style="font-size: 1.5rem; font-weight: 700; color: #FFD700;" id="playerCount">1271</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 0.9rem; opacity: 0.7;">Ваш рекорд</div>
+                            <div style="font-size: 1.5rem; font-weight: 700; color: #4ECDC4;" id="highScore">0</div>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="shareGame()" style="width: 100%;">
+                        📱 ПОДЕЛИТЬСЯ ИГРОЙ
+                    </button>
+                </div>
+                
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); opacity: 0.7; font-size: 0.9rem;">
+                    <p>🎲 Yahtzee Ultimate • Telegram Web App • Версия 2.0 • © 2024</p>
+                    <p style="margin-top: 10px;">Для лучшего опыта используйте Telegram Desktop или мобильное приложение</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Игровое поле (скрыто по умолчанию) -->
+        <div class="game-board" id="gameBoard">
             <!-- Левая колонка: Кубики и управление -->
             <div class="dice-section">
                 <h2 style="color: #FFD700; margin-bottom: 20px; font-size: 1.8rem;">
@@ -774,9 +956,9 @@
                         <span class="btn-text">АВТО-ВЫБОР</span>
                     </button>
                     
-                    <button class="btn btn-danger" onclick="showGameOverModal()">
-                        <span class="btn-icon">🏁</span>
-                        <span class="btn-text">ЗАВЕРШИТЬ</span>
+                    <button class="btn btn-danger" onclick="returnToMainMenu()">
+                        <span class="btn-icon">🏠</span>
+                        <span class="btn-text">В МЕНЮ</span>
                     </button>
                 </div>
 
@@ -858,64 +1040,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Нижняя панель: Мультиплеер и настройки -->
-        <div style="background: rgba(255,255,255,0.03); border-radius: 20px; padding: 30px; margin-top: 40px; border: 1px solid rgba(255,255,255,0.1);">
-            <h3 style="color: #FF6B6B; margin-bottom: 20px; font-size: 1.5rem; display: flex; align-items: center; gap: 10px;">
-                <span>👥 МУЛЬТИПЛЕЕР</span>
-            </h3>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-                <button class="btn" onclick="createRoom()" style="justify-content: flex-start;">
-                    <span style="font-size: 1.5rem;">🚀</span>
-                    <div style="text-align: left;">
-                        <div style="font-weight: 700;">СОЗДАТЬ КОМНАТУ</div>
-                        <div style="font-size: 0.9rem; opacity: 0.8;">Играйте с друзьями</div>
-                    </div>
-                </button>
-                
-                <button class="btn" onclick="joinRoom()" style="justify-content: flex-start;">
-                    <span style="font-size: 1.5rem;">🔗</span>
-                    <div style="text-align: left;">
-                        <div style="font-weight: 700;">ПРИСОЕДИНИТЬСЯ</div>
-                        <div style="font-size: 0.9rem; opacity: 0.8;">По коду комнаты</div>
-                    </div>
-                </button>
-                
-                <button class="btn" onclick="quickPlay()" style="justify-content: flex-start;">
-                    <span style="font-size: 1.5rem;">⚡</span>
-                    <div style="text-align: left;">
-                        <div style="font-weight: 700;">БЫСТРАЯ ИГРА</div>
-                        <div style="font-size: 0.9rem; opacity: 0.8;">Случайные соперники</div>
-                    </div>
-                </button>
-                
-                <button class="btn" onclick="playVsAI()" style="justify-content: flex-start;">
-                    <span style="font-size: 1.5rem;">🤖</span>
-                    <div style="text-align: left;">
-                        <div style="font-weight: 700;">ПРОТИВ ИИ</div>
-                        <div style="font-size: 0.9rem; opacity: 0.8;">5 уровней сложности</div>
-                    </div>
-                </button>
-            </div>
-            
-            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
-                <div style="opacity: 0.7; font-size: 0.9rem;">
-                    🎮 <span id="playerCount">1</span> игрок онлайн • 🏆 Рекорд: <span id="highScore">0</span>
-                </div>
-                <div>
-                    <button class="btn" style="padding: 10px 20px; font-size: 0.9rem;" onclick="shareGame()">
-                        📱 ПОДЕЛИТЬСЯ
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Футер -->
-        <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); opacity: 0.7; font-size: 0.9rem;">
-            <p>🎲 Yahtzee Ultimate • Telegram Web App • Версия 2.0 • © 2024</p>
-            <p style="margin-top: 10px;">Для лучшего опыта используйте Telegram Desktop или мобильное приложение</p>
-        </div>
     </div>
 
     <!-- Уведомления -->
@@ -978,7 +1102,8 @@
             lockMode: false,
             soundEnabled: true,
             currentTheme: 'dark',
-            gameActive: true
+            gameActive: false, // По умолчанию игра не активна
+            gameMode: null // Режим игры: 'single', 'multi', 'ai'
         };
 
         // Статистика
@@ -1005,17 +1130,11 @@
             // Загрузка статистики
             loadStats();
             
-            // Создание кубиков
-            createDice();
+            // Обновление интерфейса статистики
+            updateStatsUI();
             
-            // Создание карточки
-            createScorecard();
-            
-            // Обновление интерфейса
-            updateUI();
-            
-            // Воспроизведение звука
-            playSound('click');
+            // Показываем приветственное окно
+            showWelcomeModal();
             
             console.log('🎮 Игра инициализирована!');
         }
@@ -1043,13 +1162,75 @@
             
             // Кнопка назад
             tg.BackButton.onClick(() => {
-                showNotification('Выход', 'Игра будет сохранена');
-                setTimeout(() => {
-                    tg.close();
-                }, 1500);
+                if (gameState.gameActive) {
+                    showNotification('Выход из игры', 'Игра будет сохранена');
+                    returnToMainMenu();
+                } else {
+                    showNotification('Выход', 'Приложение будет закрыто');
+                    setTimeout(() => {
+                        tg.close();
+                    }, 1500);
+                }
             });
             
             console.log('🤖 Telegram Web App инициализирован');
+        }
+
+        // ==================== УПРАВЛЕНИЕ ЭКРАНАМИ ====================
+        function showWelcomeModal() {
+            document.getElementById('welcomeModal').classList.add('active');
+        }
+
+        function startFromWelcome() {
+            closeModal('welcomeModal');
+            showMainMenu();
+        }
+
+        function showMainMenu() {
+            // Скрываем игровое поле
+            document.getElementById('gameBoard').classList.remove('active');
+            // Показываем главное меню
+            document.getElementById('mainMenu').style.display = 'flex';
+            // Останавливаем игру если она была активна
+            gameState.gameActive = false;
+            
+            // Обновляем статистику
+            updateStatsUI();
+        }
+
+        function startSinglePlayer() {
+            gameState.gameActive = true;
+            gameState.gameMode = 'single';
+            
+            // Скрываем главное меню
+            document.getElementById('mainMenu').style.display = 'none';
+            // Показываем игровое поле
+            document.getElementById('gameBoard').classList.add('active');
+            
+            // Сброс состояния игры
+            resetGameState();
+            
+            // Создание кубиков
+            createDice();
+            
+            // Создание карточки
+            createScorecard();
+            
+            // Обновление интерфейса
+            updateUI();
+            
+            // Воспроизведение звука
+            playSound('click');
+            
+            showNotification('Одиночная игра', 'Удачи! Бейте свои рекорды!');
+        }
+
+        function returnToMainMenu() {
+            if (gameState.gameActive && confirm('Вы уверены? Текущая игра будет потеряна.')) {
+                showMainMenu();
+            } else if (!gameState.gameActive) {
+                showMainMenu();
+            }
         }
 
         // ==================== ИГРОВАЯ ЛОГИКА ====================
@@ -1112,7 +1293,8 @@
             const diceElements = document.querySelectorAll('.dice');
             diceElements.forEach((die, index) => {
                 die.classList.remove('rolling');
-                die.textContent = DICE_EMOJIS[gameState.dice[index] - 1] || '?';
+                die.textContent = gameState.dice[index] > 0 ? 
+                    DICE_EMOJIS[gameState.dice[index] - 1] : '?';
             });
         }
 
@@ -1387,15 +1569,13 @@
             // Обновление счета
             document.getElementById('bonusScore').textContent = gameState.bonus;
             document.getElementById('totalScoreValue').textContent = gameState.totalScore;
-            
-            // Обновление статистики
-            document.getElementById('playerCount').textContent = 
-                Math.floor(Math.random() * 1000) + 500; // Демо данные
+        }
+
+        function updateStatsUI() {
             document.getElementById('highScore').textContent = stats.highScore;
-            
-            // Обновление кнопки броска
-            const rollBtn = document.getElementById('rollBtn');
-            rollBtn.disabled = gameState.rollsLeft <= 0 || !gameState.gameActive;
+            // Генерируем случайное количество игроков онлайн
+            document.getElementById('playerCount').textContent = 
+                Math.floor(Math.random() * 1000) + 500;
         }
 
         function highlightAvailableCategories() {
@@ -1418,6 +1598,18 @@
         }
 
         // ==================== ИГРОВЫЕ СЦЕНАРИИ ====================
+        function resetGameState() {
+            gameState.dice = [0, 0, 0, 0, 0];
+            gameState.locked = [false, false, false, false, false];
+            gameState.rollsLeft = 3;
+            gameState.currentRound = 1;
+            gameState.scorecard = JSON.parse(JSON.stringify(CATEGORIES));
+            gameState.totalScore = 0;
+            gameState.upperScore = 0;
+            gameState.bonus = 0;
+            gameState.lockMode = false;
+        }
+
         function autoSelectBest() {
             if (gameState.rollsLeft > 0) {
                 showNotification('Авто-выбор', 'Сначала сделайте все броски');
@@ -1486,25 +1678,13 @@
             
             // Сохранение статистики
             saveStats();
+            updateStatsUI();
         }
 
         function startNewGame() {
             // Сброс состояния игры
-            gameState = {
-                dice: [0, 0, 0, 0, 0],
-                locked: [false, false, false, false, false],
-                rollsLeft: 3,
-                currentRound: 1,
-                totalRounds: 13,
-                scorecard: JSON.parse(JSON.stringify(CATEGORIES)),
-                totalScore: 0,
-                upperScore: 0,
-                bonus: 0,
-                lockMode: false,
-                soundEnabled: gameState.soundEnabled,
-                currentTheme: gameState.currentTheme,
-                gameActive: true
-            };
+            resetGameState();
+            gameState.gameActive = true;
             
             // Обновление интерфейса
             updateUI();
@@ -1742,6 +1922,10 @@
         function playVsAI() {
             showNotification('Игра против ИИ', 'Выберите уровень сложности');
             // Здесь можно добавить выбор уровня сложности
+            setTimeout(() => {
+                showNotification('ИИ выбран', 'Начинаем игру! Уровень сложности: Средний');
+                startSinglePlayer(); // Запускаем одиночную игру для демо
+            }, 1500);
         }
 
         function shareGame() {
@@ -1804,8 +1988,16 @@
 
         // ==================== ЗАПУСК ====================
         // Загрузка сохраненной игры при запуске
-        if (loadGame()) {
-            console.log('🎮 Игра загружена из сохранения');
+        if (loadGame() && gameState.gameActive) {
+            // Если была активная игра, показываем игровое поле
+            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('gameBoard').classList.add('active');
+            createDice();
+            createScorecard();
+            updateUI();
+        } else {
+            // Иначе показываем главное меню
+            showMainMenu();
         }
 
         // Инициализация при загрузке страницы
@@ -1814,7 +2006,8 @@
         // Для отладки в консоли
         console.log('🎲 Yahtzee Ultimate Web App загружен!');
         console.log('Доступные команды в консоли:');
-        console.log('- startNewGame() - начать новую игру');
+        console.log('- startSinglePlayer() - начать одиночную игру');
+        console.log('- showMainMenu() - показать главное меню');
         console.log('- showStats() - показать статистику');
         console.log('- createConfetti(100) - создать конфетти');
     </script>
