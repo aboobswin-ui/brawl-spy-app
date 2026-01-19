@@ -93,86 +93,12 @@
 
         /* ==================== ГЛАВНЫЙ ЭКРАН МУЛЬТИПЛЕЕРА ==================== */
         .main-menu {
-            display: flex;
+            display: none; /* Скрываем по умолчанию */
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 70vh;
-            gap: 30px;
         }
 
-        .menu-title {
-            font-size: 2.5rem;
-            font-weight: 800;
-            background: linear-gradient(45deg, #FFD700, #4ECDC4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-
-        .menu-subtitle {
-            font-size: 1.1rem;
-            opacity: 0.8;
-            margin-bottom: 40px;
-            text-align: center;
-            max-width: 600px;
-        }
-
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            width: 100%;
-            max-width: 1200px;
-        }
-
-        .menu-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border-radius: 20px;
-            padding: 30px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all var(--transition-normal);
-            cursor: pointer;
-            text-align: center;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .menu-card:hover {
-            transform: translateY(-10px);
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(255, 255, 255, 0.2);
-            box-shadow: var(--shadow-xl);
-        }
-
-        .menu-card-icon {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            display: block;
-        }
-
-        .menu-card-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-            color: #FFD700;
-        }
-
-        .menu-card-description {
-            opacity: 0.8;
-            font-size: 0.95rem;
-            margin-bottom: 20px;
-        }
-
-        .menu-card-badge {
-            display: inline-block;
-            background: rgba(255, 107, 107, 0.2);
-            color: #FF6B6B;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
+        .main-menu.active {
+            display: flex;
         }
 
         /* ==================== ИГРОВОЕ ПОЛЕ ==================== */
@@ -606,13 +532,15 @@
         }
 
         .modal-title {
-            font-size: 2rem;
+            font-size: 1.8rem; /* Уменьшил размер */
             font-weight: 800;
             margin-bottom: 20px;
             background: linear-gradient(45deg, #FFD700, #4ECDC4);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            text-align: center;
+            padding: 10px 0;
         }
 
         /* ==================== АДАПТИВНОСТЬ ==================== */
@@ -637,10 +565,6 @@
             .status-item {
                 width: 100%;
             }
-            
-            .menu-grid {
-                grid-template-columns: 1fr;
-            }
         }
 
         /* ==================== ТЕМЫ ==================== */
@@ -654,12 +578,16 @@
             --primary: #00ff88;
             --secondary: #00ccff;
             --dark: #0a0a0f;
+            --gradient-primary: linear-gradient(135deg, var(--primary), var(--secondary));
+            --gradient-dark: linear-gradient(135deg, var(--dark), #0a0a2e);
         }
 
         .theme-retro {
             --primary: #ff6b6b;
             --secondary: #4ECDC4;
             --dark: #2d3436;
+            --gradient-primary: linear-gradient(135deg, var(--primary), var(--secondary));
+            --gradient-dark: linear-gradient(135deg, var(--dark), #3a3a4e);
         }
 
         /* ==================== ПРОГРЕСС БАР ==================== */
@@ -758,41 +686,184 @@
         .notification.info {
             background: linear-gradient(45deg, #2196F3, #1976D2);
         }
+
+        /* ==================== НАСТРОЙКИ ==================== */
+        .settings-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            transition: all var(--transition-normal);
+        }
+
+        .settings-btn:hover {
+            transform: scale(1.1) rotate(45deg);
+        }
+
+        .settings-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(20px);
+            z-index: 2001;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .settings-modal.active {
+            display: flex;
+        }
+
+        .settings-content {
+            background: var(--gradient-dark);
+            border-radius: 25px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .settings-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 30px;
+            background: linear-gradient(45deg, #FFD700, #4ECDC4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+
+        .settings-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all var(--transition-normal);
+        }
+
+        .settings-option:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateX(5px);
+        }
+
+        .settings-option-label {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .settings-option-icon {
+            font-size: 1.5rem;
+        }
+
+        .theme-selector {
+            display: flex;
+            gap: 10px;
+        }
+
+        .theme-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all var(--transition-normal);
+        }
+
+        .theme-option:hover {
+            transform: scale(1.1);
+        }
+
+        .theme-option.active {
+            border-color: #FFD700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .theme-dark-option {
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+        }
+
+        .theme-neon-option {
+            background: linear-gradient(135deg, #00ff88, #00ccff);
+        }
+
+        .theme-retro-option {
+            background: linear-gradient(135deg, #ff6b6b, #4ECDC4);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 34px;
+            transition: .4s;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            transition: .4s;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background: rgba(74, 205, 196, 0.2);
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(30px);
+        }
     </style>
 </head>
 <body class="theme-dark">
     <!-- Модальные окна -->
     <div id="welcomeModal" class="modal active">
         <div class="modal-content">
-            <button class="modal-close" onclick="closeModal('welcomeModal')">✕</button>
-            <h2 class="modal-title">🎲 ДОБРО ПОЖАЛОВАТЬ В YAHTZEE ULTIMATE!</h2>
-            <div style="margin: 30px 0; max-height: 400px; overflow-y: auto; padding-right: 10px;">
-                <p style="margin-bottom: 20px; font-size: 1.2rem; line-height: 1.6; text-align: center;">
+            <button class="modal-close" onclick="closeWelcomeModal()">✕</button>
+            <h2 class="modal-title">🎲 ДОБРО ПОЖАЛОВАТЬ В<br>YAHTZEE ULTIMATE!</h2>
+            <div style="margin: 25px 0; text-align: center;">
+                <p style="font-size: 1.1rem; opacity: 0.9; line-height: 1.6; margin-bottom: 30px;">
                     Готовы к эпической битве кубиков?
                 </p>
-                <div style="background: rgba(255,255,255,0.05); padding: 25px; border-radius: 15px; margin: 20px 0;">
-                    <h3 style="color: #FFD700; margin-bottom: 20px; text-align: center; font-size: 1.4rem;">✨ Особенности:</h3>
-                    <ul style="list-style: none;">
-                        <li style="padding: 12px 0; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                            <span style="color: #4ECDC4; font-size: 1.5rem;">◻</span>
-                            <span style="font-size: 1.1rem;">Мультиплеер до 6 игроков</span>
-                        </li>
-                        <li style="padding: 12px 0; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                            <span style="color: #4ECDC4; font-size: 1.5rem;">◻</span>
-                            <span style="font-size: 1.1rem;">Продвинутая система бонусов</span>
-                        </li>
-                        <li style="padding: 12px 0; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                            <span style="color: #4ECDC4; font-size: 1.5rem;">✓</span>
-                            <span style="font-size: 1.1rem;">Глобальный рейтинг</span>
-                        </li>
-                        <li style="padding: 12px 0; display: flex; align-items: center; gap: 15px;">
-                            <span style="color: #4ECDC4; font-size: 1.5rem;">✓</span>
-                            <span style="font-size: 1.1rem;">5 уровней сложности ИИ</span>
-                        </li>
-                    </ul>
-                </div>
             </div>
-            <button class="btn btn-primary btn-large" onclick="startFromWelcome()" style="margin-top: 20px;">
+            <button class="btn btn-primary btn-large" onclick="closeWelcomeModal()" 
+                    style="margin-top: 20px; width: 100%;">
                 🚀 НАЧАТЬ ИГРАТЬ
             </button>
         </div>
@@ -808,8 +879,60 @@
                 <button class="btn btn-primary" onclick="startNewGame()">
                     🔄 НОВАЯ ИГРА
                 </button>
-                <button class="btn" onclick="showMainMenu()">
+                <button class="btn" onclick="returnToMainMenu()">
                     🏠 В ГЛАВНОЕ МЕНЮ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно настроек -->
+    <div id="settingsModal" class="settings-modal">
+        <div class="settings-content">
+            <h2 class="settings-title">⚙️ НАСТРОЙКИ</h2>
+            
+            <div class="settings-option">
+                <div class="settings-option-label">
+                    <span class="settings-option-icon">🔊</span>
+                    <span>Звуки</span>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="soundToggle" checked onchange="toggleSoundSetting()">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            
+            <div class="settings-option">
+                <div class="settings-option-label">
+                    <span class="settings-option-icon">🎨</span>
+                    <span>Тема оформления</span>
+                </div>
+                <div class="theme-selector">
+                    <div class="theme-option theme-dark-option active" data-theme="dark" onclick="changeTheme('dark')"></div>
+                    <div class="theme-option theme-neon-option" data-theme="neon" onclick="changeTheme('neon')"></div>
+                    <div class="theme-option theme-retro-option" data-theme="retro" onclick="changeTheme('retro')"></div>
+                </div>
+            </div>
+            
+            <div class="settings-option" onclick="showRules()" style="cursor: pointer;">
+                <div class="settings-option-label">
+                    <span class="settings-option-icon">📖</span>
+                    <span>Правила игры</span>
+                </div>
+                <span style="opacity: 0.7;">→</span>
+            </div>
+            
+            <div class="settings-option" onclick="showStats()" style="cursor: pointer;">
+                <div class="settings-option-label">
+                    <span class="settings-option-icon">📊</span>
+                    <span>Статистика</span>
+                </div>
+                <span style="opacity: 0.7;">→</span>
+            </div>
+            
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                <button class="btn btn-large" onclick="closeSettings()" style="width: 100%;">
+                    ЗАКРЫТЬ
                 </button>
             </div>
         </div>
@@ -823,78 +946,64 @@
             <div class="subtitle" id="gameSubtitle">Эпическая битва кубиков в реальном времени</div>
         </div>
 
-        <!-- Главное меню (мультиплеер) -->
-        <div class="main-menu" id="mainMenu">
-            <div style="text-align: center; margin-bottom: 30px;">
-                <h2 class="menu-title">МУЛЬТИПЛЕЕР</h2>
-                <p class="menu-subtitle">Выберите режим игры и бросьте вызов друзьям или ИИ</p>
-            </div>
-            
-            <div class="menu-grid">
-                <div class="menu-card" onclick="createRoom()">
-                    <span class="menu-card-icon">🚀</span>
-                    <div class="menu-card-title">СОЗДАТЬ КОМНАТУ</div>
-                    <p class="menu-card-description">Создайте приватную комнату и пригласите друзей</p>
-                    <span class="menu-card-badge">До 6 игроков</span>
-                </div>
+        <!-- Главное меню (мультиплеер) - как было изначально -->
+        <div class="main-menu active" id="mainMenu">
+            <!-- Нижняя панель: Мультиплеер и настройки -->
+            <div style="background: rgba(255,255,255,0.03); border-radius: 20px; padding: 30px; margin-top: 0; border: 1px solid rgba(255,255,255,0.1);">
+                <h3 style="color: #FF6B6B; margin-bottom: 20px; font-size: 1.5rem; display: flex; align-items: center; gap: 10px;">
+                    <span>👥 МУЛЬТИПЛЕЕР</span>
+                </h3>
                 
-                <div class="menu-card" onclick="joinRoom()">
-                    <span class="menu-card-icon">🔗</span>
-                    <div class="menu-card-title">ПРИСОЕДИНИТЬСЯ</div>
-                    <p class="menu-card-description">Введите код комнаты, чтобы присоединиться к игре</p>
-                    <span class="menu-card-badge">Быстрый вход</span>
-                </div>
-                
-                <div class="menu-card" onclick="quickPlay()">
-                    <span class="menu-card-icon">⚡</span>
-                    <div class="menu-card-title">БЫСТРАЯ ИГРА</div>
-                    <p class="menu-card-description">Найдите случайных соперников по всему миру</p>
-                    <span class="menu-card-badge">Рейтинговый</span>
-                </div>
-                
-                <div class="menu-card" onclick="playVsAI()">
-                    <span class="menu-card-icon">🤖</span>
-                    <div class="menu-card-title">ПРОТИВ ИИ</div>
-                    <p class="menu-card-description">Сразитесь с искусственным интеллектом</p>
-                    <span class="menu-card-badge">5 уровней</span>
-                </div>
-                
-                <div class="menu-card" onclick="startSinglePlayer()">
-                    <span class="menu-card-icon">🎮</span>
-                    <div class="menu-card-title">ОДИНОЧНАЯ ИГРА</div>
-                    <p class="menu-card-description">Играйте в одиночку и побивайте свои рекорды</p>
-                    <span class="menu-card-badge">Тренировка</span>
-                </div>
-                
-                <div class="menu-card" onclick="showRules()">
-                    <span class="menu-card-icon">📖</span>
-                    <div class="menu-card-title">ОБУЧЕНИЕ</div>
-                    <p class="menu-card-description">Изучите правила и стратегии игры</p>
-                    <span class="menu-card-badge">Для новичков</span>
-                </div>
-            </div>
-            
-            <div style="margin-top: 40px; text-align: center; width: 100%;">
-                <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                    <button class="btn" onclick="createRoom()" style="justify-content: flex-start;">
+                        <span style="font-size: 1.5rem;">🚀</span>
                         <div style="text-align: left;">
-                            <div style="font-size: 0.9rem; opacity: 0.7;">Онлайн игроков</div>
-                            <div style="font-size: 1.5rem; font-weight: 700; color: #FFD700;" id="playerCount">1271</div>
+                            <div style="font-weight: 700;">СОЗДАТЬ КОМНАТУ</div>
+                            <div style="font-size: 0.9rem; opacity: 0.8;">Играйте с друзьями</div>
                         </div>
-                        <div style="text-align: right;">
-                            <div style="font-size: 0.9rem; opacity: 0.7;">Ваш рекорд</div>
-                            <div style="font-size: 1.5rem; font-weight: 700; color: #4ECDC4;" id="highScore">0</div>
+                    </button>
+                    
+                    <button class="btn" onclick="joinRoom()" style="justify-content: flex-start;">
+                        <span style="font-size: 1.5rem;">🔗</span>
+                        <div style="text-align: left;">
+                            <div style="font-weight: 700;">ПРИСОЕДИНИТЬСЯ</div>
+                            <div style="font-size: 0.9rem; opacity: 0.8;">По коду комнаты</div>
                         </div>
-                    </div>
-                    <button class="btn" onclick="shareGame()" style="width: 100%;">
-                        📱 ПОДЕЛИТЬСЯ ИГРОЙ
+                    </button>
+                    
+                    <button class="btn" onclick="quickPlay()" style="justify-content: flex-start;">
+                        <span style="font-size: 1.5rem;">⚡</span>
+                        <div style="text-align: left;">
+                            <div style="font-weight: 700;">БЫСТРАЯ ИГРА</div>
+                            <div style="font-size: 0.9rem; opacity: 0.8;">Случайные соперники</div>
+                        </div>
+                    </button>
+                    
+                    <button class="btn" onclick="playVsAI()" style="justify-content: flex-start;">
+                        <span style="font-size: 1.5rem;">🤖</span>
+                        <div style="text-align: left;">
+                            <div style="font-weight: 700;">ПРОТИВ ИИ</div>
+                            <div style="font-size: 0.9rem; opacity: 0.8;">5 уровней сложности</div>
+                        </div>
                     </button>
                 </div>
                 
-                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); opacity: 0.7; font-size: 0.9rem;">
-                    <p>🎲 Yahtzee Ultimate • Telegram Web App • Версия 2.0 • © 2024</p>
-                    <p style="margin-top: 10px;">Для лучшего опыта используйте Telegram Desktop или мобильное приложение</p>
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
+                    <div style="opacity: 0.7; font-size: 0.9rem;">
+                        🎮 <span id="playerCount">1</span> игрок онлайн • 🏆 Рекорд: <span id="highScore">0</span>
+                    </div>
+                    <div>
+                        <button class="btn" style="padding: 10px 20px; font-size: 0.9rem;" onclick="shareGame()">
+                            📱 ПОДЕЛИТЬСЯ
+                        </button>
+                    </div>
                 </div>
+            </div>
+
+            <!-- Футер -->
+            <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); opacity: 0.7; font-size: 0.9rem;">
+                <p>🎲 Yahtzee Ultimate • Telegram Web App • Версия 2.0 • © 2024</p>
+                <p style="margin-top: 10px;">Для лучшего опыта используйте Telegram Desktop или мобильное приложение</p>
             </div>
         </div>
 
@@ -961,29 +1070,6 @@
                         <span class="btn-text">В МЕНЮ</span>
                     </button>
                 </div>
-
-                <!-- Дополнительные кнопки -->
-                <div class="controls">
-                    <button class="btn" onclick="toggleSound()" id="soundBtn">
-                        <span class="btn-icon">🔊</span>
-                        <span class="btn-text">ЗВУКИ: ВКЛ</span>
-                    </button>
-                    
-                    <button class="btn" onclick="toggleTheme()" id="themeBtn">
-                        <span class="btn-icon">🎨</span>
-                        <span class="btn-text">ТЕМА: ТЕМНАЯ</span>
-                    </button>
-                    
-                    <button class="btn" onclick="showRules()">
-                        <span class="btn-icon">📖</span>
-                        <span class="btn-text">ПРАВИЛА</span>
-                    </button>
-                    
-                    <button class="btn" onclick="showStats()">
-                        <span class="btn-icon">📊</span>
-                        <span class="btn-text">СТАТИСТИКА</span>
-                    </button>
-                </div>
             </div>
 
             <!-- Правая колонка: Карточка очков -->
@@ -1040,6 +1126,11 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Кнопка настроек (плавающая) -->
+    <div class="settings-btn" onclick="openSettings()">
+        ⚙️
     </div>
 
     <!-- Уведомления -->
@@ -1102,8 +1193,8 @@
             lockMode: false,
             soundEnabled: true,
             currentTheme: 'dark',
-            gameActive: false, // По умолчанию игра не активна
-            gameMode: null // Режим игры: 'single', 'multi', 'ai'
+            gameActive: false,
+            gameMode: null
         };
 
         // Статистика
@@ -1123,7 +1214,6 @@
                 initTelegramWebApp();
             } else {
                 // Режим браузера
-                console.log('Браузерный режим');
                 document.getElementById('gameSubtitle').textContent = 'Демо-режим в браузере';
             }
             
@@ -1177,24 +1267,26 @@
         }
 
         // ==================== УПРАВЛЕНИЕ ЭКРАНАМИ ====================
-        function showWelcomeModal() {
-            document.getElementById('welcomeModal').classList.add('active');
+        function closeWelcomeModal() {
+            document.getElementById('welcomeModal').classList.remove('active');
+            playSound('click');
+            // Главное меню уже активно
         }
 
-        function startFromWelcome() {
-            closeModal('welcomeModal');
-            showMainMenu();
+        function returnToMainMenu() {
+            if (gameState.gameActive) {
+                if (confirm('Вы уверены? Текущая игра будет потеряна.')) {
+                    gameState.gameActive = false;
+                    showMainMenu();
+                }
+            } else {
+                showMainMenu();
+            }
         }
 
         function showMainMenu() {
-            // Скрываем игровое поле
             document.getElementById('gameBoard').classList.remove('active');
-            // Показываем главное меню
-            document.getElementById('mainMenu').style.display = 'flex';
-            // Останавливаем игру если она была активна
-            gameState.gameActive = false;
-            
-            // Обновляем статистику
+            document.getElementById('mainMenu').classList.add('active');
             updateStatsUI();
         }
 
@@ -1202,73 +1294,42 @@
             gameState.gameActive = true;
             gameState.gameMode = 'single';
             
-            // Скрываем главное меню
-            document.getElementById('mainMenu').style.display = 'none';
-            // Показываем игровое поле
+            document.getElementById('mainMenu').classList.remove('active');
             document.getElementById('gameBoard').classList.add('active');
             
-            // Сброс состояния игры
             resetGameState();
-            
-            // Создание кубиков
             createDice();
-            
-            // Создание карточки
             createScorecard();
-            
-            // Обновление интерфейса
             updateUI();
             
-            // Воспроизведение звука
             playSound('click');
-            
             showNotification('Одиночная игра', 'Удачи! Бейте свои рекорды!');
-        }
-
-        function returnToMainMenu() {
-            if (gameState.gameActive && confirm('Вы уверены? Текущая игра будет потеряна.')) {
-                showMainMenu();
-            } else if (!gameState.gameActive) {
-                showMainMenu();
-            }
         }
 
         // ==================== ИГРОВАЯ ЛОГИКА ====================
         function rollDice() {
             if (gameState.rollsLeft <= 0 || !gameState.gameActive) return;
             
-            // Воспроизведение звука
             playSound('diceRoll');
-            
-            // Анимация кубиков
             startDiceAnimation();
             
-            // Задержка перед реальным броском
             setTimeout(() => {
-                // Бросок незафиксированных кубиков
                 for (let i = 0; i < 5; i++) {
                     if (!gameState.locked[i]) {
                         gameState.dice[i] = Math.floor(Math.random() * 6) + 1;
                     }
                 }
                 
-                // Остановка анимации
                 stopDiceAnimation();
-                
-                // Обновление интерфейса
                 gameState.rollsLeft--;
                 updateUI();
-                
-                // Проверка комбинаций
                 checkCombinations();
                 
-                // Если бросков не осталось
                 if (gameState.rollsLeft === 0) {
                     showNotification('Броски закончились!', 'Выберите категорию для очков');
                     highlightAvailableCategories();
                 }
                 
-                // Сохранение игры
                 saveGame();
                 
             }, 800);
@@ -1278,7 +1339,6 @@
             const diceElements = document.querySelectorAll('.dice');
             diceElements.forEach(die => {
                 die.classList.add('rolling');
-                // Случайный эмодзи во время анимации
                 const randomInterval = setInterval(() => {
                     if (die.classList.contains('rolling')) {
                         die.textContent = DICE_EMOJIS[Math.floor(Math.random() * 6)];
@@ -1339,7 +1399,6 @@
             const dice = [...gameState.dice].sort((a, b) => a - b);
             const counts = {};
             
-            // Подсчет значений
             dice.forEach(die => {
                 counts[die] = (counts[die] || 0) + 1;
             });
@@ -1420,37 +1479,28 @@
         function selectCategory(category) {
             if (gameState.scorecard[category].points !== null || !gameState.gameActive) return;
             
-            // Подсчет очков
             const score = calculateScore(category);
             gameState.scorecard[category].points = score;
             
-            // Обновление общего счета
             updateTotalScore();
-            
-            // Переход к следующему раунду
             nextRound();
             
-            // Воспроизведение звука
             if (score > 0) {
                 playSound('win');
             }
             
-            // Показать уведомление
             const categoryName = gameState.scorecard[category].name;
             showNotification(`Выбрано: ${categoryName}`, `+${score} очков!`);
             
-            // Сохранение игры
             saveGame();
             saveStats();
             
-            // Проверка окончания игры
             if (gameState.currentRound > gameState.totalRounds) {
                 endGame();
             }
         }
 
         function updateTotalScore() {
-            // Подсчет верхней секции
             let upperScore = 0;
             for (const key in gameState.scorecard) {
                 if (gameState.scorecard[key].section === 'upper' && 
@@ -1462,7 +1512,6 @@
             gameState.upperScore = upperScore;
             gameState.bonus = upperScore >= 63 ? 35 : 0;
             
-            // Подсчет нижней секции
             let lowerScore = 0;
             for (const key in gameState.scorecard) {
                 if (gameState.scorecard[key].section === 'lower' && 
@@ -1471,10 +1520,7 @@
                 }
             }
             
-            // Итоговый счет
             gameState.totalScore = upperScore + gameState.bonus + lowerScore;
-            
-            // Обновление интерфейса
             updateUI();
         }
 
@@ -1485,7 +1531,6 @@
             gameState.locked = [false, false, false, false, false];
             gameState.lockMode = false;
             
-            // Обновление кнопки фиксации
             const lockBtn = document.getElementById('lockBtn');
             lockBtn.classList.remove('btn-success');
             lockBtn.classList.add('btn-warning');
@@ -1513,11 +1558,9 @@
         }
 
         function createScorecard() {
-            // Верхняя секция
             const upperSection = document.getElementById('upperSection');
             upperSection.innerHTML = '';
             
-            // Нижняя секция
             const lowerSection = document.getElementById('lowerSection');
             lowerSection.innerHTML = '';
             
@@ -1546,16 +1589,13 @@
         }
 
         function updateUI() {
-            // Обновление кубиков
             createDice();
             
-            // Обновление статуса
             document.getElementById('rollsLeft').textContent = gameState.rollsLeft;
             document.getElementById('rollsBadge').textContent = `(${gameState.rollsLeft})`;
             document.getElementById('currentRound').textContent = gameState.currentRound;
             document.getElementById('currentScore').textContent = gameState.totalScore;
             
-            // Обновление прогресса
             const roundProgress = (gameState.currentRound / gameState.totalRounds) * 100;
             document.getElementById('roundProgress').textContent = 
                 `${gameState.currentRound}/${gameState.totalRounds}`;
@@ -1566,20 +1606,17 @@
             document.getElementById('gameProgress').textContent = `${Math.round(gameProgress)}%`;
             document.getElementById('gameProgressBar').style.width = `${gameProgress}%`;
             
-            // Обновление счета
             document.getElementById('bonusScore').textContent = gameState.bonus;
             document.getElementById('totalScoreValue').textContent = gameState.totalScore;
         }
 
         function updateStatsUI() {
             document.getElementById('highScore').textContent = stats.highScore;
-            // Генерируем случайное количество игроков онлайн
             document.getElementById('playerCount').textContent = 
                 Math.floor(Math.random() * 1000) + 500;
         }
 
         function highlightAvailableCategories() {
-            // Подсвечиваем доступные категории
             for (const key in gameState.scorecard) {
                 if (gameState.scorecard[key].points === null) {
                     const score = calculateScore(key);
@@ -1619,7 +1656,6 @@
             let bestCategory = null;
             let bestScore = -1;
             
-            // Находим лучшую категорию
             for (const key in gameState.scorecard) {
                 if (gameState.scorecard[key].points === null) {
                     const score = calculateScore(key);
@@ -1642,17 +1678,12 @@
             const counts = {};
             dice.forEach(die => { counts[die] = (counts[die] || 0) + 1; });
             
-            // Проверка на Яхтзи
             if (Object.values(counts).some(c => c === 5)) {
                 showNotification('🎉 ЯХТЗИ!', '5 одинаковых кубиков!');
                 createConfetti(100);
-            }
-            // Проверка на Каре
-            else if (Object.values(counts).some(c => c === 4)) {
+            } else if (Object.values(counts).some(c => c === 4)) {
                 showNotification('4️⃣ КАРЕ!', '4 одинаковых кубика!');
-            }
-            // Проверка на Фулл-хаус
-            else if (JSON.stringify(Object.values(counts).sort()) === '[2,3]') {
+            } else if (JSON.stringify(Object.values(counts).sort()) === '[2,3]') {
                 showNotification('🏠 ФУЛЛ-ХАУС!', '2+3 одинаковых кубика!');
             }
         }
@@ -1660,39 +1691,26 @@
         function endGame() {
             gameState.gameActive = false;
             
-            // Обновление статистики
             stats.gamesPlayed++;
             stats.totalScore += gameState.totalScore;
             if (gameState.totalScore > stats.highScore) {
                 stats.highScore = gameState.totalScore;
             }
             
-            // Показ результатов
             showGameOverModal();
-            
-            // Создание конфетти
             createConfetti(200);
-            
-            // Воспроизведение звука
             playSound('win');
-            
-            // Сохранение статистики
             saveStats();
             updateStatsUI();
         }
 
         function startNewGame() {
-            // Сброс состояния игры
             resetGameState();
             gameState.gameActive = true;
             
-            // Обновление интерфейса
             updateUI();
             createScorecard();
-            
-            // Закрытие модального окна
             closeModal('gameOverModal');
-            
             showNotification('Новая игра', 'Удачи!');
         }
 
@@ -1702,7 +1720,6 @@
             const title = document.getElementById('gameOverTitle');
             const content = document.getElementById('gameOverContent');
             
-            // Оценка результата
             let rating = 'Новичок';
             let ratingEmoji = '🥉';
             if (gameState.totalScore >= 300) {
@@ -1799,27 +1816,83 @@
 ПРОДОЛЖАЙТЕ ИГРАТЬ! 🏆`);
         }
 
+        // ==================== НАСТРОЙКИ ====================
+        function openSettings() {
+            document.getElementById('settingsModal').classList.add('active');
+            playSound('click');
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').classList.remove('active');
+            playSound('click');
+        }
+
+        function toggleSoundSetting() {
+            const toggle = document.getElementById('soundToggle');
+            gameState.soundEnabled = toggle.checked;
+            showNotification(gameState.soundEnabled ? 'Звук включен' : 'Звук выключен', 
+                            gameState.soundEnabled ? 'Готов к игре!' : 'Тихий режим');
+            saveGame();
+        }
+
+        function changeTheme(theme) {
+            gameState.currentTheme = theme;
+            document.body.className = `theme-${theme}`;
+            
+            // Обновляем активный индикатор темы
+            document.querySelectorAll('.theme-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            document.querySelector(`.theme-option[data-theme="${theme}"]`).classList.add('active');
+            
+            // Обновляем CSS переменные для тем
+            updateThemeVariables(theme);
+            
+            showNotification('Тема изменена', 
+                `Активирована ${theme === 'dark' ? 'тёмная' : theme === 'neon' ? 'неоновая' : 'ретро'} тема`);
+            saveGame();
+        }
+
+        function updateThemeVariables(theme) {
+            const root = document.documentElement;
+            
+            if (theme === 'neon') {
+                root.style.setProperty('--primary', '#00ff88');
+                root.style.setProperty('--secondary', '#00ccff');
+                root.style.setProperty('--dark', '#0a0a0f');
+                root.style.setProperty('--gradient-primary', 'linear-gradient(135deg, #00ff88, #00ccff)');
+                root.style.setProperty('--gradient-dark', 'linear-gradient(135deg, #0a0a0f, #0a0a2e)');
+            } else if (theme === 'retro') {
+                root.style.setProperty('--primary', '#ff6b6b');
+                root.style.setProperty('--secondary', '#4ECDC4');
+                root.style.setProperty('--dark', '#2d3436');
+                root.style.setProperty('--gradient-primary', 'linear-gradient(135deg, #ff6b6b, #4ECDC4)');
+                root.style.setProperty('--gradient-dark', 'linear-gradient(135deg, #2d3436, #3a3a4e)');
+            } else {
+                root.style.setProperty('--primary', '#6a11cb');
+                root.style.setProperty('--secondary', '#2575fc');
+                root.style.setProperty('--dark', '#1a1a2e');
+                root.style.setProperty('--gradient-primary', 'linear-gradient(135deg, #6a11cb, #2575fc)');
+                root.style.setProperty('--gradient-dark', 'linear-gradient(135deg, #1a1a2e, #16213e)');
+            }
+        }
+
         // ==================== ЭФФЕКТЫ И АНИМАЦИИ ====================
         function createConfetti(count) {
             for (let i = 0; i < count; i++) {
                 const confetti = document.createElement('div');
                 confetti.className = 'confetti';
                 
-                // Случайный цвет
                 const colors = ['#FF6B6B', '#4ECDC4', '#FFD700', '#FF8E53', '#9D4EDD'];
                 confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
                 
-                // Случайная позиция
                 confetti.style.left = `${Math.random() * 100}vw`;
                 confetti.style.width = `${Math.random() * 15 + 5}px`;
                 confetti.style.height = confetti.style.width;
-                
-                // Случайная задержка
                 confetti.style.animationDelay = `${Math.random() * 2}s`;
                 
                 document.body.appendChild(confetti);
                 
-                // Удаление после анимации
                 setTimeout(() => {
                     confetti.remove();
                 }, 3000);
@@ -1836,7 +1909,6 @@
             
             notification.classList.add('show');
             
-            // Автоматическое скрытие
             setTimeout(() => {
                 notification.classList.remove('show');
             }, 3000);
@@ -1844,43 +1916,6 @@
 
         function hideNotification() {
             document.getElementById('notification').classList.remove('show');
-        }
-
-        // ==================== НАСТРОЙКИ ====================
-        function toggleSound() {
-            gameState.soundEnabled = !gameState.soundEnabled;
-            const btn = document.getElementById('soundBtn');
-            const text = btn.querySelector('.btn-text');
-            
-            if (gameState.soundEnabled) {
-                text.textContent = 'ЗВУКИ: ВКЛ';
-                showNotification('Звук включен', 'Готов к игре!');
-            } else {
-                text.textContent = 'ЗВУКИ: ВЫКЛ';
-                showNotification('Звук выключен', 'Тихий режим');
-            }
-        }
-
-        function toggleTheme() {
-            const themes = ['dark', 'neon', 'retro'];
-            const currentIndex = themes.indexOf(gameState.currentTheme);
-            const nextIndex = (currentIndex + 1) % themes.length;
-            gameState.currentTheme = themes[nextIndex];
-            
-            // Обновление body class
-            document.body.className = `theme-${gameState.currentTheme}`;
-            
-            // Обновление кнопки
-            const btn = document.getElementById('themeBtn');
-            const text = btn.querySelector('.btn-text');
-            const themeNames = {
-                'dark': 'ТЕМНАЯ',
-                'neon': 'НЕОН',
-                'retro': 'РЕТРО'
-            };
-            text.textContent = `ТЕМА: ${themeNames[gameState.currentTheme]}`;
-            
-            showNotification('Тема изменена', `Активирована ${themeNames[gameState.currentTheme].toLowerCase()} тема`);
         }
 
         function playSound(type) {
@@ -1898,7 +1933,6 @@
             const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
             showNotification('Комната создана', `Код: ${roomCode}\nОтправьте его друзьям!`);
             
-            // В реальном приложении здесь будет подключение к серверу
             setTimeout(() => {
                 showNotification('Ожидание игроков', 'Пригласите до 5 друзей');
             }, 2000);
@@ -1908,7 +1942,6 @@
             const roomCode = prompt('Введите код комнаты:');
             if (roomCode && roomCode.length === 6) {
                 showNotification('Присоединение', `Подключение к комнате ${roomCode}...`);
-                // В реальном приложении здесь будет подключение к серверу
             }
         }
 
@@ -1921,10 +1954,9 @@
 
         function playVsAI() {
             showNotification('Игра против ИИ', 'Выберите уровень сложности');
-            // Здесь можно добавить выбор уровня сложности
             setTimeout(() => {
                 showNotification('ИИ выбран', 'Начинаем игру! Уровень сложности: Средний');
-                startSinglePlayer(); // Запускаем одиночную игру для демо
+                startSinglePlayer();
             }, 1500);
         }
 
@@ -1955,7 +1987,6 @@
                 const saved = localStorage.getItem('yahtzee_game_state');
                 if (saved) {
                     const parsed = JSON.parse(saved);
-                    // Сохраняем настройки звука и темы
                     parsed.soundEnabled = gameState.soundEnabled;
                     parsed.currentTheme = gameState.currentTheme;
                     gameState = parsed;
@@ -1987,29 +2018,27 @@
         }
 
         // ==================== ЗАПУСК ====================
-        // Загрузка сохраненной игры при запуске
         if (loadGame() && gameState.gameActive) {
-            // Если была активная игра, показываем игровое поле
-            document.getElementById('mainMenu').style.display = 'none';
+            document.getElementById('mainMenu').classList.remove('active');
             document.getElementById('gameBoard').classList.add('active');
             createDice();
             createScorecard();
             updateUI();
+            // Применяем сохраненную тему
+            changeTheme(gameState.currentTheme);
         } else {
-            // Иначе показываем главное меню
             showMainMenu();
+            changeTheme(gameState.currentTheme);
         }
 
-        // Инициализация при загрузке страницы
-        window.onload = initGame;
+        // Инициализация звука в настройках
+        window.onload = function() {
+            initGame();
+            // Устанавливаем начальное состояние тумблера звука
+            document.getElementById('soundToggle').checked = gameState.soundEnabled;
+        };
 
-        // Для отладки в консоли
         console.log('🎲 Yahtzee Ultimate Web App загружен!');
-        console.log('Доступные команды в консоли:');
-        console.log('- startSinglePlayer() - начать одиночную игру');
-        console.log('- showMainMenu() - показать главное меню');
-        console.log('- showStats() - показать статистику');
-        console.log('- createConfetti(100) - создать конфетти');
     </script>
 </body>
 </html>
