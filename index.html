@@ -1,1983 +1,1520 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>BRAWL SPY ULTIMATE EDITION 2026</title>
+#!/usr/bin/env python3
+"""
+🎲 YAHTZEE TELEGRAM BOT - FULL VERSION 🎲
+Автор: @YourName
+GitHub: https://github.com/yourusername/yahtzee-telegram-bot
+"""
+
+import logging
+import random
+import string
+import json
+import asyncio
+from datetime import datetime, timedelta
+from collections import Counter
+from typing import Dict, List, Optional, Tuple
+from enum import Enum
+
+from telegram import (
+    Update, 
+    InlineKeyboardButton, 
+    InlineKeyboardMarkup,
+    InputFile,
+    BotCommand
+)
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    CallbackQueryHandler,
+    MessageHandler,
+    ContextTypes,
+    filters,
+    PicklePersistence
+)
+from telegram.error import BadRequest, NetworkError
+import aiohttp
+from io import BytesIO
+import base64
+
+# ==================== НАСТРОЙКИ ====================
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO,
+    handlers=[
+        logging.FileHandler('yahtzee_bot.log', encoding='utf-8'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+# Конфигурация
+BOT_TOKEN = "ВАШ_ТОКЕН_БОТА_ЗДЕСЬ"  # Замени на свой токен
+WEBHOOK_URL = "https://your-domain.com/webhook"  # Для продакшена
+ADMIN_IDS = [123456789]  # ID администраторов
+
+# Эмодзи для красоты
+DICE_EMOJIS = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅']
+LOCK_EMOJI = '🔒'
+UNLOCK_EMOJI = '🎲'
+STAR_EMOJI = '⭐'
+TROPHY_EMOJI = '🏆'
+FIRE_EMOJI = '🔥'
+ROCKET_EMOJI = '🚀'
+CROWN_EMOJI = '👑'
+PARTY_EMOJI = '🎉'
+CONFETTI_EMOJI = '🎊'
+MEDALS = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
+
+# ==================== КЛАССЫ ИГРЫ ====================
+class GameState(Enum):
+    WAITING = "waiting"
+    PLAYING = "playing"
+    FINISHED = "finished"
+
+class Player:
+    def __init__(self, user_id: int, username: str, first_name: str):
+        self.id = user_id
+        self.username = username
+        self.first_name = first_name
+        self.scorecard = {
+            # Верхняя секция
+            'ones': None, 'twos': None, 'threes': None, 
+            'fours': None, 'fives': None, 'sixes': None,
+            'upper_bonus': None,
+            # Нижняя секция
+            'three_of_a_kind': None, 'four_of_a_kind': None,
+            'full_house': None, 'small_straight': None,
+            'large_straight': None, 'yahtzee': None,
+            'chance': None, 'yahtzee_bonus': 0
+        }
+        self.total_score = 0
+        self.dice = [0, 0, 0, 0, 0]
+        self.kept_dice = [False, False, False, False, False]
+        self.rolls_left = 3
+        self.is_turn = False
+        self.has_yahtzee = False
+        self.achievements = []
+        self.last_roll_time = None
+
+class GameRoom:
+    def __init__(self, room_code: str, creator_id: int):
+        self.code = room_code
+        self.creator_id = creator_id
+        self.players: List[Player] = []
+        self.state = GameState.WAITING
+        self.current_player_index = 0
+        self.round = 1
+        self.max_rounds = 13
+        self.created_at = datetime.now()
+        self.started_at = None
+        self.messages_to_delete = []
+        self.game_log = []
+        self.settings = {
+            'enable_sounds': True,
+            'enable_animations': True,
+            'time_limit': 60,  # секунд на ход
+            'allow_spectators': True
+        }
     
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    @property
+    def creator(self) -> Optional[Player]:
+        for player in self.players:
+            if player.id == self.creator_id:
+                return player
+        return None
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Rubik+One&family=Exo+2:wght@700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    @property
+    def current_player(self) -> Optional[Player]:
+        if self.players:
+            return self.players[self.current_player_index]
+        return None
     
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    def add_player(self, player: Player) -> bool:
+        if len(self.players) >= 6:  # Максимум 6 игроков
+            return False
+        if player.id not in [p.id for p in self.players]:
+            self.players.append(player)
+            self.log_event(f"Игрок {player.first_name} присоединился")
+            return True
+        return False
     
-    <style>
-        /* --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ЦВЕТОВ --- */
-        :root {
-            --neon-blue: #00d2ff;
-            --neon-red: #ff3131;
-            --neon-gold: #ffd700;
-            --neon-green: #00ff00;
-            --bg-black: #020205;
-            --card-bg: #0a0a10;
-            --glow-white: rgba(255, 255, 255, 0.9);
-            --transition-speed: 0.25s;
-        }
-
-        /* --- СБРОС СТИЛЕЙ И БАЗА --- */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            outline: none;
-        }
-
-        html, body {
-            width: 100%;
-            height: 100%;
-            background-color: var(--bg-black);
-            color: #ffffff;
-            font-family: 'Rubik One', sans-serif;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* --- ОСНОВНАЯ ОБОЛОЧКА ПРИЛОЖЕНИЯ --- */
-        .app-shell {
-            width: 100%;
-            height: 100%;
-            max-width: 450px;
-            background: radial-gradient(circle at center, #0a0a1a 0%, #020205 100%);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 0 50px rgba(0,0,0,1);
-            overflow: hidden;
-        }
-
-        /* --- СИСТЕМА ЭКРАНОВ --- */
-        .screen {
-            position: absolute;
-            inset: 0;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            padding: 25px 20px;
-            z-index: 10;
-            opacity: 0;
-            transform: scale(1.05);
-            transition: opacity var(--transition-speed), transform var(--transition-speed);
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-
-        .screen.active {
-            display: flex;
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        /* --- МОДАЛЬНЫЕ ОКНА (ИГРОВЫЕ) - КОМПАКТНЫЕ --- */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            backdrop-filter: blur(5px);
-        }
-
-        .modal-overlay.active {
-            display: flex;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal-container {
-            background: rgba(15, 15, 25, 0.95);
-            border: none;
-            border-radius: 20px;
-            padding: 25px;
-            width: 85%;
-            max-width: 320px;
-            text-align: center;
-            box-shadow: 0 0 25px rgba(255, 255, 255, 0.4),
-                        0 0 40px rgba(255, 255, 255, 0.1) inset;
-            animation: modalAppear 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .modal-container.red-glow {
-            box-shadow: 0 0 25px rgba(255, 49, 49, 0.4),
-                        0 0 40px rgba(255, 49, 49, 0.1) inset;
-        }
-
-        .modal-container.green-glow {
-            box-shadow: 0 0 25px rgba(0, 255, 0, 0.4),
-                        0 0 40px rgba(0, 255, 0, 0.1) inset;
-        }
-
-        .modal-title {
-            font-family: 'Exo 2';
-            font-size: 22px;
-            color: #ffffff;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            text-shadow: 0 0 10px var(--glow-white);
-        }
-
-        .modal-message {
-            font-family: 'Exo 2';
-            font-size: 16px;
-            color: #cccccc;
-            margin-bottom: 25px;
-            line-height: 1.4;
-        }
-
-        .room-created-message {
-            font-size: 18px;
-            margin-bottom: 10px;
-            color: #ffffff;
-            font-weight: bold;
-        }
-
-        .room-id-display {
-            font-family: 'Black Ops One';
-            font-size: 20px;
-            color: #ffffff;
-            letter-spacing: 2px;
-            margin-bottom: 25px;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            text-shadow: 0 0 8px #ffffff;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
-
-        .modal-btn {
-            flex: 1;
-            padding: 14px;
-            border: none;
-            border-radius: 15px;
-            font-family: 'Exo 2';
-            font-weight: 900;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-transform: uppercase;
-        }
-
-        .modal-btn:active {
-            transform: scale(0.95);
-        }
-
-        .modal-btn-confirm {
-            background: rgba(0, 0, 0, 0.8);
-            color: #ffffff;
-            box-shadow: 0 0 10px rgba(0, 255, 0, 0.2),
-                        0 0 15px rgba(0, 255, 0, 0.1) inset;
-        }
-
-        .modal-btn-cancel {
-            background: rgba(0, 0, 0, 0.8);
-            color: var(--neon-red);
-            box-shadow: 0 0 10px rgba(255, 49, 49, 0.2),
-                        0 0 15px rgba(255, 49, 49, 0.1) inset;
-        }
-
-        /* АНИМАЦИИ */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes modalAppear {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        @keyframes cardGlow {
-            0% { 
-                box-shadow: 
-                    0 0 30px rgba(0, 210, 255, 0.4),
-                    0 0 60px rgba(0, 210, 255, 0.2),
-                    0 0 90px rgba(0, 210, 255, 0.1),
-                    inset 0 0 50px rgba(0, 210, 255, 0.15);
-            }
-            50% { 
-                box-shadow: 
-                    0 0 40px rgba(0, 210, 255, 0.6),
-                    0 0 80px rgba(0, 210, 255, 0.3),
-                    0 0 120px rgba(0, 210, 255, 0.15),
-                    inset 0 0 70px rgba(0, 210, 255, 0.25);
-            }
-            100% { 
-                box-shadow: 
-                    0 0 30px rgba(0, 210, 255, 0.4),
-                    0 0 60px rgba(0, 210, 255, 0.2),
-                    0 0 90px rgba(0, 210, 255, 0.1),
-                    inset 0 0 50px rgba(0, 210, 255, 0.15);
-            }
-        }
-
-        @keyframes spyGlow {
-            0% { 
-                box-shadow: 
-                    0 0 40px rgba(255, 0, 0, 0.7),
-                    0 0 80px rgba(255, 0, 0, 0.4),
-                    0 0 120px rgba(255, 0, 0, 0.2),
-                    inset 0 0 60px rgba(255, 0, 0, 0.3);
-            }
-            50% { 
-                box-shadow: 
-                    0 0 50px rgba(255, 0, 0, 0.8),
-                    0 0 100px rgba(255, 0, 0, 0.5),
-                    0 0 150px rgba(255, 0, 0, 0.3),
-                    inset 0 0 80px rgba(255, 0, 0, 0.4);
-            }
-            100% { 
-                box-shadow: 
-                    0 0 40px rgba(255, 0, 0, 0.7),
-                    0 0 80px rgba(255, 0, 0, 0.4),
-                    0 0 120px rgba(255, 0, 0, 0.2),
-                    inset 0 0 60px rgba(255, 0, 0, 0.3);
-            }
-        }
-
-        /* --- ЭКРАН 1: ГЛАВНОЕ МЕНЮ --- */
-        .main-menu-header {
-            text-align: center;
-            margin-top: 40px;
-            margin-bottom: 50px;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .main-logo-text {
-            font-size: 100px;
-            color: var(--neon-red);
-            text-shadow: 0 0 40px var(--neon-red), 0 0 10px rgba(0,0,0,0.5);
-            line-height: 0.8;
-            letter-spacing: -2px;
-            margin-bottom: 5px;
-        }
-
-        .sub-logo-text {
-            font-family: 'Black Ops One';
-            font-size: 32px;
-            color: var(--neon-gold);
-            margin-top: 15px;
-            text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
-        }
-
-        .edition-label {
-            font-family: 'Exo 2';
-            font-size: 16px;
-            font-weight: 400;
-            color: #ffffff;
-            opacity: 0.7;
-            margin-top: 8px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-        }
-
-        /* --- УНИВЕРСАЛЬНЫЕ КНОПКИ --- */
-        .btn-action {
-            width: 100%;
-            max-width: 320px;
-            padding: 18px;
-            background: rgba(0, 0, 0, 0.8);
-            border: none;
-            border-radius: 20px;
-            color: #ffffff;
-            font-family: 'Exo 2';
-            font-weight: 900;
-            font-size: 20px;
-            text-transform: uppercase;
-            margin: 0 auto 15px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.15s ease;
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.3),
-                        0 0 30px rgba(0, 210, 255, 0.1) inset;
-        }
-
-        .btn-action:active {
-            transform: scale(0.96);
-            box-shadow: 0 0 25px rgba(0, 210, 255, 0.5),
-                        0 0 40px rgba(0, 210, 255, 0.2) inset;
-        }
-
-        .btn-secondary {
-            background: rgba(30, 30, 30, 0.8);
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1),
-                        0 0 20px rgba(255, 255, 255, 0.05) inset;
-            color: #aaaaaa;
-            margin-top: auto;
-            font-size: 18px;
-            border-radius: 20px;
-            max-width: 320px;
-        }
-
-        /* --- ЭКРАН 2: ВВОД ID --- */
-        .title-neon-white {
-            font-family: 'Exo 2';
-            font-size: 28px;
-            color: #ffffff;
-            text-shadow: 0 0 15px var(--glow-white);
-            margin-bottom: 30px;
-            text-transform: uppercase;
-            text-align: center;
-            width: 100%;
-        }
-
-        .id-input-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            margin-bottom: 35px;
-            height: 60px;
-        }
-
-        .id-digit-box {
-            font-family: 'Black Ops One';
-            font-size: 32px;
-            color: #ffffff;
-            text-shadow: 0 0 10px var(--glow-white);
-            width: 30px;
-            text-align: center;
-            border-bottom: 3px solid #ffffff;
-            padding-bottom: 3px;
-            height: 50px;
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-        }
-
-        .id-hyphen {
-            font-family: 'Black Ops One';
-            font-size: 28px;
-            color: #ffffff;
-            text-shadow: 0 0 10px var(--glow-white);
-            margin: 0 6px;
-            display: flex;
-            align-items: center;
-            height: 100%;
-        }
-
-        /* ЦИФРОВАЯ КЛАВИАТУРА */
-        .numpad-container {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            margin-bottom: 25px;
-        }
-
-        .numpad-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 70px);
-            gap: 12px;
-            justify-content: center;
-        }
-
-        .n-key {
-            width: 70px;
-            height: 70px;
-            background: rgba(20, 20, 30, 0.8);
-            border: none;
-            border-radius: 16px;
-            font-size: 28px;
-            color: #ffffff;
-            font-family: 'Black Ops One';
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.1s;
-            box-shadow: 0 0 10px rgba(0, 210, 255, 0.1),
-                        0 0 15px rgba(0, 210, 255, 0.05) inset;
-        }
-
-        .n-key:active {
-            background: rgba(40, 40, 60, 0.8);
-            transform: scale(0.9);
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.2),
-                        0 0 25px rgba(0, 210, 255, 0.1) inset;
-        }
-
-        /* --- ЭКРАН 3: НАСТРОЙКА ЛОББИ --- */
-        .lobby-title {
-            font-family: 'Exo 2';
-            font-size: 24px;
-            color: #ffffff;
-            text-shadow: 0 0 12px var(--glow-white);
-            margin-bottom: 25px;
-            text-transform: uppercase;
-            text-align: center;
-            width: 100%;
-            font-weight: 900;
-        }
-
-        .user-identity-card {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin: 0 auto 25px;
-            width: 100%;
-            max-width: 320px;
-        }
-
-        .avatar-frame {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            border: 2px solid #ffffff;
-            box-shadow: 0 0 10px var(--glow-white);
-            background: #222 center/cover;
-        }
-
-        .username-label {
-            font-family: 'Exo 2';
-            font-size: 16px;
-            color: #ffffff;
-            text-shadow: 0 0 8px #ffffff;
-        }
-
-        /* НАСТРОЙКИ */
-        .settings-row {
-            width: 100%;
-            max-width: 320px;
-            background: rgba(15, 15, 25, 0.6);
-            border: none;
-            border-radius: 18px;
-            padding: 12px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 0 auto 12px;
-            box-shadow: 0 0 12px rgba(0, 210, 255, 0.15),
-                        0 0 20px rgba(0, 210, 255, 0.05) inset;
-        }
-
-        .settings-row.red-theme {
-            box-shadow: 0 0 12px rgba(255, 49, 49, 0.15),
-                        0 0 20px rgba(255, 49, 49, 0.05) inset;
-        }
-
-        .control-group {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .circle-btn {
-            width: 38px;
-            height: 38px;
-            background: rgba(0, 0, 0, 0.7);
-            border: none;
-            border-radius: 10px;
-            color: var(--neon-blue);
-            font-size: 26px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Rubik One';
-            cursor: pointer;
-            box-shadow: 0 0 8px rgba(0, 210, 255, 0.2),
-                        0 0 12px rgba(0, 210, 255, 0.1) inset;
-        }
-
-        .circle-btn.red-btn {
-            color: var(--neon-red);
-            box-shadow: 0 0 8px rgba(255, 49, 49, 0.2),
-                        0 0 12px rgba(255, 49, 49, 0.1) inset;
-        }
-
-        .circle-btn:active {
-            transform: scale(0.9);
-            box-shadow: 0 0 12px rgba(0, 210, 255, 0.3),
-                        0 0 18px rgba(0, 210, 255, 0.15) inset;
-        }
-
-        .circle-btn.red-btn:active {
-            box-shadow: 0 0 12px rgba(255, 49, 49, 0.3),
-                        0 0 18px rgba(255, 49, 49, 0.15) inset;
-        }
-
-        .value-display {
-            font-family: 'Black Ops One';
-            font-size: 26px;
-            min-width: 26px;
-            text-align: center;
-            color: #ffffff;
-            text-shadow: 0 0 10px var(--glow-white);
-        }
-
-        /* КНОПКА СОЗДАТЬ КОМНАТУ */
-        .btn-create-lobby {
-            width: 100%;
-            max-width: 320px;
-            padding: 18px;
-            background: rgba(0, 0, 0, 0.8);
-            border: none;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.3),
-                        0 0 30px rgba(255, 215, 0, 0.1) inset;
-            border-radius: 20px;
-            color: #ffffff;
-            font-family: 'Exo 2';
-            font-weight: 900;
-            font-size: 20px;
-            text-transform: uppercase;
-            margin: 15px auto 0;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.15s ease;
-        }
-
-        .btn-create-lobby:active {
-            transform: scale(0.96);
-            box-shadow: 0 0 25px rgba(255, 215, 0, 0.5),
-                        0 0 40px rgba(255, 215, 0, 0.2) inset;
-        }
-
-        /* --- ЭКРАН 4: АКТИВНАЯ КОМНАТА --- */
-        .room-id-display-main {
-            font-family: 'Black Ops One';
-            font-size: 18px;
-            color: #ffffff;
-            letter-spacing: 1px;
-            margin-bottom: 20px;
-            text-align: center;
-            width: 100%;
-            opacity: 0.9;
-            text-shadow: 0 0 8px #ffffff;
-        }
-
-        .players-scroll-area {
-            width: 100%;
-            max-width: 320px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin: 0 auto 20px;
-            overflow-y: auto;
-            padding-right: 5px;
-            max-height: 220px;
-        }
-
-        .player-slot-card {
-            width: 100%;
-            background: rgba(10, 10, 16, 0.8);
-            border: 2px solid #222;
-            border-radius: 16px;
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: border-color 0.3s;
-        }
-
-        .player-slot-card.occupied {
-            border-color: #444;
-        }
-
-        .slot-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .slot-ava {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            border: 1px solid rgba(255,255,255,0.3);
-            background: #111 center/cover;
-        }
-
-        .slot-name {
-            font-family: 'Exo 2';
-            font-size: 14px;
-            color: #ffffff;
-        }
-
-        .status-indicator {
-            padding: 5px 12px;
-            border-radius: 10px;
-            font-family: 'Exo 2';
-            font-size: 12px;
-            font-weight: 900;
-            text-transform: uppercase;
-            border: 2px solid;
-            white-space: nowrap;
-        }
-
-        .status-ready {
-            border-color: var(--neon-green);
-            color: var(--neon-green);
-            box-shadow: 0 0 8px var(--neon-green);
-        }
-
-        .status-not-ready {
-            border-color: var(--neon-red);
-            color: var(--neon-red);
-            box-shadow: 0 0 8px var(--neon-red);
-        }
-
-        .status-empty {
-            border-color: #333;
-            color: #333;
-        }
-
-        /* КНОПКИ УПРАВЛЕНИЯ В КОМНАТЕ */
-        .room-controls-box {
-            width: 100%;
-            max-width: 320px;
-            display: flex;
-            flex-direction: column;
-            margin: 15px auto 0;
-        }
-
-        .btn-ready-toggle {
-            box-shadow: 0 0 12px rgba(0, 255, 0, 0.2),
-                        0 0 20px rgba(0, 255, 0, 0.1) inset;
-        }
-
-        .btn-ready-toggle.active-ready {
-            box-shadow: 0 0 12px rgba(255, 49, 49, 0.2),
-                        0 0 20px rgba(255, 49, 49, 0.1) inset;
-        }
-
-        #start-btn {
-            box-shadow: 0 0 12px rgba(255, 255, 255, 0.3),
-                        0 0 20px rgba(255, 255, 255, 0.1) inset;
-            color: #ffffff;
-            display: none;
-        }
-
-        /* --- ЭКРАН 5: ИГРА (КАРТЫ БРАВЛЕРОВ) --- */
-        .game-title {
-            font-family: 'Exo 2';
-            font-size: 26px;
-            color: #ffffff;
-            text-shadow: 0 0 15px var(--neon-blue);
-            margin-bottom: 5px; /* Уменьшен отступ */
-            text-transform: uppercase;
-            text-align: center;
-            width: 100%;
-            font-weight: 900;
-        }
-
-        .role-reveal {
-            font-family: 'Exo 2';
-            font-size: 16px;
-            color: #ffffff;
-            margin-bottom: 5px; /* Уменьшен отступ */
-            text-align: center;
-            text-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
-            font-weight: bold;
-            opacity: 0.9;
-            min-height: 24px;
-        }
-
-        /* КАРТА - ОПУЩЕНА НИЖЕ И РАСТЯНУТА */
-        .card-container {
-            width: 320px;
-            height: 440px; /* Увеличена высота */
-            perspective: 1000px;
-            margin: 25px auto 20px; /* Увеличен верхний отступ (25px) */
-        }
-
-        .card {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
-        }
-
-        .card.flipped {
-            transform: rotateY(180deg);
-        }
-
-        .card-front, .card-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            border-radius: 25px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            padding: 20px;
-        }
-
-        /* ПЕРЕДНЯЯ СТОРОНА КАРТЫ - БЕЛЫЙ ТЕКСТ */
-        .card-front {
-            background: linear-gradient(135deg, #0a0a1a, #1a1a2e);
-            border: none;
-            animation: cardGlow 2s infinite alternate;
-            padding-top: 80px; /* Сдвиг текста вниз */
-        }
-
-        /* ЗАДНЯЯ СТОРОНА КАРТЫ */
-        .card-back {
-            background: linear-gradient(135deg, #0f0f1a, #1a1a2e);
-            border: none;
-            transform: rotateY(180deg);
-            box-shadow: 
-                0 0 25px rgba(0, 210, 255, 0.4),
-                0 0 50px rgba(0, 210, 255, 0.2),
-                inset 0 0 40px rgba(0, 210, 255, 0.1);
-            padding-top: 100px; /* Сдвиг текста вниз для бравлера */
-        }
-
-        /* ОСОБЫЙ СТИЛЬ ДЛЯ КАРТЫ ШПИОНА */
-        .card-back.spy-card {
-            background: linear-gradient(135deg, #1a0000, #330000);
-            animation: spyGlow 2s infinite alternate;
-            padding-top: 100px; /* Сдвиг текста вниз для шпиона */
-        }
-
-        /* КРУПНЫЙ ТЕКСТ НА КАРТЕ - БЕЛЫЙ */
-        .big-card-text {
-            font-family: 'Exo 2';
-            font-size: 48px;
-            font-weight: 900;
-            text-transform: uppercase;
-            text-align: center;
-            text-shadow: 0 0 25px #ffffff; /* Белое свечение */
-            letter-spacing: 3px;
-            margin: 0;
-            color: #ffffff; /* Белый цвет */
-        }
-
-        /* УМЕНЬШЕННЫЕ КНОПКИ ПОД КАРТОЙ */
-        .game-controls-single {
-            width: 100%;
-            max-width: 320px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px; /* Уменьшен промежуток */
-            margin-top: auto;
-            margin-bottom: 15px; /* Уменьшен отступ снизу */
-        }
-
-        /* БЕЛАЯ КНОПКА ПРОДОЛЖИТЬ */
-        .btn-continue {
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.4),
-                        0 0 25px rgba(255, 255, 255, 0.2) inset;
-            color: #ffffff;
-            background: rgba(0, 0, 0, 0.8);
-            padding: 14px; /* Уменьшен padding */
-            font-size: 18px; /* Уменьшен шрифт */
-        }
-
-        /* --- ЭКРАН 6: ГОЛОСОВАНИЕ --- */
-        .voting-title {
-            font-family: 'Exo 2';
-            font-size: 26px;
-            color: var(--neon-red);
-            text-shadow: 0 0 20px var(--neon-red);
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            text-align: center;
-            width: 100%;
-            font-weight: 900;
-        }
-
-        /* ТАЙМЕР БЕЗ ОБВОДКИ С НЕОНОМ */
-        .voting-timer {
-            font-family: 'Black Ops One';
-            font-size: 32px;
-            color: var(--neon-red);
-            text-shadow: 0 0 25px var(--neon-red);
-            margin-bottom: 25px;
-            padding: 10px 20px;
-            border: none; /* Убрана обводка */
-            border-radius: 15px;
-            background: rgba(139, 0, 0, 0.2);
-            box-shadow: 0 0 30px rgba(255, 49, 49, 0.4);
-        }
-
-        .voting-instruction {
-            font-family: 'Exo 2';
-            font-size: 16px;
-            color: #cccccc;
-            margin-bottom: 20px; /* Уменьшен отступ */
-            text-align: center;
-            line-height: 1.5;
-        }
-
-        .voting-players {
-            width: 100%;
-            max-width: 320px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px; /* Уменьшен промежуток */
-            margin-bottom: 20px; /* Уменьшен отступ */
-            overflow-y: auto;
-            max-height: 220px; /* Уменьшена высота */
-            padding-right: 5px;
-        }
-
-        .voting-player-card {
-            width: 100%;
-            background: rgba(20, 20, 30, 0.7);
-            border: 2px solid #333;
-            border-radius: 16px;
-            padding: 12px; /* Уменьшен padding */
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .voting-player-card:hover {
-            border-color: var(--neon-blue);
-            background: rgba(30, 30, 45, 0.8);
-        }
-
-        .voting-player-card.selected {
-            border-color: var(--neon-red);
-            background: rgba(139, 0, 0, 0.3);
-            box-shadow: 0 0 15px rgba(255, 49, 49, 0.3);
-        }
-
-        .vote-count {
-            font-family: 'Black Ops One';
-            font-size: 20px;
-            color: var(--neon-green);
-            min-width: 30px;
-            text-align: center;
-            text-shadow: 0 0 10px var(--neon-green);
-        }
-
-        /* КНОПКИ ГОЛОСОВАНИЯ - КОМПАКТНЫЕ */
-        .voting-controls {
-            width: 100%;
-            max-width: 320px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px; /* Уменьшен промежуток */
-            margin-top: 10px;
-        }
-
-        /* КНОПКА ВЫХОДА - КРАСНЫЙ НЕОН */
-        .btn-exit {
-            box-shadow: 0 0 12px rgba(255, 49, 49, 0.4),
-                        0 0 20px rgba(255, 49, 49, 0.1) inset;
-            color: var(--neon-red);
-            padding: 14px; /* Уменьшен padding */
-            font-size: 18px; /* Уменьшен размер шрифта */
-        }
-
-        /* КНОПКА НАЗАД */
-        .btn-back {
-            box-shadow: 0 0 12px rgba(255, 255, 255, 0.2),
-                        0 0 20px rgba(255, 255, 255, 0.1) inset;
-            color: #aaaaaa;
-            padding: 14px; /* Уменьшен padding */
-            font-size: 18px; /* Уменьшен размер шрифта */
-        }
-
-        /* КНОПКА ПОДТВЕРДИТЬ - БЕЛАЯ */
-        .btn-confirm-vote {
-            box-shadow: 0 0 12px rgba(255, 255, 255, 0.4),
-                        0 0 20px rgba(255, 255, 255, 0.1) inset;
-            color: #ffffff; /* Белый цвет */
-            padding: 14px; /* Уменьшен padding */
-            font-size: 18px; /* Уменьшен размер шрифта */
-        }
-
-        /* СКРОЛЛБАР */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+    def remove_player(self, user_id: int) -> Optional[Player]:
+        for i, player in enumerate(self.players):
+            if player.id == user_id:
+                removed = self.players.pop(i)
+                if self.current_player_index >= len(self.players):
+                    self.current_player_index = 0
+                self.log_event(f"Игрок {removed.first_name} вышел")
+                return removed
+        return None
+    
+    def next_turn(self) -> Player:
+        self.current_player_index = (self.current_player_index + 1) % len(self.players)
+        if self.current_player_index == 0:
+            self.round += 1
+        return self.current_player
+    
+    def is_game_over(self) -> bool:
+        return self.round > self.max_rounds
+    
+    def get_sorted_players(self) -> List[Player]:
+        return sorted(self.players, key=lambda p: p.total_score, reverse=True)
+    
+    def log_event(self, event: str):
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        self.game_log.append(f"[{timestamp}] {event}")
+
+# ==================== МЕНЕДЖЕР ИГР ====================
+class GameManager:
+    def __init__(self):
+        self.rooms: Dict[str, GameRoom] = {}
+        self.user_rooms: Dict[int, str] = {}  # user_id -> room_code
+        self.waiting_players: List[int] = []
+        self.statistics = {
+            'games_played': 0,
+            'total_rolls': 0,
+            'yahtzees_made': 0,
+            'highest_score': 0
+        }
+    
+    def generate_room_code(self) -> str:
+        """Генерирует красивый код комнаты"""
+        letters = ''.join(random.choices('ABCDEFGHJKLMNPQRSTUVWXYZ', k=3))
+        numbers = ''.join(random.choices('23456789', k=3))
+        code = letters + numbers
+        while code in self.rooms:
+            code = self.generate_room_code()
+        return code
+    
+    def create_room(self, creator: Player) -> str:
+        room_code = self.generate_room_code()
+        room = GameRoom(room_code, creator.id)
+        room.add_player(creator)
+        self.rooms[room_code] = room
+        self.user_rooms[creator.id] = room_code
+        return room_code
+    
+    def join_room(self, user_id: int, room_code: str, player: Player) -> bool:
+        room_code = room_code.upper()
+        if room_code not in self.rooms:
+            return False
         
-        /* ХОВЕР ЭФФЕКТЫ ДЛЯ ДЕСКТОПА */
-        @media (hover: hover) {
-            .btn-action:hover, .btn-create-lobby:hover {
-                transform: translateY(-2px);
-            }
-            .n-key:hover {
-                box-shadow: 0 0 15px rgba(0, 210, 255, 0.2),
-                            0 0 25px rgba(0, 210, 255, 0.1) inset;
-            }
-        }
-    </style>
-</head>
-<body>
-
-    <!-- МОДАЛЬНЫЕ ОКНА -->
-    <div class="modal-overlay" id="confirm-modal">
-        <div class="modal-container red-glow">
-            <div class="modal-title">ПОДТВЕРЖДЕНИЕ</div>
-            <div class="modal-message" id="confirm-message">Вы уверены?</div>
-            <div class="modal-buttons">
-                <button class="modal-btn modal-btn-cancel" onclick="Modal.hide()">ОТМЕНА</button>
-                <button class="modal-btn modal-btn-confirm" onclick="Modal.confirmAction()">ДА</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="alert-modal">
-        <div class="modal-container green-glow">
-            <div class="modal-title" id="alert-title">УВЕДОМЛЕНИЕ</div>
-            <div class="modal-message" id="alert-message">Сообщение</div>
-            <div class="modal-buttons">
-                <button class="modal-btn modal-btn-confirm" onclick="Modal.hide()">ОК</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ОСНОВНОЙ ИНТЕРФЕЙС -->
-    <div class="app-shell">
+        room = self.rooms[room_code]
+        if room.state != GameState.WAITING:
+            return False
         
-        <!-- ЭКРАН 1: ГЛАВНОЕ МЕНЮ -->
-        <div id="scr-menu" class="screen active">
-            <div class="main-menu-header">
-                <div class="main-logo-text">SPY</div>
-                <div class="sub-logo-text">BRAWL STARS</div>
-                <div class="edition-label">edition 2026</div>
-            </div>
-            
-            <button class="btn-action" onclick="App.navigate('scr-lobby')">СОЗДАТЬ ЛОББИ</button>
-            <button class="btn-action" onclick="App.navigate('scr-join')">ВХОД ПО ID</button>
-            
-            <button class="btn-action btn-secondary" onclick="App.showExitConfirm()">ВЫХОД</button>
-        </div>
+        if room.add_player(player):
+            self.user_rooms[user_id] = room_code
+            return True
+        return False
+    
+    def leave_room(self, user_id: int) -> Optional[str]:
+        if user_id in self.user_rooms:
+            room_code = self.user_rooms[user_id]
+            room = self.rooms.get(room_code)
+            if room:
+                room.remove_player(user_id)
+                if not room.players:
+                    del self.rooms[room_code]
+                del self.user_rooms[user_id]
+                return room_code
+        return None
+    
+    def get_room_by_user(self, user_id: int) -> Optional[GameRoom]:
+        room_code = self.user_rooms.get(user_id)
+        if room_code:
+            return self.rooms.get(room_code)
+        return None
+    
+    def start_game(self, room_code: str) -> bool:
+        room = self.rooms.get(room_code)
+        if room and len(room.players) >= 2 and room.state == GameState.WAITING:
+            room.state = GameState.PLAYING
+            room.started_at = datetime.now()
+            # Перемешиваем порядок игроков
+            random.shuffle(room.players)
+            room.players[0].is_turn = True
+            self.statistics['games_played'] += 1
+            return True
+        return False
 
-        <!-- ЭКРАН 2: ВВОД ID -->
-        <div id="scr-join" class="screen">
-            <h2 class="title-neon-white">ВВЕДИТЕ ID</h2>
-            
-            <div class="id-input-container">
-                <div class="id-digit-box" id="d1">_</div>
-                <div class="id-digit-box" id="d2">_</div>
-                <div class="id-digit-box" id="d3">_</div>
-                <div class="id-digit-box" id="d4">_</div>
-                <div class="id-hyphen">-</div>
-                <div class="id-digit-box" id="d5">_</div>
-                <div class="id-digit-box" id="d6">_</div>
-                <div class="id-digit-box" id="d7">_</div>
-                <div class="id-digit-box" id="d8">_</div>
-            </div>
+# ==================== ЛОГИКА YAHTZEE ====================
+class YahtzeeLogic:
+    @staticmethod
+    def roll_dice() -> int:
+        return random.randint(1, 6)
+    
+    @staticmethod
+    def calculate_score(dice: List[int], category: str) -> Tuple[int, List[str]]:
+        """Подсчет очков с бонусами и достижениями"""
+        dice.sort()
+        counts = Counter(dice)
+        achievements = []
+        
+        # Проверка на Яхтзи
+        is_yahtzee = len(set(dice)) == 1
+        
+        # Проверка на стриты
+        is_small_straight = any(set(range(i, i+4)).issubset(set(dice)) for i in range(1, 4))
+        is_large_straight = set(dice) in [{1,2,3,4,5}, {2,3,4,5,6}]
+        
+        if category == 'ones':
+            score = counts[1] * 1
+        elif category == 'twos':
+            score = counts[2] * 2
+        elif category == 'threes':
+            score = counts[3] * 3
+        elif category == 'fours':
+            score = counts[4] * 4
+        elif category == 'fives':
+            score = counts[5] * 5
+        elif category == 'sixes':
+            score = counts[6] * 6
+        elif category == 'three_of_a_kind':
+            if any(count >= 3 for count in counts.values()):
+                score = sum(dice)
+                if max(counts.values()) >= 4:
+                    achievements.append("Бонус: Почти каре!")
+            else:
+                score = 0
+        elif category == 'four_of_a_kind':
+            if any(count >= 4 for count in counts.values()):
+                score = sum(dice)
+                if is_yahtzee:
+                    achievements.append("ВАУ! Яхтзи как каре!")
+            else:
+                score = 0
+        elif category == 'full_house':
+            if sorted(counts.values()) == [2, 3]:
+                score = 25
+                if is_yahtzee:
+                    score = 35  # Бонус за Яхтзи как фулл-хаус
+                    achievements.append("Мега бонус: Яхтзи как фулл-хаус!")
+            else:
+                score = 0
+        elif category == 'small_straight':
+            if is_small_straight:
+                score = 30
+                if is_large_straight:
+                    achievements.append("У вас большой стрит!")
+            else:
+                score = 0
+        elif category == 'large_straight':
+            if is_large_straight:
+                score = 40
+                achievements.append("Идеальный стрит!")
+            else:
+                score = 0
+        elif category == 'yahtzee':
+            if is_yahtzee:
+                score = 50
+                achievements.append(f"{FIRE_EMOJI} ЯХТЗИ! {FIRE_EMOJI}")
+            else:
+                score = 0
+        elif category == 'chance':
+            score = sum(dice)
+            if score >= 25:
+                achievements.append("Отличный шанс!")
+        else:
+            score = 0
+        
+        # Дополнительные проверки для достижений
+        if is_yahtzee and category != 'yahtzee':
+            achievements.append("Бонусный Яхтзи!")
+        
+        if sum(dice) == 30 and category == 'chance':
+            achievements.append("Идеальные 30 очков!")
+        
+        return score, achievements
+    
+    @staticmethod
+    def calculate_upper_bonus(scorecard: Dict) -> Tuple[int, bool]:
+        upper_total = sum(scorecard[cat] or 0 for cat in 
+                         ['ones', 'twos', 'threes', 'fours', 'fives', 'sixes'])
+        has_bonus = upper_total >= 63
+        bonus = 35 if has_bonus else 0
+        return bonus, has_bonus
+    
+    @staticmethod
+    def get_available_categories(scorecard: Dict) -> List[str]:
+        return [cat for cat in scorecard.keys() 
+                if scorecard[cat] is None 
+                and cat not in ['upper_bonus', 'yahtzee_bonus']]
+    
+    @staticmethod
+    def format_dice_display(dice: List[int], kept: List[bool]) -> str:
+        display = []
+        for i, die in enumerate(dice):
+            status = LOCK_EMOJI if kept[i] else UNLOCK_EMOJI
+            emoji = DICE_EMOJIS[die-1] if 1 <= die <= 6 else '❓'
+            display.append(f"{status}{emoji}")
+        return " ".join(display)
+    
+    @staticmethod
+    def create_dice_animation(dice_values: List[int]) -> str:
+        """Создает ASCII анимацию броска кубиков"""
+        frames = []
+        for _ in range(5):
+            frame = []
+            for val in dice_values:
+                # ASCII представление кубика
+                if val == 1:
+                    frame.append("┌───┐\n│ ● │\n└───┘")
+                elif val == 2:
+                    frame.append("┌───┐\n│● ●│\n└───┘")
+                elif val == 3:
+                    frame.append("┌───┐\n│● ●│\n│ ● │\n└───┘")
+                elif val == 4:
+                    frame.append("┌───┐\n│● ●│\n│● ●│\n└───┘")
+                elif val == 5:
+                    frame.append("┌───┐\n│● ●│\n│ ● │\n│● ●│\n└───┘")
+                elif val == 6:
+                    frame.append("┌───┐\n│● ●│\n│● ●│\n│● ●│\n└───┘")
+                else:
+                    frame.append("┌───┐\n│ ? │\n└───┘")
+            frames.append("   ".join(frame))
+        return "\n\n".join(frames)
 
-            <div class="numpad-container">
-                <div class="numpad-grid">
-                    <button class="n-key" onclick="App.pressKey('1')">1</button>
-                    <button class="n-key" onclick="App.pressKey('2')">2</button>
-                    <button class="n-key" onclick="App.pressKey('3')">3</button>
-                    <button class="n-key" onclick="App.pressKey('4')">4</button>
-                    <button class="n-key" onclick="App.pressKey('5')">5</button>
-                    <button class="n-key" onclick="App.pressKey('6')">6</button>
-                    <button class="n-key" onclick="App.pressKey('7')">7</button>
-                    <button class="n-key" onclick="App.pressKey('8')">8</button>
-                    <button class="n-key" onclick="App.pressKey('9')">9</button>
-                    <button class="n-key" style="color:var(--neon-red)" onclick="App.pressKey('C')">C</button>
-                    <button class="n-key" onclick="App.pressKey('0')">0</button>
-                    <button class="n-key" style="color:var(--neon-gold)" onclick="App.joinByCode()">OK</button>
-                </div>
-            </div>
-
-            <button class="btn-action btn-secondary" onclick="App.navigate('scr-menu')">НАЗАД</button>
-        </div>
-
-        <!-- ЭКРАН 3: НАСТРОЙКА ЛОББИ -->
-        <div id="scr-lobby" class="screen">
-            <h2 class="lobby-title">НАСТРОЙКА ЛОББИ</h2>
-
-            <div class="user-identity-card">
-                <div class="avatar-frame" id="my-ava"></div>
-                <div class="username-label" id="my-tag">@player</div>
-            </div>
-
-            <div class="settings-row">
-                <span style="font-family:'Exo 2'; font-size:16px; color:#fff">УЧАСТНИКИ</span>
-                <div class="control-group">
-                    <button class="circle-btn" onclick="App.updateSettings('p', -1)">-</button>
-                    <span class="value-display" id="p-count">4</span>
-                    <button class="circle-btn" onclick="App.updateSettings('p', 1)">+</button>
-                </div>
-            </div>
-
-            <div class="settings-row red-theme">
-                <span style="font-family:'Exo 2'; font-size:16px; color:#fff">ШПИОН</span>
-                <div class="control-group">
-                    <button class="circle-btn red-btn" onclick="App.updateSettings('s', -1)">-</button>
-                    <span class="value-display" id="s-count">1</span>
-                    <button class="circle-btn red-btn" onclick="App.updateSettings('s', 1)">+</button>
-                </div>
-            </div>
-
-            <button class="btn-create-lobby" onclick="App.createFinalRoom()">СОЗДАТЬ КОМНАТУ</button>
-            
-            <button class="btn-action btn-secondary" onclick="App.navigate('scr-menu')">НАЗАД</button>
-        </div>
-
-        <!-- ЭКРАН 4: АКТИВНАЯ КОМНАТА -->
-        <div id="scr-room" class="screen">
-            <h2 class="lobby-title" style="margin-bottom:5px">КОМНАТА ИГРЫ</h2>
-            <div class="room-id-display-main" id="room-id-val">ID: 0000-0000</div>
-
-            <div class="players-scroll-area" id="room-slots">
-                <!-- Слоты игроков будут здесь -->
-            </div>
-
-            <div class="room-controls-box">
-                <button class="btn-action btn-ready-toggle" id="ready-btn" onclick="App.toggleReady()">ГОТОВ</button>
-                <button class="btn-action" id="start-btn" onclick="App.startGame()">НАЧАТЬ ИГРУ</button>
-                <button class="btn-action btn-secondary" style="margin-top:10px" onclick="App.showLeaveConfirm()">ПОКИНУТЬ</button>
-            </div>
-        </div>
-
-        <!-- ЭКРАН 5: ИГРА (КАРТЫ БРАВЛЕРОВ) -->
-        <div id="scr-game" class="screen">
-            <h2 class="game-title">ВАША РОЛЬ</h2>
-            <div class="role-reveal" id="role-reveal-text">Нажмите на карту, чтобы узнать свою роль</div>
-
-            <div class="card-container">
-                <div class="card" id="role-card" onclick="Game.revealCard()">
-                    <div class="card-front">
-                        <!-- УБРАНА ИКОНКА, ТОЛЬКО ТЕКСТ -->
-                        <div class="big-card-text">BRAWL SPY</div>
-                    </div>
-                    <div class="card-back" id="card-back">
-                        <!-- ТОЛЬКО КРУПНЫЙ ТЕКСТ БЕЗ ИКОНОК -->
-                        <div class="big-card-text" id="role-text">Загрузка...</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="game-controls-single">
-                <button class="btn-action btn-continue" id="continue-btn" onclick="Game.continueToVoting()" style="display: none;">ПРОДОЛЖИТЬ</button>
-            </div>
-        </div>
-
-        <!-- ЭКРАН 6: ГОЛОСОВАНИЕ -->
-        <div id="scr-voting" class="screen">
-            <h2 class="voting-title">ТАЙМЕР</h2> <!-- Изменено с ГОЛОСОВАНИЕ -->
-            <div class="voting-timer" id="voting-timer">10:00</div> <!-- 10 минут -->
-            <div class="voting-instruction">Выберите игрока, которого считаете шпионом</div>
-
-            <div class="voting-players" id="voting-players">
-                <!-- Список игроков для голосования -->
-            </div>
-
-            <div class="voting-controls">
-                <button class="btn-action btn-confirm-vote" onclick="Game.submitVote()">ПОДТВЕРДИТЬ ВЫБОР</button>
-                <button class="btn-action btn-back" onclick="Game.cancelVoting()">НАЗАД</button> <!-- Изменено с ОТМЕНА -->
-                <button class="btn-action btn-exit" onclick="Game.showExitConfirm()">ВЫХОД</button> <!-- Новая кнопка -->
-            </div>
-        </div>
-
-    </div>
-
-    <script>
-        // ИНИЦИАЛИЗАЦИЯ TELEGRAM
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.enableClosingConfirmation();
-
-        // ========== FIREBASE КОНФИГУРАЦИЯ ==========
-        const firebaseConfig = {
-            apiKey: "AIzaSyDbopGDAnN6RxiXoAk_Il90WZBCW0bVBvg",
-            authDomain: "brawlspy.firebaseapp.com",
-            databaseURL: "https://brawlspy-default-rtdb.firebaseio.com",
-            projectId: "brawlspy",
-            storageBucket: "brawlspy.firebasestorage.app",
-            messagingSenderId: "803859610634",
-            appId: "1:803859610634:web:2310aa16bb6e61049833f3",
-            measurementId: "G-6B5WV279QC"
-        };
-
-        // Инициализация Firebase
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-
-        // БАЗА БРАВЛЕРОВ С РАБОЧИМИ ССЫЛКАМИ
-        const brawlersList = [
-            { name: "ШЕЛЛИ", image: "https://brawlstats.com/characters/shelly.png" },
-            { name: "КОЛЬТ", image: "https://brawlstats.com/characters/colt.png" },
-            { name: "НИТА", image: "https://brawlstats.com/characters/nita.png" },
-            { name: "БУЛЛ", image: "https://brawlstats.com/characters/bull.png" },
-            { name: "ДЖЕССИ", image: "https://brawlstats.com/characters/jessie.png" },
-            { name: "БРОК", image: "https://brawlstats.com/characters/brock.png" },
-            { name: "ДИНАМАЙК", image: "https://brawlstats.com/characters/dynamike.png" },
-            { name: "БО", image: "https://brawlstats.com/characters/bo.png" },
-            { name: "ТИК", image: "https://brawlstats.com/characters/tick.png" },
-            { name: "8-БИТ", image: "https://brawlstats.com/characters/8-bit.png" },
-            { name: "ЭМЗ", image: "https://brawlstats.com/characters/emz.png" },
-            { name: "СТА", image: "https://brawlstats.com/characters/stu.png" },
-            { name: "ПАМ", image: "https://brawlstats.com/characters/pam.png" },
-            { name: "ПАЙПЕР", image: "https://brawlstats.com/characters/piper.png" },
-            { name: "ФРЕНК", image: "https://brawlstats.com/characters/frank.png" },
-            { name: "ПЕННИ", image: "https://brawlstats.com/characters/penny.png" },
-            { name: "КАРЛ", image: "https://brawlstats.com/characters/carl.png" },
-            { name: "ДЖЕКИ", image: "https://brawlstats.com/characters/jacky.png" },
-            { name: "ГЕЙЛ", image: "https://brawlstats.com/characters/gale.png" },
-            { name: "СПРАУТ", image: "https://brawlstats.com/characters/sprout.png" },
-            { name: "БАЙРОН", image: "https://brawlstats.com/characters/byron.png" },
-            { name: "ЭДГАР", image: "https://brawlstats.com/characters/edgar.png" },
-            { name: "ГРИФФ", image: "https://brawlstats.com/characters/griff.png" },
-            { name: "ГРОМ", image: "https://brawlstats.com/characters/grom.png" }
-        ];
-
-        // СИСТЕМА МОДАЛЬНЫХ ОКОН
-        const Modal = {
-            currentAction: null,
-            
-            showConfirm: (message, callback) => {
-                document.getElementById('confirm-message').innerText = message;
-                Modal.currentAction = callback;
-                document.getElementById('confirm-modal').classList.add('active');
-                tg.HapticFeedback.impactOccurred('medium');
-            },
-            
-            showAlert: (title, message, showId = false, roomId = '') => {
-                document.getElementById('alert-title').innerText = title;
-                
-                if (showId && roomId) {
-                    document.getElementById('alert-message').innerHTML = 
-                        `<div class="room-created-message">${message}</div>
-                         <div class="room-id-display">${roomId}</div>`;
-                } else {
-                    document.getElementById('alert-message').innerText = message;
-                }
-                
-                document.getElementById('alert-modal').classList.add('active');
-                tg.HapticFeedback.impactOccurred('light');
-            },
-            
-            hide: () => {
-                document.getElementById('confirm-modal').classList.remove('active');
-                document.getElementById('alert-modal').classList.remove('active');
-                Modal.currentAction = null;
-                tg.HapticFeedback.selectionChanged();
-            },
-            
-            confirmAction: () => {
-                if (Modal.currentAction) {
-                    Modal.currentAction();
-                }
-                Modal.hide();
-            }
-        };
-
-        // ГЕНЕРАЦИЯ РАНДОМНОГО ID (ТОЛЬКО ЦИФРЫ)
-        function generateRandomId() {
-            let result = '';
-            for (let i = 0; i < 8; i++) {
-                result += Math.floor(Math.random() * 10);
-                if (i === 3) result += '-';
-            }
-            return result;
+# ==================== КЛАВИАТУРЫ ====================
+class KeyboardFactory:
+    @staticmethod
+    def main_menu() -> InlineKeyboardMarkup:
+        keyboard = [
+            [
+                InlineKeyboardButton(f"{ROCKET_EMOJI} СОЗДАТЬ КОМНАТУ", callback_data="create_room"),
+                InlineKeyboardButton(f"🔗 ПРИСОЕДИНИТЬСЯ", callback_data="join_room")
+            ],
+            [
+                InlineKeyboardButton(f"🎮 БЫСТРАЯ ИГРА", callback_data="quick_play"),
+                InlineKeyboardButton(f"🤖 ИГРАТЬ С БОТОМ", callback_data="play_bot")
+            ],
+            [
+                InlineKeyboardButton(f"📊 РЕЙТИНГ", callback_data="leaderboard"),
+                InlineKeyboardButton(f"🏆 ДОСТИЖЕНИЯ", callback_data="achievements")
+            ],
+            [
+                InlineKeyboardButton(f"❓ ПОМОЩЬ", callback_data="help"),
+                InlineKeyboardButton(f"⚙️ НАСТРОЙКИ", callback_data="settings")
+            ],
+            [
+                InlineKeyboardButton(f"💎 ПРЕМИУМ", callback_data="premium"),
+                InlineKeyboardButton(f"👨‍💻 РАЗРАБОТЧИК", url="https://github.com/yourusername")
+            ]
+        ]
+        return InlineKeyboardMarkup(keyboard)
+    
+    @staticmethod
+    def room_management(room_code: str, is_host: bool, player_count: int) -> InlineKeyboardMarkup:
+        keyboard = []
+        
+        if is_host:
+            keyboard.append([
+                InlineKeyboardButton(f"{ROCKET_EMOJI} НАЧАТЬ ИГРУ ({player_count}/6)", 
+                                   callback_data=f"start_{room_code}")
+            ])
+        
+        keyboard.extend([
+            [
+                InlineKeyboardButton(f"👥 ИГРОКИ ({player_count})", callback_data=f"players_{room_code}"),
+                InlineKeyboardButton(f"📋 ПРАВИЛА", callback_data="rules")
+            ],
+            [
+                InlineKeyboardButton(f"🔗 КОПИРОВАТЬ КОД", 
+                                   callback_data=f"copy_{room_code}"),
+                InlineKeyboardButton(f"🎵 ЗВУКИ: ВКЛ", callback_data="toggle_sounds")
+            ],
+            [
+                InlineKeyboardButton(f"🚪 ВЫЙТИ", callback_data="leave_room"),
+                InlineKeyboardButton(f"🏠 ГЛАВНАЯ", callback_data="main_menu")
+            ]
+        ])
+        
+        return InlineKeyboardMarkup(keyboard)
+    
+    @staticmethod
+    def dice_keyboard(dice: List[int], kept: List[bool], rolls_left: int, 
+                     can_choose: bool = False) -> InlineKeyboardMarkup:
+        keyboard = []
+        
+        # Кубики в две строки
+        row1, row2 = [], []
+        for i in range(5):
+            status = LOCK_EMOJI if kept[i] else UNLOCK_EMOJI
+            emoji = DICE_EMOJIS[dice[i]-1] if dice[i] > 0 else '❓'
+            btn = InlineKeyboardButton(
+                f"{status}{emoji}",
+                callback_data=f"toggle_{i}"
+            )
+            if i < 3:
+                row1.append(btn)
+            else:
+                row2.append(btn)
+        
+        keyboard.append(row1)
+        keyboard.append(row2)
+        
+        # Кнопки действий
+        action_row = []
+        if rolls_left > 0:
+            action_row.append(InlineKeyboardButton(
+                f"🎲 БРОСИТЬ ({rolls_left})",
+                callback_data="roll"
+            ))
+        
+        if can_choose:
+            action_row.append(InlineKeyboardButton(
+                f"📋 ВЫБРАТЬ КОМБИНАЦИЮ",
+                callback_data="choose"
+            ))
+        
+        if action_row:
+            keyboard.append(action_row)
+        
+        # Дополнительные кнопки
+        keyboard.append([
+            InlineKeyboardButton(f"📊 ТАБЛИЦА", callback_data="scores"),
+            InlineKeyboardButton(f"⏱ ТАЙМЕР", callback_data="timer"),
+            InlineKeyboardButton(f"🔍 ПОДСКАЗКА", callback_data="hint")
+        ])
+        
+        return InlineKeyboardMarkup(keyboard)
+    
+    @staticmethod
+    def categories_keyboard(available_categories: List[str], dice: List[int]) -> InlineKeyboardMarkup:
+        keyboard = []
+        logic = YahtzeeLogic()
+        
+        for i in range(0, len(available_categories), 2):
+            row = []
+            for j in range(2):
+                if i + j < len(available_categories):
+                    cat = available_categories[i + j]
+                    score, _ = logic.calculate_score(dice, cat)
+                    name = KeyboardFactory.get_category_name(cat)
+                    emoji = KeyboardFactory.get_category_emoji(cat)
+                    row.append(InlineKeyboardButton(
+                        f"{emoji} {name}: {score}",
+                        callback_data=f"cat_{cat}"
+                    ))
+            if row:
+                keyboard.append(row)
+        
+        keyboard.append([
+            InlineKeyboardButton("↩️ НАЗАД К БРОСКУ", callback_data="back"),
+            InlineKeyboardButton("🎲 СЛУЧАЙНЫЙ ВЫБОР", callback_data="random")
+        ])
+        
+        return InlineKeyboardMarkup(keyboard)
+    
+    @staticmethod
+    def get_category_name(category: str) -> str:
+        names = {
+            'ones': 'Единицы', 'twos': 'Двойки', 'threes': 'Тройки',
+            'fours': 'Четверки', 'fives': 'Пятерки', 'sixes': 'Шестерки',
+            'three_of_a_kind': 'Тройка', 'four_of_a_kind': 'Каре',
+            'full_house': 'Фулл-хаус', 'small_straight': 'Малый стрит',
+            'large_straight': 'Большой стрит', 'yahtzee': 'Яхтзи',
+            'chance': 'Шанс'
         }
-
-        // ГЕНЕРАЦИЯ УНИКАЛЬНОГО ID ИГРОКА
-        function generatePlayerId() {
-            return 'player_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        return names.get(category, category)
+    
+    @staticmethod
+    def get_category_emoji(category: str) -> str:
+        emojis = {
+            'ones': '1️⃣', 'twos': '2️⃣', 'threes': '3️⃣',
+            'fours': '4️⃣', 'fives': '5️⃣', 'sixes': '6️⃣',
+            'three_of_a_kind': '🎲', 'four_of_a_kind': '4️⃣🎲',
+            'full_house': '🏠', 'small_straight': '📏',
+            'large_straight': '📐', 'yahtzee': FIRE_EMOJI,
+            'chance': '🎯'
         }
+        return emojis.get(category, '📊')
+    
+    @staticmethod
+    def game_over_keyboard(room_code: str) -> InlineKeyboardMarkup:
+        keyboard = [
+            [
+                InlineKeyboardButton(f"{PARTY_EMOJI} НОВАЯ ИГРА", callback_data=f"rematch_{room_code}"),
+                InlineKeyboardButton(f"👥 ТА ЖЕ КОМНАТА", callback_data=f"same_room_{room_code}")
+            ],
+            [
+                InlineKeyboardButton(f"📊 СТАТИСТИКА", callback_data=f"stats_{room_code}"),
+                InlineKeyboardButton(f"💾 СОХРАНИТЬ РЕЗУЛЬТАТ", callback_data="save_result")
+            ],
+            [
+                InlineKeyboardButton(f"🏠 ГЛАВНАЯ", callback_data="main_menu"),
+                InlineKeyboardButton(f"🎮 ЕЩЕ ИГРАТЬ", callback_data="play_again")
+            ]
+        ]
+        return InlineKeyboardMarkup(keyboard)
 
-        // ========== FIREBASE HELPERS ==========
-        const FirebaseManager = {
-            // Слушатель изменений в комнате
-            roomListener: null,
+# ==================== АНИМАЦИИ И ГРАФИКА ====================
+class Animations:
+    @staticmethod
+    async def send_rolling_animation(update: Update, context: ContextTypes.DEFAULT_TYPE, 
+                                   chat_id: int, message_id: int = None):
+        """Отправляет анимацию броска кубиков"""
+        rolling_text = "🎲 Кубики катятся...\n"
+        for i in range(3):
+            rolling_text += f"{DICE_EMOJIS[random.randint(0, 5)]} "
+            if message_id:
+                try:
+                    await context.bot.edit_message_text(
+                        chat_id=chat_id,
+                        message_id=message_id,
+                        text=rolling_text
+                    )
+                except:
+                    pass
+            await asyncio.sleep(0.3)
+    
+    @staticmethod
+    def create_scorecard_image(player: Player) -> str:
+        """Создает текстовое представление карточки в виде ASCII-арта"""
+        lines = []
+        
+        # Верхняя часть карточки
+        lines.append("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┓")
+        lines.append("┃        🎯 КАРТОЧКА       ┃")
+        lines.append("┣━━━━━━━━━━━━━━━━━━━━━━━━━━━┫")
+        
+        # Верхняя секция
+        lines.append("┃   ┌─── ВЕРХ ───┐         ┃")
+        upper_cats = ['ones', 'twos', 'threes', 'fours', 'fives', 'sixes']
+        upper_total = 0
+        
+        for cat in upper_cats:
+            score = player.scorecard[cat]
+            name = KeyboardFactory.get_category_name(cat)[:8]
+            score_str = f"{score:3}" if score is not None else "  -"
+            lines.append(f"┃   │ {name:<8} → {score_str} │ ┃")
+            if score:
+                upper_total += score
+        
+        # Бонус верхней секции
+        bonus, has_bonus = YahtzeeLogic.calculate_upper_bonus(player.scorecard)
+        bonus_str = f"{bonus:3}" if has_bonus else "  -"
+        lines.append(f"┃   │ БОНUS   → {bonus_str} │ ┃")
+        lines.append("┃   └────────────┘         ┃")
+        
+        # Нижняя секция
+        lines.append("┃   ┌─── НИЗ ────┐         ┃")
+        lower_cats = ['three_of_a_kind', 'four_of_a_kind', 'full_house',
+                     'small_straight', 'large_straight', 'yahtzee', 'chance']
+        
+        for cat in lower_cats:
+            score = player.scorecard[cat]
+            name = KeyboardFactory.get_category_name(cat)[:8]
+            score_str = f"{score:3}" if score is not None else "  -"
+            lines.append(f"┃   │ {name:<8} → {score_str} │ ┃")
+        
+        # Бонусы Яхтзи
+        yahtzee_bonus = player.scorecard.get('yahtzee_bonus', 0)
+        if yahtzee_bonus:
+            lines.append(f"┃   │ YAHTZEE+ → {yahtzee_bonus:3} │ ┃")
+        
+        lines.append("┃   └────────────┘         ┃")
+        lines.append("┣━━━━━━━━━━━━━━━━━━━━━━━━━━━┫")
+        
+        # Итог
+        total = player.total_score
+        lines.append(f"┃     🏆 ИТОГО: {total:4}       ┃")
+        lines.append("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━┛")
+        
+        return "\n".join(lines)
+
+# ==================== ГЛОБАЛЬНЫЕ МЕНЕДЖЕРЫ ====================
+game_manager = GameManager()
+logic = YahtzeeLogic()
+
+# ==================== ОСНОВНЫЕ ХЕНДЛЕРЫ ====================
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Обработчик команды /start"""
+    user = update.effective_user
+    
+    # Создаем красивую ASCII-арт заголовок
+    title = """
+╔══════════════════════════════════════╗
+║       🎲 Y A H T Z E E 🎲           ║
+║    Телеграм версия с мультиплеером  ║
+╚══════════════════════════════════════╝
+    """
+    
+    welcome_text = f"""
+{title}
+
+👋 Привет, <b>{user.first_name}</b>!
+
+🎯 <b>Yahtzee</b> — классическая игра в кости, где нужно составлять комбинации из 5 кубиков и набирать максимальные очки.
+
+✨ <b>Особенности этой версии:</b>
+• 🎮 Онлайн-мультиплеер до 6 игроков
+• ⚡ Игра в реальном времени
+• 🏆 Система достижений и рейтинга
+• 💫 Красивые анимации и эффекты
+• 🤖 Игра против ИИ-бота
+• 📊 Детальная статистика
+
+🚀 <b>Начните играть прямо сейчас!</b>
+"""
+    
+    # Отправляем стикер или GIF приветствия
+    try:
+        await update.message.reply_sticker(
+            "CAACAgIAAxkBAAIBVmZ7vj8vA6MAAVgqAAHg9r4O6L-vEiwAAgkAA8A2TxP_AAHjOpJI3qY0BA"
+        )
+    except:
+        pass
+    
+    await update.message.reply_text(
+        welcome_text,
+        parse_mode='HTML',
+        reply_markup=KeyboardFactory.main_menu()
+    )
+
+async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Главное меню"""
+    query = update.callback_query
+    await query.answer()
+    
+    await query.edit_message_text(
+        "🎲 <b>ГЛАВНОЕ МЕНЮ YAHTZEE</b> 🎲\n\n"
+        "Выберите действие:",
+        parse_mode='HTML',
+        reply_markup=KeyboardFactory.main_menu()
+    )
+
+async def create_room_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Создание комнаты"""
+    query = update.callback_query
+    await query.answer()
+    
+    user = update.effective_user
+    player = Player(user.id, user.username or "", user.first_name)
+    
+    room_code = game_manager.create_room(player)
+    
+    room_text = f"""
+{CROWN_EMOJI} <b>КОМНАТА СОЗДАНА!</b> {CROWN_EMOJI}
+
+📌 <b>КОД КОМНАТЫ:</b> <code>{room_code}</code>
+
+👑 <b>Создатель:</b> {user.first_name}
+👥 <b>Игроков:</b> 1/6
+🕐 <b>Создана:</b> {datetime.now().strftime('%H:%M:%S')}
+
+<i>Пригласите друзей, отправив им код комнаты!</i>
+
+<b>Действия:</b>
+1. Отправьте код друзьям
+2. Дождитесь присоединения
+3. Нажмите "НАЧАТЬ ИГРУ"
+"""
+    
+    await query.edit_message_text(
+        room_text,
+        parse_mode='HTML',
+        reply_markup=KeyboardFactory.room_management(room_code, True, 1)
+    )
+
+async def join_room_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Присоединение к комнате"""
+    query = update.callback_query
+    await query.answer()
+    
+    await query.edit_message_text(
+        "🔗 <b>ПРИСОЕДИНЕНИЕ К КОМНАТЕ</b>\n\n"
+        "Введите 6-значный код комнаты:\n"
+        "<i>Пример: ABC123 или 456XYZ</i>",
+        parse_mode='HTML',
+        reply_markup=InlineKeyboardMarkup([[
+            InlineKeyboardButton("🔙 НАЗАД", callback_data="main_menu")
+        ]])
+    )
+    
+    context.user_data['awaiting_room_code'] = True
+
+async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Обработка текстовых сообщений"""
+    if context.user_data.get('awaiting_room_code'):
+        room_code = update.message.text.upper().strip()
+        user = update.effective_user
+        
+        if len(room_code) != 6 or not room_code.isalnum():
+            await update.message.reply_text(
+                "❌ <b>Неверный формат кода!</b>\n"
+                "Код должен состоять из 6 символов (буквы и цифры).\n"
+                "Попробуйте еще раз:",
+                parse_mode='HTML'
+            )
+            return
+        
+        player = Player(user.id, user.username or "", user.first_name)
+        
+        if game_manager.join_room(user.id, room_code, player):
+            room = game_manager.get_room_by_user(user.id)
+            players_list = "\n".join([
+                f"{i+1}. {p.first_name} {'👑' if p.id == room.creator_id else ''}"
+                for i, p in enumerate(room.players)
+            ])
             
-            // Создать комнату
-            createRoom: async (roomId, roomData) => {
-                try {
-                    await database.ref('rooms/' + roomId).set(roomData);
-                    return true;
-                } catch (error) {
-                    console.error('Ошибка создания комнаты:', error);
-                    return false;
-                }
-            },
+            success_text = f"""
+✅ <b>ВЫ ПРИСОЕДИНИЛИСЬ К КОМНАТЕ!</b>
+
+📌 <b>КОД:</b> <code>{room_code}</code>
+👥 <b>Игроков:</b> {len(room.players)}/6
+
+<b>Список игроков:</b>
+{players_list}
+
+{'⏳ Ожидание начала игры...' if len(room.players) < 6 else '🎮 Комната заполнена!'}
+"""
             
-            // Получить комнату
-            getRoom: async (roomId) => {
-                try {
-                    const snapshot = await database.ref('rooms/' + roomId).once('value');
-                    return snapshot.val();
-                } catch (error) {
-                    console.error('Ошибка получения комнаты:', error);
-                    return null;
-                }
-            },
+            await update.message.reply_text(
+                success_text,
+                parse_mode='HTML',
+                reply_markup=KeyboardFactory.room_management(
+                    room_code, 
+                    user.id == room.creator_id,
+                    len(room.players)
+                )
+            )
             
-            // Добавить игрока в комнату
-            addPlayerToRoom: async (roomId, playerData) => {
-                try {
-                    const room = await FirebaseManager.getRoom(roomId);
-                    if (!room) return false;
-                    
-                    if (room.players && Object.keys(room.players).length >= room.maxPlayers) {
-                        return false; // Комната заполнена
-                    }
-                    
-                    const playerId = playerData.id;
-                    await database.ref('rooms/' + roomId + '/players/' + playerId).set(playerData);
-                    return true;
-                } catch (error) {
-                    console.error('Ошибка добавления игрока:', error);
-                    return false;
-                }
-            },
+            # Уведомляем других игроков
+            for p in room.players:
+                if p.id != user.id:
+                    try:
+                        await context.bot.send_message(
+                            chat_id=p.id,
+                            text=f"👤 <b>{user.first_name}</b> присоединился к игре!",
+                            parse_mode='HTML'
+                        )
+                    except:
+                        pass
+        else:
+            await update.message.reply_text(
+                "❌ <b>Не удалось присоединиться!</b>\n"
+                "Возможные причины:\n"
+                "• Комната не существует\n"
+                "• Комната уже заполнена\n"
+                "• Игра уже началась\n"
+                "• Вы уже в этой комнате",
+                parse_mode='HTML'
+            )
+        
+        context.user_data['awaiting_room_code'] = False
+    else:
+        # Обработка других текстовых команд
+        text = update.message.text.lower()
+        
+        if text in ['правила', 'rules', 'help']:
+            await help_command(update, context)
+        elif text in ['статистика', 'stats']:
+            await stats_command(update, context)
+        elif text in ['рейтинг', 'top']:
+            await leaderboard_handler(update, context)
+        else:
+            await update.message.reply_text(
+                "Используйте кнопки меню для навигации 😊"
+            )
+
+async def start_game_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Начало игры в комнате"""
+    query = update.callback_query
+    await query.answer()
+    
+    room_code = query.data.split("_")[1]
+    
+    if game_manager.start_game(room_code):
+        room = game_manager.rooms[room_code]
+        
+        # Отправляем стартовое сообщение всем игрокам
+        start_text = f"""
+🎮 <b>ИГРА НАЧИНАЕТСЯ!</b> 🎮
+
+📌 <b>Комната:</b> <code>{room_code}</code>
+👥 <b>Игроков:</b> {len(room.players)}
+🔄 <b>Порядок хода:</b>
+
+""" + "\n".join([f"{i+1}. {p.first_name}" for i, p in enumerate(room.players)])
+        
+        for player in room.players:
+            try:
+                if player.is_turn:
+                    # Первому игроку - интерфейс броска
+                    await context.bot.send_message(
+                        chat_id=player.id,
+                        text=f"{ROCKET_EMOJI} <b>ВАШ ХОД!</b> {ROCKET_EMOJI}\n\n"
+                             f"Вы ходите первым.\n"
+                             f"Раунд: <b>1/{room.max_rounds}</b>\n\n"
+                             f"🎲 <b>Бросьте кубики:</b>",
+                        parse_mode='HTML',
+                        reply_markup=KeyboardFactory.dice_keyboard(
+                            [0, 0, 0, 0, 0],
+                            [False, False, False, False, False],
+                            3
+                        )
+                    )
+                else:
+                    # Остальным - информация
+                    await context.bot.send_message(
+                        chat_id=player.id,
+                        text=start_text + f"\n\n⏳ <b>Сейчас ходит:</b> {room.current_player.first_name}",
+                        parse_mode='HTML'
+                    )
+            except Exception as e:
+                logger.error(f"Ошибка отправки сообщения: {e}")
+    else:
+        await query.answer("Не удалось начать игру!", show_alert=True)
+
+async def dice_interaction_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Обработчик взаимодействия с кубиками"""
+    query = update.callback_query
+    await query.answer()
+    
+    user = update.effective_user
+    data = query.data
+    
+    room = game_manager.get_room_by_user(user.id)
+    if not room or room.state != GameState.PLAYING:
+        await query.answer("Игра не активна!", show_alert=True)
+        return
+    
+    player = next((p for p in room.players if p.id == user.id), None)
+    if not player or not player.is_turn:
+        await query.answer("Не ваш ход!", show_alert=True)
+        return
+    
+    if data == "roll":
+        if player.rolls_left <= 0:
+            await query.answer("Бросков не осталось!", show_alert=True)
+            return
+        
+        # Анимация броска
+        await Animations.send_rolling_animation(update, context, query.message.chat_id, query.message.message_id)
+        
+        # Бросок кубиков
+        for i in range(5):
+            if not player.kept_dice[i]:
+                player.dice[i] = logic.roll_dice()
+        
+        player.rolls_left -= 1
+        player.last_roll_time = datetime.now()
+        
+        # Проверка на Яхтзи
+        if len(set(player.dice)) == 1 and not player.has_yahtzee:
+            player.has_yahtzee = True
+            player.scorecard['yahtzee_bonus'] += 100
+            await query.answer(f"{FIRE_EMOJI} ЯХТЗИ! +100 бонусных очков! {FIRE_EMOJI}", show_alert=True)
+        
+        # Обновляем сообщение
+        dice_display = logic.format_dice_display(player.dice, player.kept_dice)
+        
+        message_text = f"""
+🎲 <b>БРОСОК КУБИКОВ</b> 🎲
+
+{dice_display}
+
+<b>Раунд:</b> {room.round}/{room.max_rounds}
+<b>Бросков осталось:</b> {player.rolls_left}
+<b>Сумма кубиков:</b> {sum(player.dice)}
+
+{'✅ Можно выбирать комбинацию!' if player.rolls_left == 0 else '🔄 Можно бросать еще'}
+"""
+        
+        await query.edit_message_text(
+            message_text,
+            parse_mode='HTML',
+            reply_markup=KeyboardFactory.dice_keyboard(
+                player.dice,
+                player.kept_dice,
+                player.rolls_left,
+                can_choose=(player.rolls_left == 0)
+            )
+        )
+    
+    elif data.startswith("toggle_"):
+        index = int(data.split("_")[1])
+        if 0 <= index < 5:
+            player.kept_dice[index] = not player.kept_dice[index]
             
-            // Удалить игрока из комнаты
-            removePlayerFromRoom: async (roomId, playerId) => {
-                try {
-                    await database.ref('rooms/' + roomId + '/players/' + playerId).remove();
-                    
-                    // Проверяем, остались ли игроки в комнате
-                    const room = await FirebaseManager.getRoom(roomId);
-                    if (room && (!room.players || Object.keys(room.players).length === 0)) {
-                        // Удаляем комнату если пустая
-                        await database.ref('rooms/' + roomId).remove();
-                    }
-                    return true;
-                } catch (error) {
-                    console.error('Ошибка удаления игрока:', error);
-                    return false;
-                }
-            },
+            # Обновляем клавиатуру
+            await query.edit_message_reply_markup(
+                reply_markup=KeyboardFactory.dice_keyboard(
+                    player.dice,
+                    player.kept_dice,
+                    player.rolls_left,
+                    can_choose=(player.rolls_left == 0)
+                )
+            )
+    
+    elif data == "choose":
+        if player.rolls_left == 3:
+            await query.answer("Сначала сделайте хотя бы один бросок!", show_alert=True)
+            return
+        
+        available = logic.get_available_categories(player.scorecard)
+        
+        if not available:
+            await query.answer("Все категории уже заполнены!", show_alert=True)
+            return
+        
+        await query.edit_message_text(
+            f"📋 <b>ВЫБЕРИТЕ КАТЕГОРИЮ</b>\n\n"
+            f"Ваши кубики: {logic.format_dice_display(player.dice, player.kept_dice)}\n"
+            f"Сумма: <b>{sum(player.dice)}</b>\n\n"
+            f"Доступные категории:",
+            parse_mode='HTML',
+            reply_markup=KeyboardFactory.categories_keyboard(available, player.dice)
+        )
+    
+    elif data == "back":
+        # Возврат к броску
+        dice_display = logic.format_dice_display(player.dice, player.kept_dice)
+        await query.edit_message_text(
+            f"🎲 <b>ПРОДОЛЖАЕМ БРОСОК</b>\n\n{dice_display}",
+            parse_mode='HTML',
+            reply_markup=KeyboardFactory.dice_keyboard(
+                player.dice,
+                player.kept_dice,
+                player.rolls_left,
+                can_choose=(player.rolls_left == 0)
+            )
+        )
+    
+    elif data == "scores":
+        await show_scoreboard(update, context, room)
+    
+    elif data == "hint":
+        await give_hint(update, context, player)
+
+async def category_selection_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Обработка выбора категории"""
+    query = update.callback_query
+    await query.answer()
+    
+    user = update.effective_user
+    data = query.data
+    
+    if data == "random":
+        # Случайный выбор категории
+        room = game_manager.get_room_by_user(user.id)
+        if room:
+            player = next((p for p in room.players if p.id == user.id), None)
+            if player:
+                available = logic.get_available_categories(player.scorecard)
+                if available:
+                    category = random.choice(available)
+                    data = f"cat_{category}"
+                else:
+                    await query.answer("Нет доступных категорий!", show_alert=True)
+                    return
+    
+    if data.startswith("cat_"):
+        category = data[4:]
+        
+        room = game_manager.get_room_by_user(user.id)
+        if not room:
+            return
+        
+        player = next((p for p in room.players if p.id == user.id), None)
+        if not player or not player.is_turn:
+            return
+        
+        # Подсчет очков
+        score, achievements = logic.calculate_score(player.dice, category)
+        
+        # Обновляем карточку игрока
+        player.scorecard[category] = score
+        
+        # Пересчитываем общий счет
+        bonus, has_bonus = logic.calculate_upper_bonus(player.scorecard)
+        if has_bonus and player.scorecard['upper_bonus'] is None:
+            player.scorecard['upper_bonus'] = bonus
+        
+        # Считаем общую сумму
+        total = sum(v for v in player.scorecard.values() if isinstance(v, (int, float)) and v is not None)
+        player.total_score = total
+        
+        # Создаем красивую карточку
+        scorecard_text = Animations.create_scorecard_image(player)
+        
+        # Формируем сообщение о результате
+        result_text = f"""
+{PARTY_EMOJI} <b>ХОД ЗАВЕРШЕН!</b> {PARTY_EMOJI}
+
+🎯 <b>Категория:</b> {KeyboardFactory.get_category_name(category)}
+🎲 <b>Кубики:</b> {logic.format_dice_display(player.dice, player.kept_dice)}
+🏆 <b>Очки за ход:</b> <code>{score}</code>
+💰 <b>Общий счет:</b> <code>{player.total_score}</code>
+
+{scorecard_text}
+"""
+        
+        # Добавляем достижения если есть
+        if achievements:
+            result_text += f"\n✨ <b>Достижения:</b>\n" + "\n".join(achievements)
+        
+        await query.edit_message_text(
+            result_text,
+            parse_mode='HTML'
+        )
+        
+        # Передаем ход следующему игроку
+        await end_turn(update, context, room, player)
+
+async def end_turn(update: Update, context: ContextTypes.DEFAULT_TYPE, room: GameRoom, player: Player):
+    """Завершение хода и передача очереди"""
+    # Сбрасываем состояние игрока
+    player.dice = [0, 0, 0, 0, 0]
+    player.kept_dice = [False, False, False, False, False]
+    player.rolls_left = 3
+    player.is_turn = False
+    
+    # Проверяем, не закончилась ли игра
+    if room.is_game_over():
+        await end_game(update, context, room)
+        return
+    
+    # Передаем ход следующему игроку
+    next_player = room.next_turn()
+    next_player.is_turn = True
+    
+    # Уведомляем игроков
+    turn_text = f"""
+🔄 <b>ХОД ПЕРЕДАН</b>
+
+🎯 {player.first_name} → {next_player.first_name}
+📊 Очки за ход: {player.scorecard.get(list(player.scorecard.keys())[-1])}
+"""
+    
+    # Отправляем уведомление о смене хода всем
+    for p in room.players:
+        try:
+            if p.id == next_player.id:
+                # Новому игроку - интерфейс броска
+                await context.bot.send_message(
+                    chat_id=p.id,
+                    text=f"{ROCKET_EMOJI} <b>ВАШ ХОД!</b> {ROCKET_EMOJI}\n\n"
+                         f"Раунд: <b>{room.round}/{room.max_rounds}</b>\n"
+                         f"Ваш счет: <b>{p.total_score}</b>\n\n"
+                         f"🎲 <b>Бросьте кубики:</b>",
+                    parse_mode='HTML',
+                    reply_markup=KeyboardFactory.dice_keyboard(
+                        [0, 0, 0, 0, 0],
+                        [False, False, False, False, False],
+                        3
+                    )
+                )
+            elif p.id != player.id:
+                # Остальным - уведомление
+                await context.bot.send_message(
+                    chat_id=p.id,
+                    text=turn_text + f"\n\n⏳ <b>Сейчас ходит:</b> {next_player.first_name}",
+                    parse_mode='HTML'
+                )
+        except Exception as e:
+            logger.error(f"Ошибка отправки уведомления: {e}")
+    
+    # Отправляем обновленную таблицу
+    await show_scoreboard_to_all(room, context)
+
+async def end_game(update: Update, context: ContextTypes.DEFAULT_TYPE, room: GameRoom):
+    """Завершение игры с красивым подсчетом"""
+    room.state = GameState.FINISHED
+    
+    # Сортируем игроков по очкам
+    sorted_players = room.get_sorted_players()
+    
+    # Создаем красивый финальный результат
+    final_text = f"""
+{CONFETTI_EMOJI} {CONFETTI_EMOJI} <b>ИГРА ЗАВЕРШЕНА!</b> {CONFETTI_EMOJI} {CONFETTI_EMOJI}
+
+🏁 <b>ФИНАЛЬНЫЕ РЕЗУЛЬТАТЫ</b> 🏁
+
+📊 <b>Общая статистика игры:</b>
+• Длительность: {(datetime.now() - room.started_at).seconds // 60} мин
+• Всего бросков: {sum(13 - p.rolls_left for p in room.players)}
+• Сыграно раундов: {room.round - 1}
+"""
+    
+    # Добавляем места игроков с анимацией
+    for i, player in enumerate(sorted_players):
+        medal = MEDALS[i] if i < len(MEDALS) else "🎖"
+        final_text += f"\n{medal} <b>{player.first_name}</b>\n"
+        final_text += f"   🏆 Итоговый счет: <code>{player.total_score}</code>\n"
+        
+        # Особые достижения
+        if player.has_yahtzee:
+            final_text += f"   {FIRE_EMOJI} Сделал Яхтзи!\n"
+        if player.total_score >= 300:
+            final_text += f"   {STAR_EMOJI} Отличный результат!\n"
+        if player.total_score == max(p.total_score for p in room.players):
+            final_text += f"   {CROWN_EMOJI} <b>ПОБЕДИТЕЛЬ!</b>\n"
+    
+    # Добавляем ASCII-арт победителя
+    winner = sorted_players[0]
+    final_text += f"""
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃                           ┃
+┃        {CROWN_EMOJI} ПОБЕДИТЕЛЬ {CROWN_EMOJI}       ┃
+┃                           ┃
+┃        {winner.first_name:<15}     ┃
+┃        Счет: {winner.total_score:4}         ┃
+┃                           ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+🎉 <b>Поздравляем {winner.first_name} с победой!</b> 🎉
+
+<i>Спасибо всем за игру! Надеемся, вам понравилось!</i>
+"""
+    
+    # Отправляем финальные результаты всем игрокам
+    for player in room.players:
+        try:
+            # Отправляем стикер победы
+            await context.bot.send_sticker(
+                chat_id=player.id,
+                sticker="CAACAgIAAxkBAAIBWWZ7vj9G7a-4qMCLKFOcKYVZ4pD_AAIJAAPANk8Teoxc9nz3W8Q0BA"
+            )
             
-            // Обновить готовность игрока
-            updatePlayerReady: async (roomId, playerId, isReady) => {
-                try {
-                    await database.ref('rooms/' + roomId + '/players/' + playerId + '/isReady').set(isReady);
-                    return true;
-                } catch (error) {
-                    console.error('Ошибка обновления готовности:', error);
-                    return false;
-                }
-            },
-            
-            // Начать игру
-            startGameInRoom: async (roomId, gameData) => {
-                try {
-                    await database.ref('rooms/' + roomId + '/gameStarted').set(true);
-                    await database.ref('rooms/' + roomId + '/gameData').set(gameData);
-                    return true;
-                } catch (error) {
-                    console.error('Ошибка начала игры:', error);
-                    return false;
-                }
-            },
-            
-            // Слушать изменения в комнате
-            listenToRoom: (roomId, callback) => {
-                // Удаляем предыдущий слушатель
-                if (FirebaseManager.roomListener) {
-                    FirebaseManager.roomListener();
-                }
-                
-                FirebaseManager.roomListener = database.ref('rooms/' + roomId).on('value', (snapshot) => {
-                    const room = snapshot.val();
-                    callback(room);
-                });
-            },
-            
-            // Остановить прослушивание
-            stopListening: () => {
-                if (FirebaseManager.roomListener) {
-                    FirebaseManager.roomListener();
-                    FirebaseManager.roomListener = null;
-                }
-            }
-        };
-
-        // ОСНОВНОЕ ПРИЛОЖЕНИЕ
-        const App = {
-            state: {
-                currentScreen: 'scr-menu',
-                inputCode: '',
-                participants: 4,
-                spies: 1,
-                lobbyId: generateRandomId(),
-                isReady: false,
-                isAdmin: true,
-                playerId: generatePlayerId(),
-                currentRoomId: null,
-                username: '',
-                photoUrl: ''
-            },
-
-            // Навигация
-            navigate: (screenId) => {
-                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-                const target = document.getElementById(screenId);
-                target.classList.add('active');
-                App.state.currentScreen = screenId;
-                
-                if(screenId === 'scr-room') {
-                    App.buildRoom();
-                }
-                
-                // Обновляем кнопку "Начать игру"
-                const startBtn = document.getElementById('start-btn');
-                if (screenId === 'scr-room') {
-                    startBtn.style.display = App.state.isAdmin ? 'block' : 'none';
-                } else {
-                    startBtn.style.display = 'none';
-                }
-                
-                tg.HapticFeedback.impactOccurred('light');
-            },
-
-            // Подтверждение выхода
-            showExitConfirm: () => {
-                Modal.showConfirm(
-                    "Вы уверены, что хотите выйти из игры?",
-                    () => {
-                        // Выходим из комнаты если находимся в ней
-                        if (App.state.currentRoomId) {
-                            FirebaseManager.removePlayerFromRoom(App.state.currentRoomId, App.state.playerId);
-                            FirebaseManager.stopListening();
-                        }
-                        tg.close();
-                    }
-                );
-            },
-
-            // Подтверждение выхода из комнаты
-            showLeaveConfirm: () => {
-                Modal.showConfirm(
-                    "Вы уверены, что хотите покинуть комнату?",
-                    () => {
-                        // Выходим из комнаты
-                        if (App.state.currentRoomId) {
-                            FirebaseManager.removePlayerFromRoom(App.state.currentRoomId, App.state.playerId);
-                            FirebaseManager.stopListening();
-                            App.state.currentRoomId = null;
-                        }
-                        App.navigate('scr-menu');
-                    }
-                );
-            },
-
-            // Ввод кода
-            pressKey: (key) => {
-                if(key === 'C') {
-                    App.state.inputCode = '';
-                } else if(App.state.inputCode.length < 8 && /^[0-9]$/.test(key)) {
-                    App.state.inputCode += key;
-                }
-                
-                for(let i = 1; i <= 8; i++) {
-                    const char = App.state.inputCode[i-1] || "_";
-                    const el = document.getElementById('d' + i);
-                    el.innerText = char;
-                    el.style.opacity = char === "_" ? "0.3" : "1";
-                    el.style.color = char === "_" ? "#666" : "#ffffff";
-                }
-                tg.HapticFeedback.selectionChanged();
-            },
-
-            // Подключение по коду
-            joinByCode: async () => {
-                if(App.state.inputCode.length === 8 && /^\d+$/.test(App.state.inputCode)) {
-                    const roomId = App.state.inputCode.slice(0,4) + "-" + App.state.inputCode.slice(4,8);
-                    
-                    // Проверяем существование комнаты в Firebase
-                    const room = await FirebaseManager.getRoom(roomId);
-                    
-                    if (!room) {
-                        Modal.showAlert("ОШИБКА", "Комната не найдена");
-                        tg.HapticFeedback.notificationOccurred('error');
-                        return;
-                    }
-                    
-                    // Проверяем заполненность комнаты
-                    const playerCount = room.players ? Object.keys(room.players).length : 0;
-                    if (playerCount >= room.maxPlayers) {
-                        Modal.showAlert("ОШИБКА", "Извините, комната заполнена");
-                        tg.HapticFeedback.notificationOccurred('error');
-                        return;
-                    }
-                    
-                    // Присоединяемся к комнате
-                    App.state.lobbyId = roomId;
-                    App.state.currentRoomId = roomId;
-                    App.state.isAdmin = false;
-                    App.state.participants = room.maxPlayers;
-                    App.state.spies = room.spies;
-                    
-                    // Добавляем игрока в комнату
-                    const playerData = {
-                        id: App.state.playerId,
-                        username: App.state.username || 'Игрок',
-                        photo_url: App.state.photoUrl || '',
-                        isReady: false,
-                        isAdmin: false
-                    };
-                    
-                    const success = await FirebaseManager.addPlayerToRoom(roomId, playerData);
-                    if (!success) {
-                        Modal.showAlert("ОШИБКА", "Не удалось присоединиться к комнате");
-                        return;
-                    }
-                    
-                    // Начинаем слушать изменения в комнате
-                    FirebaseManager.listenToRoom(roomId, (room) => {
-                        if (room) {
-                            App.state.participants = room.maxPlayers;
-                            App.state.spies = room.spies;
-                            App.buildRoom();
-                            
-                            // Если игра началась
-                            if (room.gameStarted && App.state.currentScreen === 'scr-room') {
-                                Game.initializeGame(Object.values(room.players || {}), room.spies);
-                                App.navigate('scr-game');
-                            }
-                        } else {
-                            // Комната удалена
-                            Modal.showAlert("ИНФО", "Комната была удалена");
-                            FirebaseManager.stopListening();
-                            App.navigate('scr-menu');
-                        }
-                    });
-                    
-                    App.navigate('scr-room');
-                    Modal.showAlert("УСПЕХ", "Вы присоединились к комнате!");
-                } else {
-                    Modal.showAlert("ОШИБКА", "Введите 8 цифр");
-                    tg.HapticFeedback.notificationOccurred('error');
-                }
-            },
-
-            // Настройки лобби
-            updateSettings: (type, delta) => {
-                if(type === 'p') {
-                    App.state.participants = Math.max(2, Math.min(8, App.state.participants + delta));
-                    document.getElementById('p-count').innerText = App.state.participants;
-                } else {
-                    App.state.spies = Math.max(1, Math.min(3, App.state.spies + delta));
-                    document.getElementById('s-count').innerText = App.state.spies;
-                }
-                tg.HapticFeedback.selectionChanged();
-            },
-
-            // Создание финальной комнаты
-            createFinalRoom: async () => {
-                App.state.isAdmin = true;
-                App.state.lobbyId = generateRandomId();
-                App.state.currentRoomId = App.state.lobbyId;
-                
-                // Создаем комнату в Firebase
-                const roomData = {
-                    maxPlayers: App.state.participants,
-                    spies: App.state.spies,
-                    players: {
-                        [App.state.playerId]: {
-                            id: App.state.playerId,
-                            username: App.state.username || 'Хост',
-                            photo_url: App.state.photoUrl || '',
-                            isReady: false,
-                            isAdmin: true
-                        }
-                    },
-                    gameStarted: false,
-                    createdAt: Date.now()
-                };
-                
-                const success = await FirebaseManager.createRoom(App.state.lobbyId, roomData);
-                if (!success) {
-                    Modal.showAlert("ОШИБКА", "Не удалось создать комнату");
-                    return;
-                }
-                
-                // Начинаем слушать изменения в комнате
-                FirebaseManager.listenToRoom(App.state.lobbyId, (room) => {
-                    if (room) {
-                        App.buildRoom();
-                        
-                        // Если игра началась
-                        if (room.gameStarted && App.state.currentScreen === 'scr-room') {
-                            Game.initializeGame(Object.values(room.players || {}), room.spies);
-                            App.navigate('scr-game');
-                        }
-                    } else {
-                        // Комната удалена
-                        Modal.showAlert("ИНФО", "Комната была удалена");
-                        FirebaseManager.stopListening();
-                        App.navigate('scr-menu');
-                    }
-                });
-                
-                App.navigate('scr-room');
-                Modal.showAlert("УСПЕХ", "Комната создана!", true, "ID: " + App.state.lobbyId);
-            },
-
-            // Логика комнаты
-            buildRoom: () => {
-                if (!App.state.currentRoomId) return;
-                
-                // Получаем комнату из Firebase
-                FirebaseManager.getRoom(App.state.currentRoomId).then(room => {
-                    if (!room) {
-                        // Если комнаты нет, возвращаем в меню
-                        App.navigate('scr-menu');
-                        return;
-                    }
-                    
-                    document.getElementById('room-id-val').innerText = "ID: " + App.state.currentRoomId;
-                    const container = document.getElementById('room-slots');
-                    container.innerHTML = '';
-
-                    // Обновляем настройки из комнаты
-                    App.state.participants = room.maxPlayers;
-                    App.state.spies = room.spies;
-
-                    // Проверяем готовность всех игроков
-                    let allReady = true;
-                    let myReadyStatus = false;
-                    const players = room.players ? Object.values(room.players) : [];
-
-                    // Отображаем всех игроков в комнате
-                    players.forEach((player, index) => {
-                        const isMe = player.id === App.state.playerId;
-                        
-                        if (isMe) {
-                            myReadyStatus = player.isReady || false;
-                            App.state.isReady = myReadyStatus;
-                        }
-                        
-                        if (!player.isReady) {
-                            allReady = false;
-                        }
-
-                        const card = document.createElement('div');
-                        card.className = `player-slot-card occupied`;
-                        
-                        card.innerHTML = `
-                            <div class="slot-info">
-                                <div class="slot-ava" style="${player.photo_url ? 'background-image:url('+player.photo_url+')' : ''}"></div>
-                                <div class="slot-name">${player.username || 'Игрок ' + (index+1)} ${player.isAdmin ? '👑' : ''}</div>
-                            </div>
-                            <div class="status-indicator ${player.isReady ? 'status-ready' : 'status-not-ready'}">
-                                ${player.isReady ? 'ГОТОВ' : 'НЕ ГОТОВ'}
-                            </div>
-                        `;
-                        container.appendChild(card);
-                    });
-
-                    // Добавляем пустые слоты если нужно
-                    for(let i = players.length; i < room.maxPlayers; i++) {
-                        const card = document.createElement('div');
-                        card.className = `player-slot-card`;
-                        
-                        card.innerHTML = `
-                            <div class="slot-info">
-                                <div class="slot-ava"></div>
-                                <div class="slot-name">Свободно</div>
-                            </div>
-                            <div class="status-indicator status-empty">
-                                НЕТ
-                            </div>
-                        `;
-                        container.appendChild(card);
-                    }
-
-                    // Обновляем кнопку готовности
-                    const btn = document.getElementById('ready-btn');
-                    btn.innerText = myReadyStatus ? 'НЕ ГОТОВ' : 'ГОТОВ';
-                    btn.classList.toggle('active-ready', myReadyStatus);
-
-                    // Показываем кнопку "Начать игру" только если все готовы и я админ
-                    const startBtn = document.getElementById('start-btn');
-                    startBtn.style.display = (allReady && App.state.isAdmin && players.length >= 2) ? 'block' : 'none';
-                });
-            },
-
-            // Переключение готовности
-            toggleReady: async () => {
-                if (!App.state.currentRoomId) return;
-                
-                App.state.isReady = !App.state.isReady;
-                const btn = document.getElementById('ready-btn');
-                btn.innerText = App.state.isReady ? 'НЕ ГОТОВ' : 'ГОТОВ';
-                btn.classList.toggle('active-ready', App.state.isReady);
-                
-                // Обновляем в Firebase
-                await FirebaseManager.updatePlayerReady(App.state.currentRoomId, App.state.playerId, App.state.isReady);
-                
-                tg.HapticFeedback.notificationOccurred('success');
-            },
-
-            // Начать игру (проверка всех игроков)
-            startGame: async () => {
-                if (!App.state.currentRoomId) return;
-                
-                const room = await FirebaseManager.getRoom(App.state.currentRoomId);
-                if (!room) return;
-
-                const players = room.players ? Object.values(room.players) : [];
-
-                // Проверяем, все ли игроки готовы
-                const allReady = players.every(p => p.isReady);
-                if (!allReady) {
-                    Modal.showAlert("ОЖИДАНИЕ", "Не все игроки готовы!");
-                    tg.HapticFeedback.notificationOccurred('warning');
-                    return;
-                }
-
-                // Проверяем минимальное количество игроков
-                if (players.length < 2) {
-                    Modal.showAlert("ОШИБКА", "Нужно минимум 2 игрока!");
-                    tg.HapticFeedback.notificationOccurred('error');
-                    return;
-                }
-
-                // Создаем данные игры
-                const gameData = {
-                    players: players,
-                    spies: room.spies,
-                    startedAt: Date.now()
-                };
-
-                // Обновляем комнату в Firebase
-                await database.ref('rooms/' + App.state.currentRoomId + '/gameStarted').set(true);
-                await database.ref('rooms/' + App.state.currentRoomId + '/gameData').set(gameData);
-
-                // Переходим к игре
-                Game.initializeGame(players, room.spies);
-                App.navigate('scr-game');
-                tg.HapticFeedback.notificationOccurred('success');
-            }
-        };
-
-        // СИСТЕМА ИГРЫ
-        const Game = {
-            myRole: null,
-            myBrawler: null,
-            isCardRevealed: false,
-            votingTimer: null,
-            timeLeft: 600,
-            selectedPlayer: null,
-            votes: {},
-            allPlayers: [],
-            spiesCount: 1,
-
-            // Инициализация игры
-            initializeGame: (players, spiesCount) => {
-                Game.allPlayers = players;
-                Game.spiesCount = spiesCount;
-                Game.isCardRevealed = false;
-                Game.timeLeft = 600;
-                Game.selectedPlayer = null;
-                Game.votes = {};
-
-                // Показываем текст "Нажмите на карту..."
-                document.getElementById('role-reveal-text').textContent = "Нажмите на карту, чтобы узнать свою роль";
-                document.getElementById('role-reveal-text').style.display = 'block';
-
-                // Скрываем кнопку ПРОДОЛЖИТЬ
-                document.getElementById('continue-btn').style.display = 'none';
-
-                // Определяем роль (шпион или бравлер)
-                const playerIndex = Game.allPlayers.findIndex(p => p.id === App.state.playerId);
-                const isSpy = Math.random() < (Game.spiesCount / Game.allPlayers.length);
-                Game.myRole = isSpy ? 'SPY' : 'BRAWLER';
-
-                // Если бравлер - выбираем случайного из списка
-                if (!isSpy) {
-                    const randomIndex = Math.floor(Math.random() * brawlersList.length);
-                    Game.myBrawler = brawlersList[randomIndex];
-                } else {
-                    Game.myBrawler = null;
-                }
-
-                // Сбрасываем карту
-                const card = document.getElementById('role-card');
-                card.classList.remove('flipped');
-                
-                // Сбрасываем заднюю сторону карты
-                const cardBack = document.getElementById('card-back');
-                cardBack.classList.remove('spy-card');
-                
-                // Сбрасываем текст
-                document.getElementById('role-text').textContent = 'Загрузка...';
-            },
-
-            // Раскрытие карты
-            revealCard: () => {
-                if (Game.isCardRevealed) return;
-
-                const card = document.getElementById('role-card');
-                const cardBack = document.getElementById('card-back');
-                const roleText = document.getElementById('role-text');
-                const continueBtn = document.getElementById('continue-btn');
-                const instructionText = document.getElementById('role-reveal-text');
-
-                // Убираем текст "Нажмите на карту..."
-                instructionText.style.display = 'none';
-
-                // Анимация переворота
-                card.classList.add('flipped');
-
-                // Устанавливаем данные в зависимости от роли
-                if (Game.myRole === 'SPY') {
-                    // ШПИОН - красный сияющий неон
-                    roleText.textContent = "ШПИОН";
-                    roleText.style.color = "#ff3131";
-                    roleText.style.textShadow = "0 0 25px #ff3131";
-                    // Добавляем стиль для карты шпиона
-                    cardBack.classList.add('spy-card');
-                } else {
-                    // БРАВЛЕР
-                    roleText.textContent = Game.myBrawler.name;
-                    roleText.style.color = "#ffffff";
-                    roleText.style.textShadow = "0 0 25px #ffffff";
-                }
-
-                Game.isCardRevealed = true;
-                
-                // Показываем кнопку ПРОДОЛЖИТЬ
-                setTimeout(() => {
-                    continueBtn.style.display = 'block';
-                }, 500);
-                
-                tg.HapticFeedback.impactOccurred('heavy');
-            },
-
-            // Продолжить к голосованию
-            continueToVoting: () => {
-                if (!Game.isCardRevealed) {
-                    Modal.showAlert("ВНИМАНИЕ", "Сначала откройте свою карту!");
-                    return;
-                }
-                
-                Game.initializeVoting();
-                App.navigate('scr-voting');
-            },
-
-            // Инициализация голосования
-            initializeVoting: () => {
-                Game.timeLeft = 600; // 10 минут
-                Game.selectedPlayer = null;
-                Game.votes = {};
-
-                // Обновляем таймер
-                const minutes = Math.floor(Game.timeLeft / 60);
-                const seconds = Game.timeLeft % 60;
-                document.getElementById('voting-timer').textContent = 
-                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-                // Создаем список игроков для голосования
-                const container = document.getElementById('voting-players');
-                container.innerHTML = '';
-
-                Game.allPlayers.forEach((player, index) => {
-                    const isMe = player.id === App.state.playerId;
-                    const playerName = isMe ? 'Вы' : (player.username || `Игрок ${index+1}`);
-                    
-                    const playerCard = document.createElement('div');
-                    playerCard.className = 'voting-player-card';
-                    playerCard.dataset.playerId = player.id;
-                    playerCard.onclick = () => Game.selectPlayer(player.id);
-
-                    playerCard.innerHTML = `
-                        <div class="slot-info">
-                            <div class="slot-ava" style="${player.photo_url ? 'background-image:url('+player.photo_url+')' : ''}"></div>
-                            <div class="slot-name">${playerName}</div>
-                        </div>
-                        <div class="vote-count" id="vote-count-${player.id}">0</div>
-                    `;
-
-                    container.appendChild(playerCard);
-                    Game.votes[player.id] = 0;
-                });
-
-                // Запускаем таймер
-                Game.startVotingTimer();
-            },
-
-            // Выбор игрока для голосования
-            selectPlayer: (playerId) => {
-                // Снимаем выделение со всех карточек
-                document.querySelectorAll('.voting-player-card').forEach(card => {
-                    card.classList.remove('selected');
-                });
-
-                // Выделяем выбранную карточку
-                const selectedCard = document.querySelector(`[data-player-id="${playerId}"]`);
-                if (selectedCard) {
-                    selectedCard.classList.add('selected');
-                }
-
-                Game.selectedPlayer = playerId;
-                tg.HapticFeedback.selectionChanged();
-            },
-
-            // Подтверждение выбора
-            submitVote: () => {
-                if (Game.selectedPlayer === null) {
-                    Modal.showAlert("ОШИБКА", "Выберите игрока для голосования");
-                    return;
-                }
-
-                // В реальной игре здесь отправка голоса на сервер
-                Game.votes[Game.selectedPlayer]++;
-
-                // Обновляем счетчик голосов
-                const voteCountElement = document.getElementById(`vote-count-${Game.selectedPlayer}`);
-                if (voteCountElement) {
-                    voteCountElement.textContent = Game.votes[Game.selectedPlayer];
-                }
-
-                Modal.showAlert("ГОЛОС", "Ваш голос учтен!");
-                
-                // Через 2 секунды показываем результаты
-                setTimeout(() => {
-                    Game.showVotingResults();
-                }, 2000);
-            },
-
-            // Показать результаты голосования
-            showVotingResults: () => {
-                // Находим игрока с максимальным количеством голосов
-                let maxVotes = -1;
-                let spyPlayerId = null;
-
-                for (const [playerId, votes] of Object.entries(Game.votes)) {
-                    if (votes > maxVotes) {
-                        maxVotes = votes;
-                        spyPlayerId = playerId;
-                    }
-                }
-
-                // Показываем результат
-                const spyPlayer = Game.allPlayers.find(p => p.id === spyPlayerId);
-                const spyName = spyPlayer ? (spyPlayer.id === App.state.playerId ? 'Вы' : spyPlayer.username) : 'Неизвестно';
-                Modal.showAlert("РЕЗУЛЬТАТ", `Большинство голосов против: ${spyName}`);
-
-                // Через 3 секунды возвращаем в комнату
-                setTimeout(() => {
-                    // Сбрасываем игру в Firebase
-                    if (App.state.currentRoomId) {
-                        database.ref('rooms/' + App.state.currentRoomId + '/gameStarted').set(false);
-                        database.ref('rooms/' + App.state.currentRoomId + '/gameData').remove();
-                        
-                        // Сбрасываем готовность всех игроков
-                        Game.allPlayers.forEach(player => {
-                            database.ref('rooms/' + App.state.currentRoomId + '/players/' + player.id + '/isReady').set(false);
-                        });
-                    }
-                    
-                    App.state.isReady = false;
-                    App.navigate('scr-room');
-                }, 3000);
-
-                // Останавливаем таймер
-                clearInterval(Game.votingTimer);
-            },
-
-            // Таймер голосования
-            startVotingTimer: () => {
-                clearInterval(Game.votingTimer); // Очищаем предыдущий таймер
-                
-                Game.votingTimer = setInterval(() => {
-                    Game.timeLeft--;
-
-                    const minutes = Math.floor(Game.timeLeft / 60);
-                    const seconds = Game.timeLeft % 60;
-                    document.getElementById('voting-timer').textContent = 
-                        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
-                    if (Game.timeLeft <= 0) {
-                        clearInterval(Game.votingTimer);
-                        Game.showVotingResults();
-                    }
-                }, 1000);
-            },
-
-            // Отмена голосования (НАЗАД)
-            cancelVoting: () => {
-                Modal.showConfirm(
-                    "Вернуться к просмотру роли?",
-                    () => {
-                        clearInterval(Game.votingTimer);
-                        App.navigate('scr-game');
-                    }
-                );
-            },
-
-            // Подтверждение выхода из голосования
-            showExitConfirm: () => {
-                Modal.showConfirm(
-                    "Вы уверены, что хотите выйти из голосования?",
-                    () => {
-                        clearInterval(Game.votingTimer);
-                        // Выходим из комнаты
-                        if (App.state.currentRoomId) {
-                            FirebaseManager.removePlayerFromRoom(App.state.currentRoomId, App.state.playerId);
-                            FirebaseManager.stopListening();
-                            App.state.currentRoomId = null;
-                        }
-                        App.navigate('scr-menu');
-                    }
-                );
-            }
-        };
-
-        // Инициализация при загрузке
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Загружаем данные пользователя из Telegram
-            if(tg.initDataUnsafe.user) {
-                const user = tg.initDataUnsafe.user;
-                App.state.username = user.username || 'Игрок';
-                App.state.photoUrl = user.photo_url || '';
-                
-                document.getElementById('my-tag').innerText = "@" + App.state.username;
-                if(App.state.photoUrl) {
-                    document.getElementById('my-ava').style.backgroundImage = `url(${App.state.photoUrl})`;
-                }
-            }
-
-            // Проверяем подключение к Firebase
-            try {
-                // Простая проверка подключения
-                await database.ref('.info/connected').once('value');
-                console.log('Firebase подключен успешно!');
-            } catch (error) {
-                console.error('Ошибка подключения к Firebase:', error);
-                Modal.showAlert("ОШИБКА", "Проблемы с подключением к серверу");
-            }
-
-            App.navigate('scr-menu');
-        });
-    </script>
-</body>
-</html>
+            # Отправляем результаты
+            await context.bot.send_message(
+                chat_id=player.id,
+                text=final_text,
+                parse_mode='HTML',
+                reply_markup=KeyboardFactory.game_over_keyboard(room.code)
+            )
+        except Exception as e:
+            logger.error(f"Ошибка отправки финального сообщения: {e}")
+    
+    # Обновляем статистику
+    game_manager.statistics['highest_score'] = max(
+        game_manager.statistics['highest_score'],
+        winner.total_score
+    )
+    
+    # Очищаем комнату через 5 минут
+    asyncio.create_task(cleanup_room(room.code))
+
+async def cleanup_room(room_code: str):
+    """Очистка комнаты через время"""
+    await asyncio.sleep(300)  # 5 минут
+    if room_code in game_manager.rooms:
+        room = game_manager.rooms[room_code]
+        for player in room.players:
+            game_manager.user_rooms.pop(player.id, None)
+        game_manager.rooms.pop(room_code, None)
+
+async def show_scoreboard(update: Update, context: ContextTypes.DEFAULT_TYPE, room: GameRoom = None):
+    """Показ таблицы счета"""
+    query = update.callback_query
+    if query:
+        await query.answer()
+    
+    if not room:
+        user = update.effective_user
+        room = game_manager.get_room_by_user(user.id)
+        if not room:
+            return
+    
+    # Создаем красивую таблицу
+    scoreboard_text = f"""
+{TROPHY_EMOJI} <b>ТАБЛИЦА ЛИДЕРОВ</b> {TROPHY_EMOJI}
+
+Раунд: {room.round}/{room.max_rounds}
+Ходит: {room.current_player.first_name if room.current_player else '?'}
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Игрок              Счет      ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫
+"""
+    
+    sorted_players = sorted(room.players, key=lambda p: p.total_score, reverse=True)
+    
+    for i, player in enumerate(sorted_players):
+        medal = MEDALS[i] if i < len(MEDALS) else "  "
+        turn_indicator = "🎲" if player.is_turn else "  "
+        scoreboard_text += f"┃ {medal}{turn_indicator} {player.first_name:<15} {player.total_score:>6} ┃\n"
+    
+    scoreboard_text += "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
+    
+    if query:
+        await query.edit_message_text(
+            scoreboard_text,
+            parse_mode='HTML',
+            reply_markup=InlineKeyboardMarkup([[
+                InlineKeyboardButton("🔙 НАЗАД", callback_data="back")
+            ]])
+        )
+    else:
+        await update.message.reply_text(scoreboard_text, parse_mode='HTML')
+
+async def show_scoreboard_to_all(room: GameRoom, context: ContextTypes.DEFAULT_TYPE):
+    """Показ таблицы всем игрокам"""
+    scoreboard_text = f"""
+📊 <b>ОБНОВЛЕНИЕ ТАБЛИЦЫ</b>
+
+Раунд: {room.round}/{room.max_rounds}
+Текущий игрок: {room.current_player.first_name}
+
+"""
+    
+    sorted_players = sorted(room.players, key=lambda p: p.total_score, reverse=True)
+    
+    for i, player in enumerate(sorted_players):
+        medal = MEDALS[i] if i < len(MEDALS) else "  "
+        turn_indicator = "🎲" if player.is_turn else "  "
+        scoreboard_text += f"{medal}{turn_indicator} {player.first_name}: {player.total_score}\n"
+    
+    for player in room.players:
+        try:
+            await context.bot.send_message(
+                chat_id=player.id,
+                text=scoreboard_text,
+                parse_mode='HTML'
+            )
+        except:
+            pass
+
+async def give_hint(update: Update, context: ContextTypes.DEFAULT_TYPE, player: Player):
+    """Дает подсказку по наилучшей комбинации"""
+    query = update.callback_query
+    await query.answer()
+    
+    available = logic.get_available_categories(player.scorecard)
+    if not available:
+        await query.answer("Нет доступных категорий!", show_alert=True)
+        return
+    
+    # Находим лучшую комбинацию
+    best_score = -1
+    best_category = None
+    
+    for category in available:
+        score, _ = logic.calculate_score(player.dice, category)
+        if score > best_score:
+            best_score = score
+            best_category = category
+    
+    if best_category:
+        hint_text = f"""
+💡 <b>ПОДСКАЗКА</b>
+
+🎲 <b>Ваши кубики:</b> {logic.format_dice_display(player.dice, player.kept_dice)}
+🎯 <b>Лучшая комбинация:</b> {KeyboardFactory.get_category_name(best_category)}
+🏆 <b>Потенциальные очки:</b> {best_score}
+
+<i>Совет: попробуйте {'зафиксировать' if best_score > 20 else 'перебросить'} некоторые кубики</i>
+"""
+        
+        await query.answer(hint_text, show_alert=True)
+    else:
+        await query.answer("Не могу дать подсказку!", show_alert=True)
+
+async def leaderboard_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Глобальная таблица лидеров"""
+    query = update.callback_query
+    await query.answer()
+    
+    # В реальном приложении здесь была бы БД
+    leaderboard_text = f"""
+{TROPHY_EMOJI} <b>ГЛОБАЛЬНЫЙ РЕЙТИНГ</b> {TROPHY_EMOJI}
+
+🏆 <b>Лучшие игроки этого месяца:</b>
+
+🥇 Игрок 1: 425 очков
+🥈 Игрок 2: 398 очков
+🥉 Игрок 3: 387 очков
+4️⃣ Игрок 4: 365 очков
+5️⃣ Игрок 5: 342 очков
+
+📈 <b>Ваша статистика:</b>
+• Игр сыграно: {random.randint(1, 50)}
+• Лучший счет: {random.randint(200, 400)}
+• Средний счет: {random.randint(150, 250)}
+
+🔥 <b>Рекорд игры:</b> 450 очков
+"""
+    
+    await query.edit_message_text(
+        leaderboard_text,
+        parse_mode='HTML',
+        reply_markup=InlineKeyboardMarkup([[
+            InlineKeyboardButton("🔄 ОБНОВИТЬ", callback_data="leaderboard"),
+            InlineKeyboardButton("🏠 ГЛАВНАЯ", callback_data="main_menu")
+        ]])
+    )
+
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Команда помощи"""
+    if update.message:
+        chat_id = update.message.chat_id
+    else:
+        query = update.callback_query
+        await query.answer()
+        chat_id = query.message.chat_id
+    
+    help_text = f"""
+{STAR_EMOJI} <b>ПОМОЩЬ ПО ИГРЕ YAHTZEE</b> {STAR_EMOJI}
+
+🎯 <b>Цель игры:</b>
+Набрать максимальное количество очков за 13 раундов, заполняя карточку комбинациями из 5 кубиков.
+
+🔄 <b>Как играть:</b>
+1. Бросьте кубики (до 3 раз за ход)
+2. Зафиксируйте нужные кубики
+3. Выберите категорию для подсчета очков
+4. Передайте ход следующему игроку
+
+📋 <b>Категории очков:</b>
+
+<b>Верхняя секция (1-6):</b>
+• Сумма всех кубиков с указанным значением
+• Бонус +35 очков за сумму ≥63
+
+<b>Нижняя секция:</b>
+• <b>Тройка/Каре:</b> Сумма всех кубиков
+• <b>Фулл-хаус:</b> 25 очков (2+3 одинаковых)
+• <b>Стриты:</b> 30/40 очков (4/5 подряд)
+• <b>Яхтзи:</b> 50 очков (5 одинаковых)
+• <b>Шанс:</b> Сумма всех кубиков
+
+✨ <b>Особенности:</b>
+• Яхтзи можно использовать в любой категории
+• За каждый дополнительный Яхтзи +100 очков
+• Можно играть до 6 игроков онлайн
+
+🎮 <b>Управление:</b>
+• Нажмите на кубик, чтобы зафиксировать
+• Кнопка "🎲 БРОСИТЬ" - сделать бросок
+• Кнопка "📋 ВЫБРАТЬ" - выбрать категорию
+• Кнопка "🔍 ПОДСКАЗКА" - получить совет
+
+<b>Нужна дополнительная помощь?</b>
+Напишите разработчику: @yourusername
+"""
+    
+    if update.message:
+        await update.message.reply_text(help_text, parse_mode='HTML')
+    else:
+        query = update.callback_query
+        await query.edit_message_text(
+            help_text,
+            parse_mode='HTML',
+            reply_markup=InlineKeyboardMarkup([[
+                InlineKeyboardButton("🏠 ГЛАВНАЯ", callback_data="main_menu")
+            ]])
+        )
+
+async def stats_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Статистика бота"""
+    stats = game_manager.statistics
+    
+    stats_text = f"""
+📈 <b>СТАТИСТИКА БОТА</b>
+
+🎮 <b>Всего игр:</b> {stats['games_played']}
+🎲 <b>Всего бросков:</b> {stats['total_rolls']}
+{FIRE_EMOJI} <b>Яхтзи сделано:</b> {stats['yahtzees_made']}
+🏆 <b>Рекордный счет:</b> {stats['highest_score']}
+
+👥 <b>Сейчас онлайн:</b> {len(game_manager.user_rooms)} игроков
+🏠 <b>Активных комнат:</b> {len(game_manager.rooms)}
+
+⏰ <b>Бот работает:</b> 24/7
+🔧 <b>Версия:</b> 2.0.0
+"""
+    
+    await update.message.reply_text(stats_text, parse_mode='HTML')
+
+async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Обработчик ошибок"""
+    logger.error(f"Ошибка: {context.error}", exc_info=context.error)
+    
+    try:
+        if update and update.effective_chat:
+            await update.effective_chat.send_message(
+                "❌ Произошла ошибка. Пожалуйста, попробуйте еще раз.\n"
+                "Если ошибка повторяется, обратитесь к разработчику: @yourusername"
+            )
+    except:
+        pass
+
+async def set_commands(application: Application):
+    """Установка команд бота"""
+    commands = [
+        BotCommand("start", "Запустить бота"),
+        BotCommand("help", "Помощь по игре"),
+        BotCommand("stats", "Статистика бота"),
+        BotCommand("rules", "Правила игры"),
+        BotCommand("top", "Рейтинг игроков"),
+        BotCommand("create", "Создать комнату"),
+        BotCommand("join", "Присоединиться к комнате"),
+    ]
+    await application.bot.set_my_commands(commands)
+
+def main():
+    """Основная функция запуска бота"""
+    # Создаем Application с persistence для сохранения состояния
+    persistence = PicklePersistence(filepath='yahtzee_bot.pickle')
+    application = Application.builder()\
+        .token(BOT_TOKEN)\
+        .persistence(persistence)\
+        .build()
+    
+    # Устанавливаем команды
+    application.post_init = set_commands
+    
+    # Добавляем хендлеры
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("help", help_command))
+    application.add_handler(CommandHandler("stats", stats_command))
+    application.add_handler(CommandHandler("rules", help_command))
+    application.add_handler(CommandHandler("top", leaderboard_handler))
+    application.add_handler(CommandHandler("create", create_room_handler))
+    application.add_handler(CommandHandler("join", join_room_handler))
+    
+    # Callback query handlers
+    application.add_handler(CallbackQueryHandler(main_menu, pattern="^main_menu$"))
+    application.add_handler(CallbackQueryHandler(create_room_handler, pattern="^create_room$"))
+    application.add_handler(CallbackQueryHandler(join_room_handler, pattern="^join_room$"))
+    application.add_handler(CallbackQueryHandler(start_game_handler, pattern="^start_"))
+    application.add_handler(CallbackQueryHandler(dice_interaction_handler, pattern="^(roll|toggle_|choose|back|scores|hint)$"))
+    application.add_handler(CallbackQueryHandler(category_selection_handler, pattern="^(cat_|random)$"))
+    application.add_handler(CallbackQueryHandler(leaderboard_handler, pattern="^leaderboard$"))
+    application.add_handler(CallbackQueryHandler(help_command, pattern="^(help|rules)$"))
+    
+    # Обработчик текстовых сообщений
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
+    
+    # Обработчик ошибок
+    application.add_error_handler(error_handler)
+    
+    # Запускаем бота
+    logger.info("🎲 Бот Yahtzee запущен!")
+    print("""
+╔══════════════════════════════════════════╗
+║       YAHTZEE TELEGRAM BOT v2.0         ║
+║         Автор: @yourusername            ║
+║     GitHub: github.com/yourusername     ║
+╚══════════════════════════════════════════╝
+    """)
+    
+    # Запуск polling
+    application.run_polling(
+        allowed_updates=Update.ALL_UPDATES,
+        drop_pending_updates=True
+    )
+
+if __name__ == '__main__':
+    # Проверка токена
+    if BOT_TOKEN == "ВАШ_ТОКЕН_БОТА_ЗДЕСЬ":
+        print("❌ ОШИБКА: Замените BOT_TOKEN на ваш токен от @BotFather")
+        print("1. Напишите @BotFather в Telegram")
+        print("2. Создайте нового бота: /newbot")
+        print("3. Скопируйте токен и вставьте в код")
+        exit(1)
+    
+    main()
